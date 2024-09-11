@@ -11,6 +11,7 @@ Simulation, Open World, Action-Adventure
 Main inspiration: Untitled Goose Game
 Visual art: realism/semi-realism (somewhat realistic environment modeling, uses animation as transition between scenes, cartoon style of conversations boxes)
 - [Persona 5 Royal - PC Gameplay 4K60FPS](https://www.youtube.com/watch?v=mz0g9hxq7L8&t=296s)
+
 Music: Dave the Diver soundtrack (mostly instrumental, changes when switched to different parts of the map, gives various atmosphere) 
 - [Dave the Diver Original Soundtrack (Full)](https://www.youtube.com/watch?v=JBKhYkRc9u8&t=72s)
 
