@@ -9,6 +9,8 @@ import com.jme3.scene.shape.Box;
 import com.jme3.input.*;
 import com.jme3.input.controls.*;
 import com.jme3.math.Vector3f;
+import mygame.SquirrelControl;
+
 
 /**
  * This is the Main Class of your Game. 
@@ -40,23 +42,22 @@ public class Main extends SimpleApplication {
     
     @Override
     public void simpleInitApp() {
-        // Input mappings for movement and climbing
+        initializeSquirrelAndTree();
+
+        attachCenterMark();
+
+        //Leo: I added squirrel control here
+        SquirrelControl squirrelControl = new SquirrelControl(cam);
+        squirrelGeom.addControl(squirrelControl);
+
         inputManager.addMapping(MAPPING_RUN_FORWARD, TRIGGER_RUN_FORWARD);
         inputManager.addMapping(MAPPING_RUN_BACKWARD, TRIGGER_RUN_BACKWARD);
         inputManager.addMapping(MAPPING_RUN_LEFT, TRIGGER_RUN_LEFT);
         inputManager.addMapping(MAPPING_RUN_RIGHT, TRIGGER_RUN_RIGHT);
         inputManager.addMapping(MAPPING_CLIMB_UP, TRIGGER_CLIMB_UP);
         inputManager.addMapping(MAPPING_CLIMB_DOWN, TRIGGER_CLIMB_DOWN);
-        
-        // Add the input listener for the mappings
-        inputManager.addListener(actionListener, 
-            MAPPING_CLIMB_UP, MAPPING_CLIMB_DOWN);
-        inputManager.addListener(analogListener, 
-            MAPPING_RUN_FORWARD, MAPPING_RUN_BACKWARD, MAPPING_RUN_LEFT, MAPPING_RUN_RIGHT);
-        
-        initializeSquirrelAndTree();
-        
-        attachCenterMark(); // Can modify the center mark later; show boundaries for targets instead?
+        //Leo: I added this listener
+        inputManager.addListener(analogListener, MAPPING_RUN_FORWARD, MAPPING_RUN_BACKWARD, MAPPING_RUN_LEFT, MAPPING_RUN_RIGHT, MAPPING_CLIMB_UP, MAPPING_CLIMB_DOWN);  
         
     }
     
@@ -89,45 +90,56 @@ public class Main extends SimpleApplication {
 
     /*
     * Action listener to handle climbing actions
-    */
+   
     private ActionListener actionListener = new ActionListener() {
         public void onAction(String name, boolean isPressed, float tpf) {
             if (isPressed) {
-                if (name.equals(MAPPING_CLIMB_UP) && !isPressed) {
+                if (name.equals(MAPPING_CLIMB_UP)) {
                     squirrelGeom.move(0, 5 * tpf, 0);
                     System.out.println("You triggered: Climb Up");
-                } else if (name.equals(MAPPING_CLIMB_DOWN) && !isPressed) {
+                } else if (name.equals(MAPPING_CLIMB_DOWN)) {
                     squirrelGeom.move(0, -5 * tpf, 0);
                     System.out.println("You triggered: Climb Down");
                 }
             }
         }
     };
+     */
 
     /*
     * Analog listener to handle movement actions
     */
+    //Leo: I encapsulated the move function into squirrel control
     private AnalogListener analogListener = new AnalogListener() {
         public void onAnalog(String name, float intensity, float tpf) {
+            SquirrelControl control = squirrelGeom.getControl (SquirrelControl.class);
             if (name.equals(MAPPING_RUN_FORWARD)) {
                 // Move squirrel forward
-                squirrelGeom.move(0, 0, -5 * tpf);
+                control.moveForward(tpf);
                 System.out.println("You triggered: Run Forward");
             } else if (name.equals(MAPPING_RUN_BACKWARD)) {
                 // Move squirrel backward
-                squirrelGeom.move(0, 0, 5 * tpf);
+                control.moveBackward(tpf);
                 System.out.println("You triggered: Run Backward");
             } else if (name.equals(MAPPING_RUN_LEFT)) {
                 // Move squirrel left
-                squirrelGeom.move(-5 * tpf, 0, 0);
+                control.moveLeft(tpf);
                 System.out.println("You triggered: Run Left");
             } else if (name.equals(MAPPING_RUN_RIGHT)) {
                 // Move squirrel right
-                squirrelGeom.move(5 * tpf, 0, 0);
+                control.moveRight(tpf);
                 System.out.println("You triggered: Run Right");
+            } else if (name.equals(MAPPING_CLIMB_UP)) {
+                control.climbUp(tpf);
+                System.out.println("You triggered: Climb Up");
+            } else if (name.equals(MAPPING_CLIMB_DOWN)) {
+                control.climbDown(tpf);
+                System.out.println("You triggered: Climb Down");
             }
-        }
-    };
+    }
+};
+
+    
     
     /*
     * Method that provides a convenient way to mass produce cubes
