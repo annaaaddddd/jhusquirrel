@@ -97,9 +97,8 @@ public class Main extends SimpleApplication {
                 if (name.equals(MAPPING_CLIMB_UP)) {
                     squirrelGeom.move(0, 5 * tpf, 0);
                     System.out.println("You triggered: Climb Up");
-                } else if (name.equals(MAPPING_CLIMB_DOWN)) {
+                } else if (name.equals(MAPPING_CLIMB_DOWN) && !isPressed) {
                     squirrelGeom.move(0, -5 * tpf, 0);
-                    System.out.println("You triggered: Climb Down");
                 }
             }
         }
@@ -115,26 +114,20 @@ public class Main extends SimpleApplication {
             SquirrelControl control = squirrelGeom.getControl (SquirrelControl.class);
             if (name.equals(MAPPING_RUN_FORWARD)) {
                 // Move squirrel forward
-                control.moveForward(tpf);
+                squirrelGeom.move(0, 0, -5 * tpf);
                 System.out.println("You triggered: Run Forward");
             } else if (name.equals(MAPPING_RUN_BACKWARD)) {
                 // Move squirrel backward
-                control.moveBackward(tpf);
+                squirrelGeom.move(0, 0, 5 * tpf);
                 System.out.println("You triggered: Run Backward");
             } else if (name.equals(MAPPING_RUN_LEFT)) {
                 // Move squirrel left
-                control.moveLeft(tpf);
+                squirrelGeom.move(-5 * tpf, 0, 0);
                 System.out.println("You triggered: Run Left");
             } else if (name.equals(MAPPING_RUN_RIGHT)) {
                 // Move squirrel right
-                control.moveRight(tpf);
+                squirrelGeom.move(5 * tpf, 0, 0);
                 System.out.println("You triggered: Run Right");
-            } else if (name.equals(MAPPING_CLIMB_UP)) {
-                control.climbUp(tpf);
-                System.out.println("You triggered: Climb Up");
-            } else if (name.equals(MAPPING_CLIMB_DOWN)) {
-                control.climbDown(tpf);
-                System.out.println("You triggered: Climb Down");
             }
     }
 };
