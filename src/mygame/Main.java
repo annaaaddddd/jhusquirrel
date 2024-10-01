@@ -95,10 +95,8 @@ public class Main extends SimpleApplication {
             if (isPressed) {
                 if (name.equals(MAPPING_CLIMB_UP) && !isPressed) {
                     squirrelGeom.move(0, 5 * tpf, 0);
-                    System.out.println("You triggered: Climb Up");
                 } else if (name.equals(MAPPING_CLIMB_DOWN) && !isPressed) {
                     squirrelGeom.move(0, -5 * tpf, 0);
-                    System.out.println("You triggered: Climb Down");
                 }
             }
         }
@@ -110,21 +108,13 @@ public class Main extends SimpleApplication {
     private AnalogListener analogListener = new AnalogListener() {
         public void onAnalog(String name, float intensity, float tpf) {
             if (name.equals(MAPPING_RUN_FORWARD)) {
-                // Move squirrel forward
                 squirrelGeom.move(0, 0, -5 * tpf);
-                System.out.println("You triggered: Run Forward");
             } else if (name.equals(MAPPING_RUN_BACKWARD)) {
-                // Move squirrel backward
                 squirrelGeom.move(0, 0, 5 * tpf);
-                System.out.println("You triggered: Run Backward");
             } else if (name.equals(MAPPING_RUN_LEFT)) {
-                // Move squirrel left
                 squirrelGeom.move(-5 * tpf, 0, 0);
-                System.out.println("You triggered: Run Left");
             } else if (name.equals(MAPPING_RUN_RIGHT)) {
-                // Move squirrel right
                 squirrelGeom.move(5 * tpf, 0, 0);
-                System.out.println("You triggered: Run Right");
             }
         }
     };
