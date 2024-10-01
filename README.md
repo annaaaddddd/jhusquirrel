@@ -12,6 +12,10 @@ Simulation, Open World, Action-Adventure
 #### [Untitled Goose Game](https://store.steampowered.com/app/837470/Untitled_Goose_Game/)
 In this game, players control a goose who bothers the inhabitants of an English village. Players must use the goose's abilities to manipulate objects and interact with non-player characters to complete objectives. 
 
+
+https://github.com/user-attachments/assets/d0c51a0e-7020-4655-917d-a548d602e7c6
+
+
 #### [Sneaky Sasquatch](https://apps.apple.com/us/app/sneaky-sasquatch/id1098342019)
 The player plays as a Sasquatch, who lives near a campground, and is friends with local wildlife NPCs. Players initially revolves around stealing food from campers and hiding from park rangers. After obtaining human clothes, Sasquatch mingles among humans and participates in human activities, competes in sports, and even can get a bank account and get jobs like a doctor, police officer or an office executive. 
 Sasquatch also need food and sleep, and has a food meter that can deplete through various means. There are currently four chapters of main storyline, but players can explore the world without being obligated to complete all missions.
