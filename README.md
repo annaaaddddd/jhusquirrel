@@ -12,12 +12,12 @@ Simulation, Open World, Action-Adventure
 #### [Untitled Goose Game](https://store.steampowered.com/app/837470/Untitled_Goose_Game/)
 In this game, players control a goose who bothers the inhabitants of an English village. Players must use the goose's abilities to manipulate objects and interact with non-player characters to complete objectives. 
 
-#### Sneaky Sasquatch
+#### [Sneaky Sasquatch](https://apps.apple.com/us/app/sneaky-sasquatch/id1098342019)
 The player plays as a Sasquatch, who lives near a campground, and is friends with local wildlife NPCs. Players initially revolves around stealing food from campers and hiding from park rangers. After obtaining human clothes, Sasquatch mingles among humans and participates in human activities, competes in sports, and even can get a bank account and get jobs like a doctor, police officer or an office executive. 
 Sasquatch also need food and sleep, and has a food meter that can deplete through various means. There are currently four chapters of main storyline, but players can explore the world without being obligated to complete all missions.
 
 
-#### Persona 5 Royal
+#### [Persona 5 Royal](https://persona.atlus.com/p5r/?lang=en)
 Taking place in modern-day Tokyo, the story follows a high school student known by the codename Joker who transfers to a new school after he is falsely accused of assault and put on probation. Over the course of a school year, he and other students awaken to a special power, becoming a group of secret vigilantes known as the Phantom Thieves of Hearts.
 The game contains a day-night cycle and weather systems. The year is punctuated by events as Joker attends school, and outside of school he can have part-time jobs, pursue leisure activities, or create battle items.
 
@@ -26,7 +26,7 @@ The visual art style in this game is realism/semi-realism (somewhat realistic en
 [Persona 5 Royal - PC Gameplay 4K60FPS](https://www.youtube.com/watch?v=mz0g9hxq7L8&t=296s)
 
 
-#### Dave the Diver
+#### [Dave the Diver](https://store.steampowered.com/app/1868140/DAVE_THE_DIVER/)
 The game sets up at the Blue Hole, a spot said to contain fish from all over the world, Dave (controlled by players) fishes for ingredients during the day and helps Bancho with the restaurant at night. During his exploration, Dave comes across a race of sea people which leads him to the mystery behind the deepsea earthquakes.
 
 Music in this game is mostly instrumental and changes when switched to different parts of the map, thereby giving various atmosphere. Our game also wants to incorporate this ideally.
