@@ -9,7 +9,7 @@ Simulation, Open World, Action-Adventure
 
 ## Inspiration
 ### Gameplay
-#### Untitled Goose Game
+#### [Untitled Goose Game](https://store.steampowered.com/app/837470/Untitled_Goose_Game/)
 In this game, players control a goose who bothers the inhabitants of an English village. Players must use the goose's abilities to manipulate objects and interact with non-player characters to complete objectives. 
 
 #### Sneaky Sasquatch
