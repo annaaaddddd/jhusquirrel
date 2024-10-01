@@ -19,6 +19,7 @@ https://github.com/user-attachments/assets/a67e124b-2b30-40ac-b5a9-e67b2ac17491
 #### [Sneaky Sasquatch](https://apps.apple.com/us/app/sneaky-sasquatch/id1098342019)
 The player plays as a Sasquatch, who lives near a campground, and is friends with local wildlife NPCs. Players initially revolves around stealing food from campers and hiding from park rangers. After obtaining human clothes, Sasquatch mingles among humans and participates in human activities, competes in sports, and even can get a bank account and get jobs like a doctor, police officer or an office executive. 
 Sasquatch also need food and sleep, and has a food meter that can deplete through various means. There are currently four chapters of main storyline, but players can explore the world without being obligated to complete all missions.
+![MV5BMmZiNzA4MTYtMTdlOC00NGZjLWFjMzUtZDM4NmVjNDA4YzZmXkEyXkFqcGc@ _V1_](https://github.com/user-attachments/assets/751577cf-7e9d-48f9-b0fc-f78f79c13ab9)
 
 #### [Persona 5 Royal](https://persona.atlus.com/p5r/?lang=en)
 Taking place in modern-day Tokyo, the story follows a high school student known by the codename Joker who transfers to a new school after he is falsely accused of assault and put on probation. Over the course of a school year, he and other students awaken to a special power, becoming a group of secret vigilantes known as the Phantom Thieves of Hearts.
@@ -36,6 +37,7 @@ The visual art style in this game is realism/semi-realism (somewhat realistic en
 
 #### [Dave the Diver](https://store.steampowered.com/app/1868140/DAVE_THE_DIVER/)
 The game sets up at the Blue Hole, a spot said to contain fish from all over the world, Dave (controlled by players) fishes for ingredients during the day and helps Bancho with the restaurant at night. During his exploration, Dave comes across a race of sea people which leads him to the mystery behind the deepsea earthquakes.
+![Dave_the_Diver_cover](https://github.com/user-attachments/assets/b68b9011-b1fa-4d0f-9d37-456ed09465f6)
 
 Music in this game is mostly instrumental and changes when switched to different parts of the map, thereby giving various atmosphere. Our game also wants to incorporate this ideally.
 [Dave the Diver Original Soundtrack (Full)](https://www.youtube.com/watch?v=JBKhYkRc9u8&t=72s)
