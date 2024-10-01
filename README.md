@@ -12,18 +12,22 @@ Simulation, Open World, Action-Adventure
 #### [Untitled Goose Game](https://store.steampowered.com/app/837470/Untitled_Goose_Game/)
 In this game, players control a goose who bothers the inhabitants of an English village. Players must use the goose's abilities to manipulate objects and interact with non-player characters to complete objectives. 
 
-https://github.com/user-attachments/assets/d0c51a0e-7020-4655-917d-a548d602e7c6
+
+https://github.com/user-attachments/assets/a67e124b-2b30-40ac-b5a9-e67b2ac17491
+
 
 #### [Sneaky Sasquatch](https://apps.apple.com/us/app/sneaky-sasquatch/id1098342019)
 The player plays as a Sasquatch, who lives near a campground, and is friends with local wildlife NPCs. Players initially revolves around stealing food from campers and hiding from park rangers. After obtaining human clothes, Sasquatch mingles among humans and participates in human activities, competes in sports, and even can get a bank account and get jobs like a doctor, police officer or an office executive. 
 Sasquatch also need food and sleep, and has a food meter that can deplete through various means. There are currently four chapters of main storyline, but players can explore the world without being obligated to complete all missions.
 
-
 #### [Persona 5 Royal](https://persona.atlus.com/p5r/?lang=en)
 Taking place in modern-day Tokyo, the story follows a high school student known by the codename Joker who transfers to a new school after he is falsely accused of assault and put on probation. Over the course of a school year, he and other students awaken to a special power, becoming a group of secret vigilantes known as the Phantom Thieves of Hearts.
 The game contains a day-night cycle and weather systems. The year is punctuated by events as Joker attends school, and outside of school he can have part-time jobs, pursue leisure activities, or create battle items.
 
-https://github.com/user-attachments/assets/fe5c97a0-cb7e-4c60-a85e-a2b5665ea43f
+
+https://github.com/user-attachments/assets/92af0005-95d3-4f6d-bf8d-7c3ee8c4f2fc
+
+
 
 The visual art style in this game is realism/semi-realism (somewhat realistic environment modeling, uses animation as transition between scenes, cartoon style of conversations boxes), which is the style our game aims for.
 
