@@ -47,15 +47,27 @@ Players will engage in a variety of tasks that immerse them in the life of a cam
 
 ## Development
 ### First Deliverable
-#### Basic 3D Scene Setup
-We created basic geometry to represent the game elements, including:
-Squirrel: Represented by a brown box, with movement controls.
-Tree: Represented by a tall green box, placed around the squirrel's environment.
-Buildings: Represented by white boxes, placed around the campus environment.
+#### Scene Setup and Grouped Geometry
+We used a hierarchical scene graph structure to organize the environment elements, including:
+Squirrel: Represented by a brown box that can move and climb.
+Trees: Green boxes representing trees, placed at different locations on the campus.
+Buildings: Larger white boxes placed around a central quad, representing campus buildings.
+Quad: A flat, wide light gray box that serves as the central area around which the trees and buildings are arranged.
+
+All these elements are attached to a parent node called campusNode, allowing for efficient transformations and grouped scene management
 
 #### User Interaction
-Movement: The squirrel can move in four directions using the WASD keys.
-Climbing Mechanism: The squirrel can climb the tree when it is within proximity using the Spacebar (climb up) and Left Shift (climb down). This is enabled by distance checks to ensure climbing is only allowed when near the tree.
+Movement: The squirrel is controlled using the following keys:
+WASD keys to move forward, backward, left, and right.
+Spacebar to climb up when near a tree.
+Left Shift to climb down when near a tree.
 
-#### Scene Graph and Transformations
-We used a hierarchical scene graph structure where objects like the squirrel and the environment (trees, buildings, quad) are attached to parent nodes for easier management and transformations.
+Climbing Mechanism: The squirrel can climb trees when it is close enough (within a threshold distance). A distance check ensures that climbing is only allowed when near a tree, adding realism to the interaction.
+
+#### Control and Input Handling:
+We used the InputManager to handle user input via key mappings for movement and climbing.
+The SquirrelControl class manages the movement and climbing behavior, encapsulating the squirrel’s controls and integrating distance checks for climbing.
+
+#### Object-Oriented Structure:
+We extended AbstractControl to create the SquirrelControl class, which manages the squirrel's movement and interaction logic.
+The game state management is handled using an AbstractAppState, as seen in the GameRunningAppState.java file, allowing for smoother state transitions and scene updates.
