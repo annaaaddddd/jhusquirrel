@@ -113,6 +113,12 @@ public class GameRunningAppState extends AbstractAppState {
             } else if (name.equals(MAPPING_RUN_RIGHT)) {
                 control.moveRight(tpf);
                 // System.out.println("You triggered: Run Right");
+            } else if (name.equals(MAPPING_CLIMB_UP)) {
+                control.climbUp(tpf);
+                // System.out.println("You triggered: Climb up");
+            } else if (name.equals(MAPPING_CLIMB_DOWN)) {
+                control.climbDown(tpf);
+                // System.out.println("You triggered: Climb down");
             }
         }
     };
