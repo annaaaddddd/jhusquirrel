@@ -61,7 +61,6 @@ All these elements are attached to a parent node called campusNode, allowing for
   - WASD keys to move forward, backward, left, and right.
   - Spacebar to climb up when near a tree.
   - Left Shift to climb down when near a tree.
-- Climbing Mechanism: The squirrel can climb trees when it is close enough (within a threshold distance). A distance check ensures that climbing is only allowed when near a tree, adding realism to the interaction.
 
 #### Control and Input Handling:
 We used the InputManager to handle user input via key mappings for movement and climbing.
