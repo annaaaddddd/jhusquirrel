@@ -38,6 +38,7 @@ The game sets up at the Blue Hole, a spot said to contain fish from all over the
 ![Dave_the_Diver_cover](https://github.com/user-attachments/assets/b68b9011-b1fa-4d0f-9d37-456ed09465f6)
 
 **Music** in this game is mostly instrumental and changes when switched to different parts of the map, thereby giving various atmosphere. Our game also wants to incorporate this ideally.
+
 [Dave the Diver Original Soundtrack (Full)](https://www.youtube.com/watch?v=JBKhYkRc9u8&t=72s)
 
 ## Gameplay
