@@ -59,8 +59,8 @@ All these elements are attached to a parent node called campusNode, allowing for
 #### User Interaction
 - Movement: The squirrel is controlled using the following keys:
   - WASD keys to move forward, backward, left, and right.
-  - Spacebar to climb up when near a tree.
-  - Left Shift to climb down when near a tree.
+  - Spacebar to climb up.
+  - Left Shift to climb down.
 
 #### Control and Input Handling:
 We used the InputManager to handle user input via key mappings for movement and climbing.
@@ -68,4 +68,5 @@ The SquirrelControl class manages the movement and climbing behavior, encapsulat
 
 #### Object-Oriented Structure:
 We extended AbstractControl to create the SquirrelControl class, which manages the squirrel's movement and interaction logic.
-The game state management is handled using an AbstractAppState, as seen in the GameRunningAppState.java file, allowing for smoother state transitions and scene updates.
+The game state management is handled using an AbstractAppState, as seen in the GameRunningAppState.java file, allowing for organized code for starting game.
+The GameRunningAppState includes keyboard mapping and initialization code. It manages input actions, including running and climbing, through the use of AnalogListener. This enables fluid and responsive controls, enhancing player interaction with the game environment.
