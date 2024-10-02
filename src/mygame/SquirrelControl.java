@@ -6,11 +6,15 @@ import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import com.jme3.scene.control.AbstractControl;
 
+/**
+ * This is the Control for Squirrel. 
+ * @author Anna Dai, Serena Hu, and Leo Zhuang
+ */
 public class SquirrelControl extends AbstractControl {
 
     private Camera cam;
-    private Vector3f cameraOffset = new Vector3f(0, 5, 10); //Leo: cam offset with respect to the squirrel
-
+    private Vector3f cameraOffset = new Vector3f(0, 5, 10); // Camera offset with respect to the squirrel
+    
     public SquirrelControl(Camera cam) {
         this.cam = cam; 
     }
@@ -31,11 +35,11 @@ public class SquirrelControl extends AbstractControl {
         cam.setLocation(camPos);
         cam.lookAt(squirrelPos, Vector3f.UNIT_Y);
     }
+    
     public void moveForward(float tpf) {
         spatial.move(0, 0, -5 * tpf);
     }
 
-   
     public void moveBackward(float tpf) {
         spatial.move(0, 0, 5 * tpf);
     }
