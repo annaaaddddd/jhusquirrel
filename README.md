@@ -35,10 +35,11 @@ The **visual art** style in this game is **realism/semi-realism** (somewhat real
 
 ### [Dave the Diver](https://store.steampowered.com/app/1868140/DAVE_THE_DIVER/)
 The game sets up at the Blue Hole, a spot said to contain fish from all over the world, Dave (controlled by players) fishes for ingredients during the day and helps Bancho with the restaurant at night. During his exploration, Dave comes across a race of sea people which leads him to the mystery behind the deepsea earthquakes.
-![Dave_the_Diver_cover](https://github.com/user-attachments/assets/b68b9011-b1fa-4d0f-9d37-456ed09465f6)
+
+![dave2](https://github.com/user-attachments/assets/1b852b1f-2d99-4562-925f-6a0884ee528c)
+![dave1](https://github.com/user-attachments/assets/8924548a-ce32-4484-bcf0-c003f3b97d99)
 
 **Music** in this game is mostly instrumental and changes when switched to different parts of the map, thereby giving various atmosphere. Our game also wants to incorporate this ideally.
-
 [Dave the Diver Original Soundtrack (Full)](https://www.youtube.com/watch?v=JBKhYkRc9u8&t=72s)
 
 ## Gameplay
