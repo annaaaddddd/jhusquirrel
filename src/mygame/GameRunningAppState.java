@@ -94,7 +94,7 @@ public class GameRunningAppState extends AbstractAppState {
 
     }
     
-    /*
+    /**
      * Analog listener to handle movement actions
      */
     private AnalogListener analogListener = new AnalogListener() {
@@ -122,8 +122,10 @@ public class GameRunningAppState extends AbstractAppState {
             }
         }
     };
-        
-    // Method to creates squirrel and campus assets
+
+    /**
+     * Method to creates squirrel box and campus assets (currently as boxes)
+     */
     private void initializeSquirrelAndCampus() {
         // Create a parent node for both the squirrel and environment objects
         Node campusNode = new Node("CampusNode");
@@ -149,7 +151,10 @@ public class GameRunningAppState extends AbstractAppState {
         rootNode.attachChild(campusNode);
     }
 
-    // Method to add the squirrel
+    /**
+     * Method to add the squirrel
+     * @param parentNode 
+     */
     private void addSquirrel(Node parentNode) {
         Box squirrelBox = new Box(1, 1, 1);
         squirrelGeom = new Geometry("Squirrel", squirrelBox); // Geometry for squirrel
@@ -165,7 +170,13 @@ public class GameRunningAppState extends AbstractAppState {
         parentNode.attachChild(squirrelGeom); // Attach the squirrel to the parent node
     }
 
-    // Method to create trees
+    /**
+     * Method to create green tree boxes at given coordinate and under given parentNode.
+     * @param parentNode
+     * @param x - x coordinate of its location
+     * @param y - y coordinate of its location
+     * @param z - z zoordinate of its location
+     */
     private void createTree(Node parentNode, float x, float y, float z) {
         Box treeBox = new Box(1, 5, 1);
         Geometry treeGeom = new Geometry("Tree", treeBox);
@@ -177,7 +188,13 @@ public class GameRunningAppState extends AbstractAppState {
         parentNode.attachChild(treeGeom);
     }
 
-    // Method to create buildings
+    /**
+     * Method to create boxlike buildings at given coordinate and under given parentNode.
+     * @param parentNode
+     * @param x - x coordinate of its location
+     * @param y - y coordinate of its location
+     * @param z - z zoordinate of its location
+     */
     private void createBuilding(Node parentNode, float x, float y, float z) {
         Box buildingBox = new Box(3, 6, 3); // Larger dimensions for a building
         Geometry buildingGeom = new Geometry("Building", buildingBox);
@@ -189,7 +206,14 @@ public class GameRunningAppState extends AbstractAppState {
         parentNode.attachChild(buildingGeom);
     }
 
-    // Method to create a flat quad (representing the central grassy area)
+    /**
+     * Method to create a flat quad (representing the central grassy area) at 
+     * given coordinate and under given parentNode.
+     * @param parentNode
+     * @param x - x coordinate of its location
+     * @param y - y coordinate of its location
+     * @param z - z zoordinate of its location
+     */
     private void createQuad(Node parentNode, float x, float y, float z) {
         Box quadBox = new Box(10, 0.01f, 10); // Wide and flat box for the quad
         Geometry quadGeom = new Geometry("Quad", quadBox);
@@ -201,10 +225,9 @@ public class GameRunningAppState extends AbstractAppState {
         parentNode.attachChild(quadGeom);
     }
 
-    
-   /*
-    * Method that attaches a square center mark for picking
-    */
+    /**
+     * Method that attaches a square center mark for picking
+     */
     private void attachCenterMark() {
         Geometry c = new Geometry("center mark", new Box(1, 1, 1));
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");

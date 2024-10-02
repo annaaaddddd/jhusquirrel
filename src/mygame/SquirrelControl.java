@@ -29,6 +29,9 @@ public class SquirrelControl extends AbstractControl {
 
     }
 
+    /**
+     * Method that allows third perspective by updating camera position with the movement of squirrel
+     */
     private void updateCameraPosition() {
         Vector3f squirrelPos = spatial.getWorldTranslation();
         Vector3f camPos = squirrelPos.add(cameraOffset);
