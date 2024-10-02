@@ -49,20 +49,19 @@ Players will engage in a variety of tasks that immerse them in the life of a cam
 ### First Deliverable
 #### Scene Setup and Grouped Geometry
 We used a hierarchical scene graph structure to organize the environment elements, including:
-Squirrel: Represented by a brown box that can move and climb.
-Trees: Green boxes representing trees, placed at different locations on the campus.
-Buildings: Larger white boxes placed around a central quad, representing campus buildings.
-Quad: A flat, wide light gray box that serves as the central area around which the trees and buildings are arranged.
+- Squirrel: Represented by a brown box that can move and climb.
+- Trees: Green boxes representing trees, placed at different locations on the campus.
+- Buildings: Larger white boxes placed around a central quad, representing campus buildings.
+- Quad: A flat, wide light gray box that serves as the central area around which the trees and buildings are arranged.
 
 All these elements are attached to a parent node called campusNode, allowing for efficient transformations and grouped scene management
 
 #### User Interaction
-Movement: The squirrel is controlled using the following keys:
-WASD keys to move forward, backward, left, and right.
-Spacebar to climb up when near a tree.
-Left Shift to climb down when near a tree.
-
-Climbing Mechanism: The squirrel can climb trees when it is close enough (within a threshold distance). A distance check ensures that climbing is only allowed when near a tree, adding realism to the interaction.
+- Movement: The squirrel is controlled using the following keys:
+  - WASD keys to move forward, backward, left, and right.
+  - Spacebar to climb up when near a tree.
+  - Left Shift to climb down when near a tree.
+- Climbing Mechanism: The squirrel can climb trees when it is close enough (within a threshold distance). A distance check ensures that climbing is only allowed when near a tree, adding realism to the interaction.
 
 #### Control and Input Handling:
 We used the InputManager to handle user input via key mappings for movement and climbing.
