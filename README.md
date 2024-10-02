@@ -49,7 +49,7 @@ Players will engage in a variety of tasks that immerse them in the life of a cam
 ### First Deliverable
 #### Basic 3D Scene Setup
 We created basic geometry to represent the game elements, including:
-Squirrel: Represented by a brown box, with movement controls including forward, backward, left, and right.
+Squirrel: Represented by a brown box, with movement controls.
 Tree: Represented by a tall green box, placed around the squirrel's environment.
 Buildings: Represented by white boxes, placed around the campus environment.
 
