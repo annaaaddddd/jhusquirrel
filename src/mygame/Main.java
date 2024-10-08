@@ -11,7 +11,7 @@ public class Main extends SimpleApplication {
     
     @Override
     public void simpleInitApp() {
-        GameRunningAppState runningGame = new GameRunningAppState();
+        StartScreenAppState runningGame = new StartScreenAppState();
         stateManager.attach(runningGame);
     }
 
