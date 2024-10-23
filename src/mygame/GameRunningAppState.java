@@ -15,7 +15,10 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * AppState for running the game.
@@ -28,8 +31,8 @@ public class GameRunningAppState extends AbstractAppState {
     private Camera cam;
     private InputManager inputManager;
     private AssetManager assetManager;
-    
     private Geometry squirrelGeom;
+    private List<Spatial> trees; // List to store tree references
     
     // Movement triggers
     private final static Trigger TRIGGER_RUN_FORWARD = new KeyTrigger(KeyInput.KEY_W);
@@ -58,6 +61,7 @@ public class GameRunningAppState extends AbstractAppState {
         this.inputManager = this.app.getInputManager();
         this.cam = this.app.getCamera();
         this.assetManager = this.app.getAssetManager();
+        trees = new ArrayList<>();  // Initialize the list to hold trees
         
         startGame();
     }
@@ -133,10 +137,15 @@ public class GameRunningAppState extends AbstractAppState {
         // Add the squirrel
         addSquirrel(campusNode);
 
-        // Add trees manually around the campus
-        createTree(campusNode, 5, 2.5f, 0);  // Tree near the center
-        createTree(campusNode, 10, 2.5f, -3); // Tree near the quad
-        createTree(campusNode, -5, 2.5f, 5);  // Tree near a building
+        // Add trees manually and add them to the trees list
+        Spatial tree1 = createTree(campusNode, 5, 2.5f, 0);
+        trees.add(tree1);  // Add tree to list
+
+        Spatial tree2 = createTree(campusNode, 10, 2.5f, -3);
+        trees.add(tree2);
+
+        Spatial tree3 = createTree(campusNode, -5, 2.5f, 5);
+        trees.add(tree3);
 
         // Add buildings around the quad
         createBuilding(campusNode, 10, 3, 10);  // Building 1
@@ -157,17 +166,18 @@ public class GameRunningAppState extends AbstractAppState {
      */
     private void addSquirrel(Node parentNode) {
         Box squirrelBox = new Box(1, 1, 1);
-        squirrelGeom = new Geometry("Squirrel", squirrelBox); // Geometry for squirrel
+        squirrelGeom = new Geometry("Squirrel", squirrelBox);
         Material squirrelMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        squirrelMat.setColor("Color", ColorRGBA.Brown);  // Set a brown color for the squirrel
+        squirrelMat.setColor("Color", ColorRGBA.Brown);
         squirrelGeom.setMaterial(squirrelMat);
-        squirrelGeom.setLocalTranslation(0, 1, 0); // Position the squirrel above the ground
+        squirrelGeom.setLocalTranslation(0, 1, 0);
         squirrelGeom.setLocalScale(0.3f);
-        
-        SquirrelControl squirrelControl = new SquirrelControl(cam); // Added squirrel control here
+
+        // Pass the list of trees to SquirrelControl
+        SquirrelControl squirrelControl = new SquirrelControl(cam, trees);
         squirrelGeom.addControl(squirrelControl);
-        
-        parentNode.attachChild(squirrelGeom); // Attach the squirrel to the parent node
+
+        parentNode.attachChild(squirrelGeom);
     }
 
     /**
@@ -177,15 +187,15 @@ public class GameRunningAppState extends AbstractAppState {
      * @param y - y coordinate of its location
      * @param z - z zoordinate of its location
      */
-    private void createTree(Node parentNode, float x, float y, float z) {
+    private Spatial createTree(Node parentNode, float x, float y, float z) {
         Box treeBox = new Box(1, 5, 1);
         Geometry treeGeom = new Geometry("Tree", treeBox);
         Material treeMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         treeMat.setColor("Color", ColorRGBA.Green);
         treeGeom.setMaterial(treeMat);
-        
         treeGeom.setLocalTranslation(x, y, z);
         parentNode.attachChild(treeGeom);
+        return treeGeom;  // Return the tree geometry so we can track it
     }
 
     /**
