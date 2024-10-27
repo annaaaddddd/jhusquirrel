@@ -167,6 +167,8 @@ public class GameRunningAppState extends AbstractAppState {
     private void addSquirrel(Node parentNode) {
         Box squirrelBox = new Box(1, 1, 1);
         squirrelGeom = new Geometry("Squirrel", squirrelBox);
+        //loading squirrel model
+        //Spatial squirrelModel = assetManager.loadModel("Textures/squirrel_HP.fbx"); // Adjust the path if necessary
         Material squirrelMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
         squirrelMat.setColor("Color", ColorRGBA.Brown);
         squirrelGeom.setMaterial(squirrelMat);
@@ -174,7 +176,7 @@ public class GameRunningAppState extends AbstractAppState {
         squirrelGeom.setLocalScale(0.3f);
 
         // Pass the list of trees to SquirrelControl
-        SquirrelControl squirrelControl = new SquirrelControl(cam, trees);
+        SquirrelControl squirrelControl = new SquirrelControl(cam, trees, inputManager);
         squirrelGeom.addControl(squirrelControl);
 
         parentNode.attachChild(squirrelGeom);
