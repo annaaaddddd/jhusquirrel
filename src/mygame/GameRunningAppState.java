@@ -158,10 +158,12 @@ public class GameRunningAppState extends AbstractAppState {
 
         // Create a material and apply the DiffuseMap texture
         Material squirrelMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        squirrelMat.setTexture("DiffuseMap", assetManager.loadTexture("Textures/squirrel_albedo.jpg"));
-    
-        // Apply the material to the model
+        squirrelMat.setTexture("DiffuseMap", assetManager.loadTexture("Textures/squirrel_albedo.jpg"));// Base color texture
+        // Optional: Add a NormalMap if you want more detail
+        //squirrelMat.setTexture("NormalMap", assetManager.loadTexture("Textures/squirrel_fur.png"));
         squirrelModel.setMaterial(squirrelMat);
+        
+        squirrelMat.setFloat("Shininess", 1f); // Lower shininess for a matte look
     
         // Adjust position, scale, and rotation if necessary
         squirrelModel.setLocalTranslation(0, 1, 0);  // Adjust height as needed
@@ -179,9 +181,12 @@ public class GameRunningAppState extends AbstractAppState {
     private Spatial createTree(Node parentNode, float x, float y, float z) {
         Box treeBox = new Box(1, 5, 1);
         Geometry treeGeom = new Geometry("Tree", treeBox);
-        Material treeMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        treeMat.setColor("Color", ColorRGBA.Green);
+        
+        // Load and set a tree bark texture
+        Material treeMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        treeMat.setTexture("DiffuseMap", assetManager.loadTexture("Textures/tree-bark.jpg")); 
         treeGeom.setMaterial(treeMat);
+        
         treeGeom.setLocalTranslation(x, y, z);
         parentNode.attachChild(treeGeom);
         return treeGeom;  // Return the tree geometry so we can track it
@@ -191,9 +196,12 @@ public class GameRunningAppState extends AbstractAppState {
         // Flat box for the quad
         Box quad = new Box(10, 0.1f, 10);
         Geometry quadGeom = new Geometry("Quad", quad);
-        Material quadMat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        quadMat.setColor("Color", ColorRGBA.Gray);
+        
+        // Apply a grass or dirt texture to the ground
+        Material quadMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        quadMat.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Ground.jpg")); // Use a ground texture
         quadGeom.setMaterial(quadMat);
+        
         quadGeom.setLocalTranslation(x, y, z);
         parentNode.attachChild(quadGeom);
     }
