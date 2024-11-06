@@ -72,3 +72,13 @@ The SquirrelControl class manages the movement and climbing behavior, encapsulat
 We extended AbstractControl to create the SquirrelControl class, which manages the squirrel's movement and interaction logic.
 The game state management is handled using an AbstractAppState, as seen in the GameRunningAppState.java file, allowing for organized code for starting game.
 The GameRunningAppState includes keyboard mapping and initialization code. It manages input actions, including running and climbing, through the use of AnalogListener. This enables fluid and responsive controls, enhancing player interaction with the game environment.
+
+==Missing screenshots!==
+
+### Second Deliverable
+#### Updated home screen design
+New home screen
+<img width="1920" alt="Screenshot 2024-11-06 at 18 52 11" src="https://github.com/user-attachments/assets/345bcdd2-3498-480d-b016-8da26f1379cf">
+
+New setting screen
+<img width="1920" alt="Screenshot 2024-11-06 at 18 52 18" src="https://github.com/user-attachments/assets/906591f4-a6ed-4bfa-812b-21c552da0219">
