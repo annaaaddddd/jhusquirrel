@@ -15,6 +15,7 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.MouseButtonTrigger;
 import com.jme3.renderer.Camera;
 import com.jme3.scene.Node;
+import com.jme3.texture.Texture;
 import com.jme3.ui.Picture;
 
 /**
@@ -28,13 +29,14 @@ public class StartScreenAppState extends AbstractAppState {
     private AssetManager assetManager;
     private Camera cam;
     
-    // Button dimensions and spacing
-    private float buttonWidth = 150;
-    private float buttonHeight = 150;
     private float spacing = 50;
 
     // Starting Y position for vertical centering
     private float startY;
+    
+    private String playButtonPath = "Textures/Home Menu/Buttons/homePlay.png";
+    private String settingButtonPath  = "Textures/Home Menu/Buttons/homeSetting.png";
+    private String exitButtonPath = "Textures/Home Menu/Buttons/homeExit.png";
 
     
     @Override
@@ -46,7 +48,7 @@ public class StartScreenAppState extends AbstractAppState {
         this.assetManager = this.app.getAssetManager();
         this.inputManager = this.app.getInputManager();
 
-        this.startY = (cam.getHeight() - ((buttonHeight * 3) + (spacing * 2))) / 2; // 3 buttons with 2 spaces
+        this.startY = cam.getHeight() * 0.3f; // Y coordinate to place buttons
         createStartMenu();
     }
 
@@ -59,23 +61,24 @@ public class StartScreenAppState extends AbstractAppState {
 
         // This background is temporary
         Picture background = new Picture("MenuBackground");
-        background.setImage(assetManager, "Textures/menu_background.png", true);
+        background.setImage(assetManager, "Textures/Home Menu/menu_background2.png", true);
         background.setPosition(0, 0); 
         background.setWidth(cam.getWidth()); // Full screen width
         background.setHeight(cam.getHeight()); // Full screen height
         rootNode.attachChild(background);
 
         // Calculate the center X position for buttons
-        float centerX = (cam.getWidth() - buttonWidth) / 2;
+        float centerX = (cam.getWidth()) / 2;
+        
+        // Create and position buttons dynamically based on their texture dimensions
+        float playButtonY = startY;
+        addButton("PlayButton", playButtonPath, centerX, playButtonY);
 
-        // Create Play button
-        addButton("PlayButton", "Textures/play_button.png", centerX, startY);
+        float optionsButtonY = playButtonY - getButtonHeight(playButtonPath) - spacing;
+        addButton("OptionsButton", settingButtonPath, centerX, optionsButtonY);
 
-        // Create Quit button
-        addButton("QuitButton", "Textures/quit_button.png", centerX, startY + buttonHeight + spacing);
-
-        // Create Options button
-        addButton("OptionsButton", "Textures/options_button.png", centerX, startY + 2 * (buttonHeight + spacing));
+        float quitButtonY = optionsButtonY - getButtonHeight(settingButtonPath) - spacing;
+        addButton("QuitButton", exitButtonPath, centerX, quitButtonY);
 
         // Add mouse input listener for buttons
         if (!inputManager.hasMapping("Play")) {
@@ -95,24 +98,28 @@ public class StartScreenAppState extends AbstractAppState {
 
     
     /**
-    * Creates and adds a button to the screen.
-    *
-    * @param buttonName  The name of the button (for internal identification).
-    * @param texturePath The file path to the button image.
-    * @param xPos        The X position for the button.
-    * @param yPos        The Y position for the button.
-    */
-   private void addButton(String buttonName, String texturePath, float xPos, float yPos) {
-       Picture button = new Picture(buttonName);
-       button.setImage(assetManager, texturePath, true);
-       button.setWidth(buttonWidth);
-       button.setHeight(buttonHeight);
-       button.setPosition(xPos, yPos);
-       rootNode.attachChild(button);
-   }
+     * Creates and adds a button to the screen.
+     *
+     * @param buttonName  The name of the button.
+     * @param texturePath The file path to the button image.
+     * @param centerX     The X position for centering the button.
+     * @param yPos        The Y position for the button.
+     */
+    private void addButton(String buttonName, String texturePath, float centerX, float yPos) {
+        Texture buttonTexture = assetManager.loadTexture(texturePath);
+        int textureWidth = buttonTexture.getImage().getWidth();
+        int textureHeight = buttonTexture.getImage().getHeight();
+
+        Picture button = new Picture(buttonName);
+        button.setImage(assetManager, texturePath, true);
+        button.setWidth(textureWidth);
+        button.setHeight(textureHeight);
+        button.setPosition(centerX - (textureWidth / 2), yPos); // Center the button on X axis
+        rootNode.attachChild(button);
+    }
 
 
-    private ActionListener actionListener = new ActionListener() {
+       private ActionListener actionListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
             if (isPressed) {
@@ -120,51 +127,67 @@ public class StartScreenAppState extends AbstractAppState {
                 float clickX = inputManager.getCursorPosition().x;
                 float clickY = inputManager.getCursorPosition().y;
 
+                // Center X position for buttons
+                float buttonX = cam.getWidth() / 2;
+
                 // Check if the Play button was clicked
-                float playX = (cam.getWidth() - buttonWidth) / 2;
                 float playY = startY;
-                if (isClickOnButton(clickX, clickY, playX, playY)) {
+                if (isClickOnButton(clickX, clickY, buttonX, playY, playButtonPath)) {
                     System.out.println("Navigating to running game.");
                     GameRunningAppState gameRunning = new GameRunningAppState();
                     app.getStateManager().detach(StartScreenAppState.this);
                     app.getStateManager().attach(gameRunning);
                 }
 
-                // Check if the Quit button was clicked
-                float quitY = startY + buttonHeight + spacing;
-                if (isClickOnButton(clickX, clickY, playX, quitY)) {
-                    System.out.println("Exiting game.");
-                    app.stop();
-                    return;
-                }
-
                 // Check if the Options button was clicked
-                float optionsY = startY + 2 * (buttonHeight + spacing);
-                if (isClickOnButton(clickX, clickY, playX, optionsY)) {
+                float optionsY = playY - getButtonHeight(playButtonPath) - spacing;
+                if (isClickOnButton(clickX, clickY, buttonX, optionsY, settingButtonPath)) {
                     System.out.println("Navigating to options menu.");
                     OptionsScreenAppState optionsScreen = new OptionsScreenAppState();
                     app.getStateManager().detach(StartScreenAppState.this);
                     app.getStateManager().attach(optionsScreen);
                 }
+
+                // Check if the Quit button was clicked
+                float quitY = optionsY - getButtonHeight(settingButtonPath) - spacing;
+                if (isClickOnButton(clickX, clickY, buttonX, quitY, exitButtonPath)) {
+                    System.out.println("Exiting game.");
+                    app.stop();
+                }
             }
         }
     };
-    
+       
     /**
-    * Determines if a mouse click is within the bounds of a button.
-    *
-    * @param clickX The X position of the mouse click.
-    * @param clickY The Y position of the mouse click.
-    * @param buttonX The X position of the button.
-    * @param buttonY The Y position of the button.
-    * @param buttonWidth The width of the button.
-    * @param buttonHeight The height of the button.
-    * @return True if the mouse click is within the button bounds, otherwise false.
-    */
-   private boolean isClickOnButton(float clickX, float clickY, float buttonX, float buttonY) {
-       return clickX >= buttonX && clickX <= buttonX + this.buttonWidth &&
-              clickY >= buttonY && clickY <= buttonY + this.buttonHeight;
-   }
+     * Gets the height of a button based on its texture.
+     *
+     * @param texturePath The file path to the button image.
+     * @return The height of the button texture.
+     */
+    private float getButtonHeight(String texturePath) {
+        Texture buttonTexture = assetManager.loadTexture(texturePath);
+        return buttonTexture.getImage().getHeight();
+    }
+
+     /**
+     * Determines if a mouse click is within the bounds of a button.
+     *
+     * @param clickX      The X position of the mouse click.
+     * @param clickY      The Y position of the mouse click.
+     * @param centerX     The centered X position of the button.
+     * @param buttonY     The Y position of the button.
+     * @param texturePath The file path to the button image.
+     * @return True if the mouse click is within the button bounds, otherwise false.
+     */
+    private boolean isClickOnButton(float clickX, float clickY, float centerX, float buttonY, String texturePath) {
+        Texture buttonTexture = assetManager.loadTexture(texturePath);
+        float buttonWidth = buttonTexture.getImage().getWidth();
+        float buttonHeight = buttonTexture.getImage().getHeight();
+        
+        float buttonX = centerX - (buttonWidth / 2);
+        return clickX >= buttonX && clickX <= buttonX + buttonWidth &&
+               clickY >= buttonY && clickY <= buttonY + buttonHeight;
+    }
 
 
        

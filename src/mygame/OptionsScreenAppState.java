@@ -47,7 +47,7 @@ public class OptionsScreenAppState extends AbstractAppState {
     // TODO: add more options for customizing keyboard layout, graphic quality, or difficulty. (buttons, sliders, etc.)
     private void createOptionsMenu() {
         Picture background = new Picture("MenuBackground");
-        background.setImage(assetManager, "Textures/menu_background.png", true);
+        background.setImage(assetManager, "Textures/Setting Menu/setting_homebackground.png", true);
         background.setPosition(0, 0);
         background.setWidth(cam.getWidth()); // Full screen width
         background.setHeight(cam.getHeight()); // Full screen height
