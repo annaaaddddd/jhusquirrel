@@ -1,10 +1,14 @@
 package mygame;
 
+import com.jme3.animation.AnimChannel;
+import com.jme3.animation.AnimControl;
+import com.jme3.animation.LoopMode;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
+import com.jme3.input.ChaseCamera;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.AnalogListener;
@@ -18,6 +22,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.light.AmbientLight;
+import com.jme3.light.DirectionalLight;
+import com.jme3.math.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,11 +68,20 @@ public class GameRunningAppState extends AbstractAppState {
         this.cam = this.app.getCamera();
         this.assetManager = this.app.getAssetManager();
         trees = new ArrayList<>();  // Initialize the list to hold trees
-        
-        // Add ambient light to the scene to ensure lighting is not causing black appearance
+
+        // Ambient light to make sure the model is visible
         AmbientLight ambient = new AmbientLight();
         ambient.setColor(ColorRGBA.White.mult(1.3f));
         rootNode.addLight(ambient);
+        
+        // Directional light to simulate sunlight
+        /*
+        DirectionalLight sun = new DirectionalLight();
+        sun.setColor(ColorRGBA.White);
+        sun.setDirection(new Vector3f(-0.5f, -1f, -0.5f).normalizeLocal());
+        rootNode.addLight(sun);
+        */
+
         
         startGame();
     }
@@ -109,6 +124,10 @@ public class GameRunningAppState extends AbstractAppState {
         @Override
         public void onAnalog(String name, float intensity, float tpf) {
             SquirrelControl control = squirrelModel.getControl(SquirrelControl.class);
+            //if (control == null) {
+                //System.out.println("Control is null, skipping movement.");
+                //return;
+            //}
             if (name.equals(MAPPING_RUN_FORWARD)) {
                 control.moveForward(tpf);
             } else if (name.equals(MAPPING_RUN_BACKWARD)) {
@@ -151,31 +170,62 @@ public class GameRunningAppState extends AbstractAppState {
         // Attach the campus node to the root node
         rootNode.attachChild(campusNode);
     }
-
+    
     private void addSquirrel(Node parentNode) {
-        // Load the squirrel model
-        squirrelModel = assetManager.loadModel("Textures/squirrel_HP.fbx");
+        // Load the squirrel model with animations from the Squirrel2 folder
+        System.out.println("Loading squirrel model...");
+        //squirrelModel = assetManager.loadModel("Textures/Squirrel2/squirrel-anim.blend");
+        squirrelModel = assetManager.loadModel("Textures/Squirrel2/squirrel-anim.glb");
 
-        // Create a material and apply the DiffuseMap texture
-        Material squirrelMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        squirrelMat.setTexture("DiffuseMap", assetManager.loadTexture("Textures/squirrel_albedo.jpg"));// Base color texture
-        // Optional: Add a NormalMap if you want more detail
-        //squirrelMat.setTexture("NormalMap", assetManager.loadTexture("Textures/squirrel_fur.png"));
-        squirrelModel.setMaterial(squirrelMat);
-        
-        squirrelMat.setFloat("Shininess", 1f); // Lower shininess for a matte look
-    
-        // Adjust position, scale, and rotation if necessary
-        squirrelModel.setLocalTranslation(0, 1, 0);  // Adjust height as needed
-        squirrelModel.setLocalScale(0.02f);  // Try a smaller scale if it appears too large
-        squirrelModel.rotate(0, (float)Math.PI, 0);  // Rotate to face forward if needed
-    
+
+        if (squirrelModel == null) {
+            System.out.println("Failed to load squirrel model!");
+        } else {
+            System.out.println("Squirrel model loaded successfully.");
+        }
+
+        // Print available animations to identify names
+        AnimControl animControl = squirrelModel.getControl(AnimControl.class);
+        if (animControl != null) {
+            System.out.println("Available animations:");
+            for (String animName : animControl.getAnimationNames()) {
+                System.out.println("Animation: " + animName);
+            }
+        }
+
+        // Set textures from the Squirrel2 folder
+  
+        Material squirrelMaterial = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        squirrelMaterial.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Squirrel2/squirrel-body.png"));
+        //squirrelMaterial.setTexture("NormalMap", assetManager.loadTexture("Textures/Squirrel2/squirrel-body-norm.png"));
+        //squirrelMaterial.setTexture("SpecularMap", assetManager.loadTexture("Textures/Squirrel2/squirrel-head.png"));
+        //squirrelMaterial.setFloat("Shininess", 8f); // Adjust shininess if needed for better effect
+        squirrelModel.setMaterial(squirrelMaterial);
+
+
+
+        // Position, scale, and rotation adjustments
+        squirrelModel.setLocalTranslation(0, 1, 0);
+        squirrelModel.setLocalScale(0.3f); // Adjust scale if needed
+        squirrelModel.rotate(0, (float)Math.PI, 0);  // Rotate to face forward if necessary
+
+        // Attach the model to the parent node
+        parentNode.attachChild(squirrelModel);
+
+        // Set up an animation if the name is known
+        if (animControl != null) {
+            AnimChannel animChannel = animControl.createChannel();
+            animChannel.setAnim("Idle"); // Replace with actual animation name
+            animChannel.setLoopMode(LoopMode.Loop);
+        }
+
         // Add control and attach to parent node
         SquirrelControl squirrelControl = new SquirrelControl(cam, trees, inputManager);
         squirrelModel.addControl(squirrelControl);
-    
-        parentNode.attachChild(squirrelModel);
     }
+
+
+
 
 
     private Spatial createTree(Node parentNode, float x, float y, float z) {
