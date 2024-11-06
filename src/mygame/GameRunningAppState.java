@@ -171,58 +171,44 @@ public class GameRunningAppState extends AbstractAppState {
         rootNode.attachChild(campusNode);
     }
     
-    private void addSquirrel(Node parentNode) {
-        // Load the squirrel model with animations from the Squirrel2 folder
-        System.out.println("Loading squirrel model...");
-        //squirrelModel = assetManager.loadModel("Textures/Squirrel2/squirrel-anim.blend");
-        squirrelModel = assetManager.loadModel("Textures/Squirrel2/squirrel-anim.glb");
+private void addSquirrel(Node parentNode) {
+    // Load the squirrel model with animations from the Squirrel2 folder
+    System.out.println("Loading squirrel model...");
+    squirrelModel = assetManager.loadModel("Textures/Squirrel2/squirrel-anim.j3o");
 
-
-        if (squirrelModel == null) {
-            System.out.println("Failed to load squirrel model!");
-        } else {
-            System.out.println("Squirrel model loaded successfully.");
-        }
-
-        // Print available animations to identify names
-        AnimControl animControl = squirrelModel.getControl(AnimControl.class);
-        if (animControl != null) {
-            System.out.println("Available animations:");
-            for (String animName : animControl.getAnimationNames()) {
-                System.out.println("Animation: " + animName);
-            }
-        }
-
-        // Set textures from the Squirrel2 folder
-  
-        Material squirrelMaterial = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        squirrelMaterial.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Squirrel2/squirrel-body.png"));
-        //squirrelMaterial.setTexture("NormalMap", assetManager.loadTexture("Textures/Squirrel2/squirrel-body-norm.png"));
-        //squirrelMaterial.setTexture("SpecularMap", assetManager.loadTexture("Textures/Squirrel2/squirrel-head.png"));
-        //squirrelMaterial.setFloat("Shininess", 8f); // Adjust shininess if needed for better effect
-        squirrelModel.setMaterial(squirrelMaterial);
-
-
-
-        // Position, scale, and rotation adjustments
-        squirrelModel.setLocalTranslation(0, 1, 0);
-        squirrelModel.setLocalScale(0.3f); // Adjust scale if needed
-        squirrelModel.rotate(0, (float)Math.PI, 0);  // Rotate to face forward if necessary
-
-        // Attach the model to the parent node
-        parentNode.attachChild(squirrelModel);
-
-        // Set up an animation if the name is known
-        if (animControl != null) {
-            AnimChannel animChannel = animControl.createChannel();
-            animChannel.setAnim("Idle"); // Replace with actual animation name
-            animChannel.setLoopMode(LoopMode.Loop);
-        }
-
-        // Add control and attach to parent node
-        SquirrelControl squirrelControl = new SquirrelControl(cam, trees, inputManager);
-        squirrelModel.addControl(squirrelControl);
+    if (squirrelModel == null) {
+        System.out.println("Failed to load squirrel model!");
+    } else {
+        System.out.println("Squirrel model loaded successfully.");
     }
+
+    // Set textures from the Squirrel2 folder
+    Material squirrelMaterial = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+    squirrelMaterial.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Squirrel2/squirrel-body.png"));
+    squirrelModel.setMaterial(squirrelMaterial);
+
+    // Position, scale, and rotation adjustments
+    squirrelModel.setLocalTranslation(0, 1, 0);
+    squirrelModel.setLocalScale(0.3f); // Adjust scale if needed
+    squirrelModel.rotate(0, (float)Math.PI, 0);  // Rotate to face forward if necessary
+
+    // Attach the model to the parent node
+    parentNode.attachChild(squirrelModel);
+    
+    com.jme3.anim.SkinningControl skinningControl = squirrelModel.getControl(com.jme3.anim.SkinningControl.class);
+    if (skinningControl != null) {
+        // Use skinningControl for animation-related functionality
+        System.out.println("SkinningControl found. Attempting to engage animations.");
+    } else {
+        System.out.println("No AnimComposer or SkinningControl found for the squirrel model.");
+    }
+    
+
+    // Add control for squirrel-specific movement
+    SquirrelControl squirrelControl = new SquirrelControl(cam, trees, inputManager);
+    squirrelModel.addControl(squirrelControl);
+}
+
 
 
 
