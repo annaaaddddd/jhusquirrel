@@ -1,5 +1,6 @@
 package mygame;
 
+import com.jme3.anim.AnimComposer;
 import com.jme3.animation.AnimChannel;
 import com.jme3.animation.AnimControl;
 import com.jme3.animation.LoopMode;
@@ -8,6 +9,8 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
+import com.jme3.asset.TextureKey;
+import com.jme3.bullet.BulletAppState;
 import com.jme3.font.BitmapText;
 import com.jme3.font.BitmapFont;
 import com.jme3.input.ChaseCamera;
@@ -32,6 +35,11 @@ import java.util.ArrayList;
 import java.util.List;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.ui.Picture;
+import com.jme3.bullet.control.RigidBodyControl; 
+import com.jme3.util.TangentBinormalGenerator;
+import com.jme3.anim.SkinningControl;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * AppState for running the game.
@@ -47,6 +55,10 @@ public class GameRunningAppState extends AbstractAppState {
     private AssetManager assetManager;
     private Spatial squirrelModel;  // Updated to use squirrelModel instead of squirrelGeom
     private List<Spatial> trees; // List to store tree references
+    private BulletAppState bulletAppState;
+    private AnimComposer composer;
+    final private Queue<String> anims = new LinkedList<>();
+    private boolean playAnim = true;
     
     private Picture settingsIcon;
     private Picture saveIcon;
@@ -82,19 +94,29 @@ public class GameRunningAppState extends AbstractAppState {
         this.assetManager = this.app.getAssetManager();
         trees = new ArrayList<>();  // Initialize the list to hold trees
 
+        bulletAppState = new BulletAppState();
+        stateManager.attach(bulletAppState);
+        // Set global gravity to pull objects downwards
+        bulletAppState.getPhysicsSpace().setGravity(new Vector3f(0, -0.81f, 0));
+
+        initializeLight();
+        startGame();
+        createGUI();
+    }
+    
+    /**
+     * Initialize light setting. Add ambient light and sunlight (directional) to the scene.
+     */
+    private void initializeLight() {
         // Ambient light to make sure the model is visible
         AmbientLight ambient = new AmbientLight();
         ambient.setColor(ColorRGBA.White.mult(1.3f));
         rootNode.addLight(ambient);
         
-        // Directional light to simulate sunlight
         DirectionalLight sun = new DirectionalLight();
         sun.setColor(ColorRGBA.White);
         sun.setDirection(new Vector3f(-0.5f, -1f, -0.5f).normalizeLocal());
         rootNode.addLight(sun);
-
-        startGame();
-        createGUI();
     }
 
     /**
@@ -180,6 +202,10 @@ public class GameRunningAppState extends AbstractAppState {
         inputManager.addListener(analogListener, 
                 MAPPING_RUN_FORWARD, MAPPING_RUN_BACKWARD, MAPPING_RUN_LEFT, MAPPING_RUN_RIGHT, 
                 MAPPING_CLIMB_UP, MAPPING_CLIMB_DOWN);  
+        
+//        
+//        inputManager.addMapping("ToggleToSecondState", new KeyTrigger(KeyInput.KEY_T));
+//        inputManager.addListener(actionListener, "ToggleToSecondState");
     }
     
     /**
@@ -218,6 +244,7 @@ public class GameRunningAppState extends AbstractAppState {
 
         // Add the squirrel
         addSquirrel(campusNode);
+        animateSquirrel();
 
         // Add trees manually and add them to the trees list
         Spatial tree1 = createTree(campusNode, 5, 2.5f, 0);
@@ -236,47 +263,76 @@ public class GameRunningAppState extends AbstractAppState {
         rootNode.attachChild(campusNode);
     }
     
-private void addSquirrel(Node parentNode) {
-    // Load the squirrel model with animations from the Squirrel2 folder
-    System.out.println("Loading squirrel model...");
-    squirrelModel = assetManager.loadModel("Textures/Squirrel2/squirrel-anim.j3o");
+    private void addSquirrel(Node parentNode) {
+        // Load the squirrel model with animations from the Squirrel2 folder
+        System.out.println("Loading squirrel model...");
+        squirrelModel = assetManager.loadModel("Textures/Squirrel2/squirrel-anim.j3o");
 
-    if (squirrelModel == null) {
-        System.out.println("Failed to load squirrel model!");
-    } else {
-        System.out.println("Squirrel model loaded successfully.");
+        if (squirrelModel == null) {
+            System.out.println("Failed to load squirrel model!");
+        } else {
+            System.out.println("Squirrel model loaded successfully.");
+        }
+
+        // Set textures from the Squirrel2 folder
+        Material squirrelMaterial = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        //squirrelMaterial.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Squirrel2/squirrel-body.png"));
+        
+        TextureKey squirrelDiffuse = new TextureKey(
+           "Textures/Squirrel2/squirrel-body.png", false);
+        squirrelMaterial.setTexture("DiffuseMap",
+            assetManager.loadTexture(squirrelDiffuse));
+        TextureKey squirrelNormal = new TextureKey(
+         "Textures/Squirrel2/squirrel-body-norm.png", false);
+        squirrelMaterial.setTexture("NormalMap",
+            assetManager.loadTexture(squirrelNormal));
+        
+        squirrelMaterial.setBoolean("UseMaterialColors",true);
+        squirrelMaterial.setColor("Ambient", ColorRGBA.Gray);
+        squirrelMaterial.setColor("Diffuse", ColorRGBA.White);
+        squirrelModel.setMaterial(squirrelMaterial);
+        
+        TangentBinormalGenerator.generate(squirrelModel);
+        
+        // Position, scale, and rotation adjustments
+        squirrelModel.setLocalTranslation(0, 1, 0);
+        squirrelModel.setLocalScale(0.3f); // Adjust scale if needed
+        squirrelModel.rotate(0, (float)Math.PI, 0);  // Rotate to face forward if necessary
+        RigidBodyControl squirrelPhysics = new RigidBodyControl(1.0f); // mass > 0
+        squirrelModel.addControl(squirrelPhysics);
+        bulletAppState.getPhysicsSpace().add(squirrelPhysics);
+
+        // Attach the model to the parent node
+
+//        SkinningControl skinningControl = squirrelModel.getControl(SkinningControl.class);
+//        if (skinningControl != null) {
+//            // Use skinningControl for animation-related functionality
+//            System.out.println("SkinningControl found. Attempting to engage animations.");
+//        } else {
+//            System.out.println("No AnimComposer or SkinningControl found for the squirrel model.");
+//        }
+        
+
+        // Add control for squirrel-specific movement
+        SquirrelControl squirrelControl = new SquirrelControl(cam, trees, inputManager, squirrelPhysics);
+        squirrelModel.addControl(squirrelControl);
+
+        parentNode.attachChild(squirrelModel);
     }
-
-    // Set textures from the Squirrel2 folder
-    Material squirrelMaterial = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-    squirrelMaterial.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Squirrel2/squirrel-body.png"));
-    squirrelModel.setMaterial(squirrelMaterial);
-
-    // Position, scale, and rotation adjustments
-    squirrelModel.setLocalTranslation(0, 1, 0);
-    squirrelModel.setLocalScale(0.3f); // Adjust scale if needed
-    squirrelModel.rotate(0, (float)Math.PI, 0);  // Rotate to face forward if necessary
-
-    // Attach the model to the parent node
-    parentNode.attachChild(squirrelModel);
     
-    com.jme3.anim.SkinningControl skinningControl = squirrelModel.getControl(com.jme3.anim.SkinningControl.class);
-    if (skinningControl != null) {
-        // Use skinningControl for animation-related functionality
-        System.out.println("SkinningControl found. Attempting to engage animations.");
-    } else {
-        System.out.println("No AnimComposer or SkinningControl found for the squirrel model.");
+    private void animateSquirrel() {
+        composer = squirrelModel.getControl(AnimComposer.class);
+
+        if (composer != null) {
+            String animName = composer.getAnimClipsNames().iterator().next(); // Assuming one animation
+            composer.setCurrentAction(animName);
+            composer.setEnabled(true);  // Enable the animation
+
+            System.out.println("Playing animation: " + animName);
+        } else {
+            System.out.println("No AnimComposer found for the squirrel model.");
+        }
     }
-    
-
-    // Add control for squirrel-specific movement
-    SquirrelControl squirrelControl = new SquirrelControl(cam, trees, inputManager);
-    squirrelModel.addControl(squirrelControl);
-}
-
-
-
-
 
 
 
