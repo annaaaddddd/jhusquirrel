@@ -8,6 +8,8 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
+import com.jme3.font.BitmapText;
+import com.jme3.font.BitmapFont;
 import com.jme3.input.ChaseCamera;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
@@ -23,9 +25,13 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.shape.Box;
 import com.jme3.light.AmbientLight;
 import com.jme3.light.DirectionalLight;
+import com.jme3.material.RenderState.BlendMode;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.shape.Quad;
 import java.util.ArrayList;
 import java.util.List;
+import com.jme3.renderer.queue.RenderQueue;
+import com.jme3.ui.Picture;
 
 /**
  * AppState for running the game.
@@ -35,11 +41,17 @@ import java.util.List;
 public class GameRunningAppState extends AbstractAppState {
     private SimpleApplication app;
     private Node rootNode;
+    private Node guiNode;
     private Camera cam;
     private InputManager inputManager;
     private AssetManager assetManager;
     private Spatial squirrelModel;  // Updated to use squirrelModel instead of squirrelGeom
     private List<Spatial> trees; // List to store tree references
+    
+    private Picture settingsIcon;
+    private Picture saveIcon;
+    private Geometry missionBlock;
+    private BitmapText missionText;
     
     // Movement triggers
     private final static Trigger TRIGGER_RUN_FORWARD = new KeyTrigger(KeyInput.KEY_W);
@@ -64,6 +76,7 @@ public class GameRunningAppState extends AbstractAppState {
         super.initialize(stateManager, app);
         this.app = (SimpleApplication) app;
         this.rootNode = this.app.getRootNode();
+        this.guiNode = this.app.getGuiNode();
         this.inputManager = this.app.getInputManager();
         this.cam = this.app.getCamera();
         this.assetManager = this.app.getAssetManager();
@@ -75,15 +88,13 @@ public class GameRunningAppState extends AbstractAppState {
         rootNode.addLight(ambient);
         
         // Directional light to simulate sunlight
-        /*
         DirectionalLight sun = new DirectionalLight();
         sun.setColor(ColorRGBA.White);
         sun.setDirection(new Vector3f(-0.5f, -1f, -0.5f).normalizeLocal());
         rootNode.addLight(sun);
-        */
 
-        
         startGame();
+        createGUI();
     }
 
     /**
@@ -98,6 +109,60 @@ public class GameRunningAppState extends AbstractAppState {
         addMapping();
         attachCenterMark();   
     }
+    
+    private void createGUI() {
+        // Create Settings icon
+        settingsIcon = new Picture("Settings Icon");
+        settingsIcon.setImage(assetManager, "Interface/In Game GUI/setting.png", true); 
+        settingsIcon.setWidth(64);
+        settingsIcon.setHeight(64);
+        settingsIcon.setPosition(cam.getWidth() - 80, cam.getHeight() - 80); // Top-right corner
+        guiNode.attachChild(settingsIcon);
+
+        // Create Save icon
+        saveIcon = new Picture("Save Icon");
+        saveIcon.setImage(assetManager, "Interface/In Game GUI/save.png", true);
+        saveIcon.setWidth(64);
+        saveIcon.setHeight(64);
+        saveIcon.setPosition(cam.getWidth() - 160, cam.getHeight() - 80); // Next to Settings icon
+        guiNode.attachChild(saveIcon);
+
+        // Create and position the Mission Block
+        Quad missionQuad = new Quad(300, 150);
+        missionBlock = new Geometry("Mission Block", missionQuad);
+
+        // Set up the semi-transparent material for mission block
+        Material missionMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        missionMat.setBoolean("UseMaterialColors", true);
+        missionMat.setColor("Diffuse", new ColorRGBA(1, 1, 1, 0.5f)); // Semi-transparent white
+        missionMat.setColor("Ambient", new ColorRGBA(1, 1, 1, 0.5f));
+        missionMat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha); // Enable alpha blending
+
+        missionBlock.setMaterial(missionMat);
+        missionBlock.setQueueBucket(RenderQueue.Bucket.Transparent); // Set to transparent bucket
+
+        // Adjust position to ensure it's visible within the screen area
+        missionBlock.setLocalTranslation(20, cam.getHeight() - 200, 0); // Adjusted for better visibility
+        guiNode.attachChild(missionBlock);
+
+        // Debugging print to confirm mission block is added
+        System.out.println("Mission block added at position: " + missionBlock.getLocalTranslation());
+
+        // Create and position mission text
+        BitmapFont font = assetManager.loadFont("Interface/Fonts/Default.fnt");
+        missionText = new BitmapText(font, false);
+        missionText.setSize(font.getCharSet().getRenderedSize() * 1.2f); // Set font size
+        missionText.setColor(ColorRGBA.White); // Text color
+        missionText.setText("Missions:\n- Bite 10 students\n- Collect 10 acorns");
+
+        // Position the text inside the mission block, relative to its translation
+        missionText.setLocalTranslation(30, cam.getHeight() - 130, 0); // Adjust to align within mission block
+        guiNode.attachChild(missionText);
+
+        // Debugging print to confirm mission text is added
+        System.out.println("Mission text added at position: " + missionText.getLocalTranslation());
+    }
+
     
     /**
      * Method that add mapping for keyboard triggers
