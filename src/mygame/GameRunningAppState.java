@@ -54,6 +54,7 @@ public class GameRunningAppState extends AbstractAppState {
     private InputManager inputManager;
     private AssetManager assetManager;
     private Spatial squirrelModel;  // Updated to use squirrelModel instead of squirrelGeom
+    private Spatial treeModel;
     private List<Spatial> trees; // List to store tree references
     private BulletAppState bulletAppState;
     private AnimComposer composer;
@@ -244,16 +245,16 @@ public class GameRunningAppState extends AbstractAppState {
 
         // Add the squirrel
         addSquirrel(campusNode);
-        animateSquirrel();
+        animateModel(squirrelModel, "squirrel");
 
         // Add trees manually and add them to the trees list
-        Spatial tree1 = createTree(campusNode, 5, 2.5f, 0);
+        Spatial tree1 = createTree(campusNode, 5, 0.5f, 0);
         trees.add(tree1);
 
-        Spatial tree2 = createTree(campusNode, 10, 2.5f, -3);
+        Spatial tree2 = createTree(campusNode, 10, 0.5f, -3);
         trees.add(tree2);
 
-        Spatial tree3 = createTree(campusNode, -5, 2.5f, 5);
+        Spatial tree3 = createTree(campusNode, -10, 0.5f, 5);
         trees.add(tree3);
 
         // Add the quad in the center
@@ -276,7 +277,6 @@ public class GameRunningAppState extends AbstractAppState {
 
         // Set textures from the Squirrel2 folder
         Material squirrelMaterial = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        //squirrelMaterial.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Squirrel2/squirrel-body.png"));
         
         TextureKey squirrelDiffuse = new TextureKey(
            "Textures/Squirrel2/squirrel-body.png", false);
@@ -302,17 +302,6 @@ public class GameRunningAppState extends AbstractAppState {
         squirrelModel.addControl(squirrelPhysics);
         bulletAppState.getPhysicsSpace().add(squirrelPhysics);
 
-        // Attach the model to the parent node
-
-//        SkinningControl skinningControl = squirrelModel.getControl(SkinningControl.class);
-//        if (skinningControl != null) {
-//            // Use skinningControl for animation-related functionality
-//            System.out.println("SkinningControl found. Attempting to engage animations.");
-//        } else {
-//            System.out.println("No AnimComposer or SkinningControl found for the squirrel model.");
-//        }
-        
-
         // Add control for squirrel-specific movement
         SquirrelControl squirrelControl = new SquirrelControl(cam, trees, inputManager, squirrelPhysics);
         squirrelModel.addControl(squirrelControl);
@@ -320,8 +309,8 @@ public class GameRunningAppState extends AbstractAppState {
         parentNode.attachChild(squirrelModel);
     }
     
-    private void animateSquirrel() {
-        composer = squirrelModel.getControl(AnimComposer.class);
+    private void animateModel(Spatial model, String modelname) {
+        composer = model.getControl(AnimComposer.class);
 
         if (composer != null) {
             String animName = composer.getAnimClipsNames().iterator().next(); // Assuming one animation
@@ -330,23 +319,20 @@ public class GameRunningAppState extends AbstractAppState {
 
             System.out.println("Playing animation: " + animName);
         } else {
-            System.out.println("No AnimComposer found for the squirrel model.");
+            System.out.println("No AnimComposer found for the model " + modelname);
         }
     }
-
 
 
     private Spatial createTree(Node parentNode, float x, float y, float z) {
         Box treeBox = new Box(1, 5, 1);
         Geometry treeGeom = new Geometry("Tree", treeBox);
-        
-        // Load and set a tree bark texture
+        //Load and set a tree bark texture
         Material treeMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
         treeMat.setTexture("DiffuseMap", assetManager.loadTexture("Textures/tree-bark.jpg")); 
         treeGeom.setMaterial(treeMat);
-        
-        treeGeom.setLocalTranslation(x, y, z);
         parentNode.attachChild(treeGeom);
+        treeGeom.setLocalTranslation(x, y, z);
         return treeGeom;  // Return the tree geometry so we can track it
     }
     
