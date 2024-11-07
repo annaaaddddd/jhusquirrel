@@ -309,11 +309,38 @@ public class GameRunningAppState extends AbstractAppState {
         parentNode.attachChild(squirrelModel);
     }
     
+    /**
+     * Recursively search for the AnimComposer of the model.
+     * @param model
+     * @return AnimComposer
+     */
+    private AnimComposer findAnimComposer(Spatial model) {
+        if (model instanceof Node) {
+            for (Spatial child : ((Node) model).getChildren()) {
+                AnimComposer composer = child.getControl(AnimComposer.class);
+                if (composer != null) {
+                    return composer;
+                }
+                composer = findAnimComposer(child); 
+                if (composer != null) {
+                    return composer;
+                }
+            }
+        }
+        return model.getControl(AnimComposer.class); // Check at the root level as well
+    }
+    
+    
+    /**
+     * Helper function that plays the first animation in the animComposer list. Do nothing if not found
+     * @param model
+     * @param modelname 
+     */
     private void animateModel(Spatial model, String modelname) {
-        composer = model.getControl(AnimComposer.class);
+        composer = findAnimComposer(model); // Use the recursive method to find AnimComposer
 
         if (composer != null) {
-            String animName = composer.getAnimClipsNames().iterator().next(); // Assuming one animation
+            String animName = composer.getAnimClipsNames().iterator().next(); // Playing one animation
             composer.setCurrentAction(animName);
             composer.setEnabled(true);  // Enable the animation
 
@@ -322,7 +349,29 @@ public class GameRunningAppState extends AbstractAppState {
             System.out.println("No AnimComposer found for the model " + modelname);
         }
     }
+    
+    /**
+     * Helper function that specifically play animation with corresponding animationName. Do nothing if not found
+     * @param model
+     * @param modelname
+     * @param animationName 
+     */
+    private void animateModel(Spatial model, String modelname, String animationName) {
+        composer = model.getControl(AnimComposer.class);
 
+        if (composer != null) {
+            // Check if the specified animation name exists
+            if (composer.getAnimClipsNames().contains(animationName)) {
+                composer.setCurrentAction(animationName);
+                composer.setEnabled(true);  // Enable the animation
+                System.out.println("Playing animation: " + animationName);
+            } else {
+                System.out.println("Animation " + animationName + " not found in model " + modelname);
+            }
+        } else {
+            System.out.println("No AnimComposer found for the model " + modelname);
+        }
+    }
 
     private Spatial createTree(Node parentNode, float x, float y, float z) {
         Box treeBox = new Box(1, 5, 1);
