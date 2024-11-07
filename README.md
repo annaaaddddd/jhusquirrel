@@ -73,8 +73,6 @@ We extended AbstractControl to create the SquirrelControl class, which manages t
 The game state management is handled using an AbstractAppState, as seen in the GameRunningAppState.java file, allowing for organized code for starting game.
 The GameRunningAppState includes keyboard mapping and initialization code. It manages input actions, including running and climbing, through the use of AnalogListener. This enables fluid and responsive controls, enhancing player interaction with the game environment.
 
-==Missing screenshots!==
-
 ### Second Deliverable
 #### Updated home screen design
 New home screen
@@ -82,3 +80,17 @@ New home screen
 
 New setting screen
 <img width="1920" alt="Screenshot 2024-11-06 at 18 52 18" src="https://github.com/user-attachments/assets/906591f4-a6ed-4bfa-812b-21c552da0219">
+### Model
+We used assetManager to load models and add textures, and skinning control to add animated meshes. We also included collision and other physics to further implement our game design.
+#### The Squirrel Model
+
+
+<img width="407" alt="Screenshot 2024-11-06 at 22 06 28" src="https://github.com/user-attachments/assets/68906fa1-460f-40b2-bb7e-be5aee4824ac">
+
+
+The environment is also updated with treebark and grass, simulating a real-world environment.
+Lighting is added so that the character and other elements appear shaded.
+
+
+
+
