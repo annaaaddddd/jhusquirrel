@@ -58,6 +58,11 @@ We used a hierarchical scene graph structure to organize the environment element
 
 All these elements are attached to a parent node called campusNode, allowing for efficient transformations and grouped scene management
 
+
+![IMG_E73B587611CB-1](https://github.com/user-attachments/assets/7bd0426f-ce84-4f1c-a427-9491c45c29c6)
+
+
+
 #### User Interaction
 - Movement: The squirrel is controlled using the following keys:
   - WASD keys to move forward, backward, left, and right.
@@ -73,6 +78,7 @@ We extended AbstractControl to create the SquirrelControl class, which manages t
 The game state management is handled using an AbstractAppState, as seen in the GameRunningAppState.java file, allowing for organized code for starting game.
 The GameRunningAppState includes keyboard mapping and initialization code. It manages input actions, including running and climbing, through the use of AnalogListener. This enables fluid and responsive controls, enhancing player interaction with the game environment.
 
+Home screen:
 <img width="1512" alt="Screenshot 2024-11-06 at 23 26 40" src="https://github.com/user-attachments/assets/7ad17b75-0afc-4c65-ae24-4e983fd4f15e">
 
 ### Second Deliverable
