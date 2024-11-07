@@ -279,6 +279,7 @@ private void addSquirrel(Node parentNode) {
 
 
 
+
     private Spatial createTree(Node parentNode, float x, float y, float z) {
         Box treeBox = new Box(1, 5, 1);
         Geometry treeGeom = new Geometry("Tree", treeBox);
