@@ -38,6 +38,8 @@ import com.jme3.ui.Picture;
 import com.jme3.bullet.control.RigidBodyControl; 
 import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.anim.SkinningControl;
+import com.jme3.math.FastMath;
+import com.jme3.math.Quaternion;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -297,7 +299,6 @@ public class GameRunningAppState extends AbstractAppState {
         // Position, scale, and rotation adjustments
         squirrelModel.setLocalTranslation(0, 1, 0);
         squirrelModel.setLocalScale(0.3f); // Adjust scale if needed
-        squirrelModel.rotate(0, (float)Math.PI, 0);  // Rotate to face forward if necessary
         RigidBodyControl squirrelPhysics = new RigidBodyControl(1.0f); // mass > 0
         squirrelModel.addControl(squirrelPhysics);
         bulletAppState.getPhysicsSpace().add(squirrelPhysics);
@@ -305,8 +306,12 @@ public class GameRunningAppState extends AbstractAppState {
         // Add control for squirrel-specific movement
         SquirrelControl squirrelControl = new SquirrelControl(cam, trees, inputManager, squirrelPhysics);
         squirrelModel.addControl(squirrelControl);
-
+        rotateSquirrelToFront();
+        
         parentNode.attachChild(squirrelModel);
+        rotateSquirrelToFront();
+        
+
     }
     
     /**
@@ -415,6 +420,21 @@ public class GameRunningAppState extends AbstractAppState {
         
         app.getGuiNode().attachChild(c); // Attach to 2D user interface
     }
+    private void rotateSquirrelToFront() {
+    if (squirrelModel == null) {
+        System.out.println("Error: squirrelModel is null!");
+    } else {
+        System.out.println("squirrelModel exists. Current rotation: " + squirrelModel.getLocalRotation());
+    }
+
+        // Rotate the squirrel to face forward along the Z-axis
+        Quaternion frontRotation = new Quaternion();
+        frontRotation.fromAngleAxis( FastMath.PI , Vector3f.UNIT_Y);
+        squirrelModel.setLocalRotation(frontRotation);
+        squirrelModel.updateGeometricState();
+
+    }
+
 
 
     @Override
@@ -424,3 +444,5 @@ public class GameRunningAppState extends AbstractAppState {
         inputManager.removeListener(analogListener);
     }
 }
+
+

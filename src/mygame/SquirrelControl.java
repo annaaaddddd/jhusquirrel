@@ -58,8 +58,8 @@ public class SquirrelControl extends AbstractControl {
 
     private void updateCameraPosition() {
         Vector3f squirrelPos = spatial.getWorldTranslation();
-        float offsetX = cameraOffset.z * FastMath.sin(yaw);
-        float offsetZ = cameraOffset.z * FastMath.cos(yaw);
+        float offsetX = -cameraOffset.z * FastMath.sin(yaw);
+        float offsetZ = -cameraOffset.z * FastMath.cos(yaw);
         float offsetY = cameraOffset.y * FastMath.sin(pitch);
 
         Vector3f camPos = squirrelPos.add(offsetX, offsetY, offsetZ);
