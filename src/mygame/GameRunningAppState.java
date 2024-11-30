@@ -63,6 +63,10 @@ public class GameRunningAppState extends AbstractAppState {
     final private Queue<String> anims = new LinkedList<>();
     private boolean playAnim = true;
     
+    private List<Spatial> acorns = new ArrayList<>(); // List to store acorn geometries
+    private int collectedAcorns = 0; // Counter for collected acorns
+    private BitmapText acornCounterText; // GUI element to display the counter
+
     private Picture settingsIcon;
     private Picture saveIcon;
     private Geometry missionBlock;
@@ -106,6 +110,31 @@ public class GameRunningAppState extends AbstractAppState {
         startGame();
         createGUI();
     }
+    private void generateRandomCubes(int count) {
+        for (int i = 0; i < count; i++) {
+            // Create a cube (acorn)
+            Box acornBox = new Box(0.2f, 0.2f, 0.2f);
+            Geometry acorn = new Geometry("Acorn", acornBox);
+
+            // Assign a simple material
+            Material acornMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+            acornMaterial.setColor("Color", ColorRGBA.Brown);
+            acorn.setMaterial(acornMaterial);
+
+            // Place the acorn at a random position, including random heights
+            float x = (float) (Math.random() * 20 - 10); // Random X between -10 and 10
+            float z = (float) (Math.random() * 20 - 10); // Random Z between -10 and 10
+            float y = (float) (Math.random() * 5 + 0.5f); // Random Y between 0.5 and 5.5
+
+            acorn.setLocalTranslation(x, y, z);
+
+            // Add to the scene and the acorns list
+            rootNode.attachChild(acorn);
+            acorns.add(acorn);
+        }
+    }
+
+
     
     /**
      * Initialize light setting. Add ambient light and sunlight (directional) to the scene.
@@ -133,6 +162,7 @@ public class GameRunningAppState extends AbstractAppState {
         initializeSquirrelAndCampus();
         addMapping();
         attachCenterMark();   
+        generateRandomCubes(3);
     }
     
     private void createGUI() {

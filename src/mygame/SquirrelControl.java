@@ -89,9 +89,9 @@ public class SquirrelControl extends AbstractControl {
     }
 
     public void climbUp(float intensity) {
-        if (canClimb) {
+        //if (canClimb) {
             squirrelPhysics.applyCentralForce(new Vector3f(0, intensity * 100, 0));
-        }
+        //}
     }
 
     public void climbDown(float intensity) {
