@@ -387,7 +387,7 @@ public class GameRunningAppState extends AbstractAppState {
         acornCounterText,     // GUI element for the acorn counter
         inputManager,         // Input manager
         squirrelPhysics,       // Squirrel's physics control
-        assetManager        // Pass the AssetManager       
+        assetManager,        // Pass the AssetManager       
         findAnimComposer(squirrelModel) // Squirrel's animComposer
     );
         squirrelModel.addControl(squirrelControl);

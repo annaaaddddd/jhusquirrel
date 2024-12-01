@@ -42,8 +42,6 @@ public class SquirrelControl extends AbstractControl {
     private AudioNode chirpSound;
     private AudioNode acornCollectSound;
     private AssetManager assetManager;
-
-    public SquirrelControl(Camera cam, List<Spatial> trees, List<Spatial> acorns, Node rootNode, BitmapText acornCounterText, InputManager inputManager, RigidBodyControl squirrelPhysics, AssetManager assetManager) {
     
     // Animation related fields
     private boolean isJumping = false; // Track if the squirrel is jumping
@@ -56,7 +54,7 @@ public class SquirrelControl extends AbstractControl {
 
     public SquirrelControl(Camera cam, List<Spatial> trees, List<Spatial> acorns, Node rootNode,
                             BitmapText acornCounterText, InputManager inputManager, RigidBodyControl squirrelPhysics, 
-                            AnimComposer animComposer) {
+                            AssetManager assetManager, AnimComposer animComposer) {
         this.cam = cam;
         this.trees = trees;
         this.acorns = acorns;
