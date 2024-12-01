@@ -1,19 +1,16 @@
 package mygame;
 
 import com.jme3.anim.AnimComposer;
-import com.jme3.animation.AnimChannel;
-import com.jme3.animation.AnimControl;
-import com.jme3.animation.LoopMode;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.TextureKey;
+import com.jme3.audio.AudioNode;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.font.BitmapText;
 import com.jme3.font.BitmapFont;
-import com.jme3.input.ChaseCamera;
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.AnalogListener;
@@ -37,7 +34,6 @@ import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.ui.Picture;
 import com.jme3.bullet.control.RigidBodyControl; 
 import com.jme3.util.TangentBinormalGenerator;
-import com.jme3.anim.SkinningControl;
 import com.jme3.material.RenderState;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
@@ -72,6 +68,8 @@ public class GameRunningAppState extends AbstractAppState {
     private Picture saveIcon;
     private Geometry missionBlock;
     private BitmapText missionText;
+    
+    private AudioNode ambientSound;
     
     // Movement triggers
     private final static Trigger TRIGGER_RUN_FORWARD = new KeyTrigger(KeyInput.KEY_W);
@@ -110,6 +108,14 @@ public class GameRunningAppState extends AbstractAppState {
         initializeLight();
         createGUI();
         startGame();
+        
+        // Load ambient nature sound
+        ambientSound = new AudioNode(app.getAssetManager(), "Sounds/Environment/Nature.ogg", true);
+        ambientSound.setLooping(true); // Continuous sound
+        ambientSound.setPositional(false); // Global sound
+        ambientSound.setVolume(0.6f);
+        ((SimpleApplication) app).getRootNode().attachChild(ambientSound);
+        ambientSound.play();
         
     }
     private void generateRandomCubes(int count) {

@@ -9,6 +9,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
+import com.jme3.audio.AudioNode;
 import com.jme3.input.InputManager;
 import com.jme3.input.MouseInput;
 import com.jme3.input.controls.ActionListener;
@@ -37,6 +38,9 @@ public class StartScreenAppState extends AbstractAppState {
     private String playButtonPath = "Textures/Home Menu/Buttons/homePlay.png";
     private String settingButtonPath  = "Textures/Home Menu/Buttons/homeSetting.png";
     private String exitButtonPath = "Textures/Home Menu/Buttons/homeExit.png";
+    
+    private AudioNode menuMusic;
+    private AudioNode buttonClickSound;
 
     
     @Override
@@ -50,6 +54,20 @@ public class StartScreenAppState extends AbstractAppState {
 
         this.startY = cam.getHeight() * 0.3f; // Y coordinate to place buttons
         createStartMenu();
+        
+        // Load background music for the menu
+        menuMusic = new AudioNode(app.getAssetManager(), "Sounds/Environment/MenuMusic.wav", true);
+        menuMusic.setLooping(true);
+        menuMusic.setPositional(false);
+        menuMusic.setVolume(0.5f);
+        ((SimpleApplication) app).getRootNode().attachChild(menuMusic);
+        menuMusic.play();
+        
+        // Load button click sound
+        buttonClickSound = new AudioNode(assetManager, "Sounds/Effects/ButtonClick.wav", false);
+        buttonClickSound.setPositional(false); // Global sound
+        buttonClickSound.setVolume(0.8f);
+        ((SimpleApplication) app).getRootNode().attachChild(buttonClickSound);
     }
 
     /**
@@ -123,6 +141,8 @@ public class StartScreenAppState extends AbstractAppState {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
             if (isPressed) {
+                buttonClickSound.playInstance(); // Play click sound
+                
                 // Get mouse click position
                 float clickX = inputManager.getCursorPosition().x;
                 float clickY = inputManager.getCursorPosition().y;
@@ -136,6 +156,9 @@ public class StartScreenAppState extends AbstractAppState {
                     System.out.println("Navigating to running game.");
                     GameRunningAppState gameRunning = new GameRunningAppState();
                     app.getStateManager().detach(StartScreenAppState.this);
+                    // Stop menu music before transitioning
+                    menuMusic.stop();
+                    app.getRootNode().detachChild(menuMusic);
                     app.getStateManager().attach(gameRunning);
                 }
 

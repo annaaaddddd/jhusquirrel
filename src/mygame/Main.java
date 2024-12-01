@@ -8,6 +8,7 @@ import com.jme3.renderer.RenderManager;
  * @author Anna Dai, Serena Hu, and Leo Zhuang
  */
 public class Main extends SimpleApplication {
+    private AudioManager audioManager;
     
     @Override
     public void simpleInitApp() {
