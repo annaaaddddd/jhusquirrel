@@ -37,6 +37,10 @@ import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.material.RenderState;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.renderer.ViewPort;
+import com.jme3.renderer.queue.RenderQueue.ShadowMode;
+import com.jme3.shadow.DirectionalLightShadowRenderer;
+import com.jme3.util.SkyFactory;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -52,6 +56,8 @@ public class GameRunningAppState extends AbstractAppState {
     private Camera cam;
     private InputManager inputManager;
     private AssetManager assetManager;
+    private ViewPort viewPort;
+    
     private Spatial squirrelModel;  // Updated to use squirrelModel instead of squirrelGeom
     private Spatial treeModel;
     private List<Spatial> trees; // List to store tree references
@@ -99,6 +105,7 @@ public class GameRunningAppState extends AbstractAppState {
         this.inputManager = this.app.getInputManager();
         this.cam = this.app.getCamera();
         this.assetManager = this.app.getAssetManager();
+        this.viewPort = this.app.getViewPort();
         trees = new ArrayList<>();  // Initialize the list to hold trees
 
         bulletAppState = new BulletAppState();
@@ -106,9 +113,9 @@ public class GameRunningAppState extends AbstractAppState {
         // Set global gravity to pull objects downwards
         bulletAppState.getPhysicsSpace().setGravity(new Vector3f(0, -0.81f, 0));
 
-        initializeLight();
         createGUI();
         startGame();
+        initializeLight();
         
         // Load ambient nature sound
         ambientSound = new AudioNode(app.getAssetManager(), "Sounds/Environment/Nature.ogg", true);
@@ -146,6 +153,8 @@ public class GameRunningAppState extends AbstractAppState {
             // Add to the scene and the acorns list
             rootNode.attachChild(acorn);
             acorns.add(acorn);
+            
+            acorn.setShadowMode(ShadowMode.CastAndReceive);
         }
     }
 
@@ -162,10 +171,21 @@ public class GameRunningAppState extends AbstractAppState {
         
         DirectionalLight sun = new DirectionalLight();
         sun.setColor(ColorRGBA.White);
-        sun.setDirection(new Vector3f(-0.5f, -1f, -0.5f).normalizeLocal());
+        sun.setDirection(new Vector3f(0.1f, -1f, 0.95f).normalizeLocal());
         rootNode.addLight(sun);
+        
+        
+        Spatial sky = SkyFactory.createSky(assetManager, 
+                "Textures/Sky/Bright/FullskiesBlueClear03.dds", false);
+        rootNode.attachChild(sky);
+        
+        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, 1024, 2);
+        dlsr.setShadowIntensity(0.4f);
+        dlsr.setLight(sun);
+        viewPort.addProcessor(dlsr);
+        rootNode.setShadowMode(ShadowMode.Off);
     }
-
+    
     /**
      * Initialize game level and logic (creating level content, setting up physics, etc.
      * Potential TODO: Add a WorldManagerState object that attaches nodes to the rootNode object, 
@@ -375,7 +395,7 @@ public class GameRunningAppState extends AbstractAppState {
         parentNode.attachChild(squirrelModel);
         rotateSquirrelToFront();
         
-
+        squirrelModel.setShadowMode(ShadowMode.CastAndReceive);
     }
     
     /**
@@ -462,6 +482,7 @@ public class GameRunningAppState extends AbstractAppState {
         treeGeo.setLocalTranslation(treeLoc);
 
         parentNode.attachChild(treeGeo);
+        treeGeo.setShadowMode(ShadowMode.CastAndReceive);
         return treeGeo;
     }
     
@@ -477,6 +498,7 @@ public class GameRunningAppState extends AbstractAppState {
         
         quadGeom.setLocalTranslation(x, y, z);
         parentNode.attachChild(quadGeom);
+        quadGeom.setShadowMode(ShadowMode.Receive);
     }
     
     /**
