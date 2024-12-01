@@ -51,7 +51,8 @@ public class SquirrelControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
         if (spatial.getWorldTranslation().z <= targetZLevel) {
-            squirrelPhysics.setGravity(Vector3f.ZERO);
+            //squirrelPhysics.setGravity(Vector3f.ZERO);
+            squirrelPhysics.setGravity(new Vector3f(0, -0.05f, 0));
         } else {
             squirrelPhysics.setGravity(new Vector3f(0, -0.05f, 0));
         }
