@@ -9,10 +9,13 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.Camera;
-import com.jme3.renderer.RenderManager;
-import com.jme3.renderer.ViewPort;
+import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
+import com.jme3.font.BitmapText;
+import com.jme3.renderer.RenderManager;
+import com.jme3.renderer.ViewPort;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SquirrelControl extends AbstractControl {
@@ -22,6 +25,10 @@ public class SquirrelControl extends AbstractControl {
     private boolean canClimb = false;
     private float climbDistanceThreshold = 3.0f;
     private List<Spatial> trees;
+    private List<Spatial> acorns;
+    private Node rootNode;
+    private BitmapText acornCounterText;
+    private int collectedAcorns = 0;
     private float sensitivity = 0.2f;
     private InputManager inputManager;
     private float yaw = 0f;
@@ -29,9 +36,13 @@ public class SquirrelControl extends AbstractControl {
     private RigidBodyControl squirrelPhysics;
     private float targetZLevel = -10f;
 
-    public SquirrelControl(Camera cam, List<Spatial> trees, InputManager inputManager, RigidBodyControl squirrelPhysics) {
+    public SquirrelControl(Camera cam, List<Spatial> trees, List<Spatial> acorns, Node rootNode,
+                            BitmapText acornCounterText, InputManager inputManager, RigidBodyControl squirrelPhysics) {
         this.cam = cam;
         this.trees = trees;
+        this.acorns = acorns;
+        this.rootNode = rootNode;
+        this.acornCounterText = acornCounterText;
         this.inputManager = inputManager;
         this.squirrelPhysics = squirrelPhysics;
         setupMouseControl();
@@ -40,21 +51,53 @@ public class SquirrelControl extends AbstractControl {
     @Override
     protected void controlUpdate(float tpf) {
         if (spatial.getWorldTranslation().z <= targetZLevel) {
-        // Stop any further movement along the Z-axis
-            squirrelPhysics.setGravity(Vector3f.ZERO);  // Set gravity to zero to prevent further falling
+            squirrelPhysics.setGravity(Vector3f.ZERO);
         } else {
-            // Ensure gravity is applied while above the target Z level
-            squirrelPhysics.setGravity(new Vector3f(0, -0.05f,0));  // Adjust if gravity is acting downward on the Z-axis
+            squirrelPhysics.setGravity(new Vector3f(0, -0.05f, 0));
         }
         updateCameraPosition();
         updateSquirrelRotation();
         checkProximityToTree();
+        checkProximityToAcorns();
     }
-
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
-        // Not used in this case
+        // Not used in this case, so leave it empty
     }
+
+
+    private void checkProximityToAcorns() {
+        Vector3f squirrelPos = spatial.getWorldTranslation();
+        List<Spatial> collected = new ArrayList<>(); // Temporary list to store collected acorns
+
+        for (Spatial acorn : acorns) {
+            float distance = squirrelPos.distance(acorn.getWorldTranslation());
+            if (distance < 1.0f) {
+                collected.add(acorn); // Mark the acorn for removal
+            }
+        }
+
+        // Remove collected acorns safely
+        for (Spatial acorn : collected) {
+            rootNode.detachChild(acorn);
+            updateAcornCounter();
+            acorns.remove(acorn); 
+        }
+
+        // Update the counter text after all acorns are processed
+     
+    }
+
+
+    private void updateAcornCounter() {
+    if (acornCounterText != null) {
+        System.out.println("Updating acorn counter text.");
+        collectedAcorns++;
+        acornCounterText.setText("Acorns Collected: " + collectedAcorns);
+    } else {
+        System.out.println("acornCounterText is null!");
+    }
+}
 
     private void updateCameraPosition() {
         Vector3f squirrelPos = spatial.getWorldTranslation();

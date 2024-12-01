@@ -65,7 +65,7 @@ public class GameRunningAppState extends AbstractAppState {
     private boolean playAnim = true;
     
     private List<Spatial> acorns = new ArrayList<>(); // List to store acorn geometries
-    private int collectedAcorns = 0; // Counter for collected acorns
+    private int collectedAcorns = 1; // Counter for collected acorns
     private BitmapText acornCounterText; // GUI element to display the counter
 
     private Picture settingsIcon;
@@ -108,8 +108,9 @@ public class GameRunningAppState extends AbstractAppState {
         bulletAppState.getPhysicsSpace().setGravity(new Vector3f(0, -0.81f, 0));
 
         initializeLight();
-        startGame();
         createGUI();
+        startGame();
+        
     }
     private void generateRandomCubes(int count) {
         for (int i = 0; i < count; i++) {
@@ -167,6 +168,18 @@ public class GameRunningAppState extends AbstractAppState {
     }
     
     private void createGUI() {
+        BitmapFont font = assetManager.loadFont("Interface/Fonts/Default.fnt");
+    
+        // Acorn counter text
+        acornCounterText = new BitmapText(font, false);
+        acornCounterText.setSize(font.getCharSet().getRenderedSize());
+        acornCounterText.setColor(ColorRGBA.White);
+        acornCounterText.setText("Acorns Collected:");
+        acornCounterText.setLocalTranslation(20, cam.getHeight() - 50, 0); // Position on the screen
+        guiNode.attachChild(acornCounterText);
+        System.out.println("guiNode children count: " + guiNode.getQuantity());
+        System.out.println("acornCounterText is attached: " + (guiNode.hasChild(acornCounterText)));
+
         // Create Settings icon
         settingsIcon = new Picture("Settings Icon");
         settingsIcon.setImage(assetManager, "Interface/In Game GUI/setting.png", true); 
@@ -205,7 +218,6 @@ public class GameRunningAppState extends AbstractAppState {
         System.out.println("Mission block added at position: " + missionBlock.getLocalTranslation());
 
         // Create and position mission text
-        BitmapFont font = assetManager.loadFont("Interface/Fonts/Default.fnt");
         missionText = new BitmapText(font, false);
         missionText.setSize(font.getCharSet().getRenderedSize() * 1.2f); // Set font size
         missionText.setColor(ColorRGBA.White); // Text color
@@ -296,8 +308,8 @@ public class GameRunningAppState extends AbstractAppState {
         // Attach the campus node to the root node
         rootNode.attachChild(campusNode);
     }
-    
     private void addSquirrel(Node parentNode) {
+        System.out.println("Passing acornCounterText to SquirrelControl: " + (acornCounterText != null));
         // Load the squirrel model with animations from the Squirrel2 folder
         System.out.println("Loading squirrel model...");
         squirrelModel = assetManager.loadModel("Textures/Squirrel2/squirrel-anim.j3o");
@@ -335,7 +347,15 @@ public class GameRunningAppState extends AbstractAppState {
         bulletAppState.getPhysicsSpace().add(squirrelPhysics);
 
         // Add control for squirrel-specific movement
-        SquirrelControl squirrelControl = new SquirrelControl(cam, trees, inputManager, squirrelPhysics);
+        SquirrelControl squirrelControl = new SquirrelControl(
+        cam,                  // Camera
+        trees,                // List of trees
+        acorns,               // List of acorns
+        rootNode,             // Root node
+        acornCounterText,     // GUI element for the acorn counter
+        inputManager,         // Input manager
+        squirrelPhysics       // Squirrel's physics control
+    );
         squirrelModel.addControl(squirrelControl);
         rotateSquirrelToFront();
         
@@ -477,7 +497,7 @@ public class GameRunningAppState extends AbstractAppState {
 
     }
 
-
+   
 
     @Override
     public void cleanup() {
