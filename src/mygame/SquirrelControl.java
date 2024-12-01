@@ -1,6 +1,7 @@
 package mygame;
 
 import com.jme3.asset.AssetManager;
+import com.jme3.anim.AnimComposer;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.input.InputManager;
@@ -37,13 +38,25 @@ public class SquirrelControl extends AbstractControl {
     private float pitch = 10f;
     private RigidBodyControl squirrelPhysics;
     private float targetZLevel = -10f;
-    private float idleTimer = 0;
     private final float idleChirpInterval = 5.0f; // Chirp every 5 seconds of idling
     private AudioNode chirpSound;
     private AudioNode acornCollectSound;
     private AssetManager assetManager;
 
     public SquirrelControl(Camera cam, List<Spatial> trees, List<Spatial> acorns, Node rootNode, BitmapText acornCounterText, InputManager inputManager, RigidBodyControl squirrelPhysics, AssetManager assetManager) {
+    
+    // Animation related fields
+    private boolean isJumping = false; // Track if the squirrel is jumping
+    private boolean isFlying = false; // Track if the squirrel is mid-air
+    private boolean playedJumpEnd = false; // Track if Jump.End has been played
+    private final AnimComposer animComposer;
+    private float idleTimer = 0f;
+    private final float idleAnimationInterval = 5f; // Trigger idle animation every 5 seconds
+
+
+    public SquirrelControl(Camera cam, List<Spatial> trees, List<Spatial> acorns, Node rootNode,
+                            BitmapText acornCounterText, InputManager inputManager, RigidBodyControl squirrelPhysics, 
+                            AnimComposer animComposer) {
         this.cam = cam;
         this.trees = trees;
         this.acorns = acorns;
@@ -53,10 +66,13 @@ public class SquirrelControl extends AbstractControl {
         this.squirrelPhysics = squirrelPhysics;
         this.assetManager = assetManager; // Assign the AssetManager
         setupMouseControl();
+        this.animComposer = animComposer;
     }
 
     @Override
     protected void controlUpdate(float tpf) {
+        updateSquirrelState(tpf);
+        
         if (spatial.getWorldTranslation().z <= targetZLevel) {
             //squirrelPhysics.setGravity(Vector3f.ZERO);
             squirrelPhysics.setGravity(new Vector3f(0, -0.05f, 0));
@@ -153,28 +169,46 @@ public class SquirrelControl extends AbstractControl {
     }
 
     public void moveForward(float intensity) {
+        if (!isJumping) {
+            startJump();
+        }
         squirrelPhysics.applyCentralForce(cam.getDirection().mult(intensity * 100));
     }
 
     public void moveBackward(float intensity) {
+        if (!isJumping) {
+            startJump();
+        }
         squirrelPhysics.applyCentralForce(cam.getDirection().mult(-intensity * 100));
     }
 
     public void moveLeft(float intensity) {
+        if (!isJumping) {
+            startJump();
+        }
         squirrelPhysics.applyCentralForce(cam.getLeft().mult(intensity * 100));
     }
 
     public void moveRight(float intensity) {
+        if (!isJumping) {
+            startJump();
+        }
         squirrelPhysics.applyCentralForce(cam.getLeft().mult(-intensity * 100));
     }
 
     public void climbUp(float intensity) {
+        if (!isJumping) {
+            startJump();
+        }
         //if (canClimb) {
             squirrelPhysics.applyCentralForce(new Vector3f(0, intensity * 100, 0));
         //}
     }
 
     public void climbDown(float intensity) {
+        if (!isJumping) {
+            startJump();
+        }
         squirrelPhysics.applyCentralForce(new Vector3f(0, -intensity * 100, 0));
     }
 
@@ -216,4 +250,99 @@ public class SquirrelControl extends AbstractControl {
         updateCameraPosition();
         updateSquirrelRotation();
     };
+    
+    private void updateSquirrelState(float tpf) {
+        Vector3f velocity = squirrelPhysics.getLinearVelocity();
+
+        // Thresholds for stopping the jump
+        float verticalThreshold = 0.01f; // Small vertical velocity threshold
+        float totalVelocityThreshold = 0.1f; // Small total velocity threshold
+
+        // Transition to Jump.Fly while in the air
+        if (isJumping && !isFlying && velocity.y > verticalThreshold) {
+            playAnimation("Jump.Fly");
+            isFlying = true;
+            playedJumpEnd = false; // Reset the flag to allow Jump.End later
+            idleTimer = 0f; // Reset idle timer since the squirrel is moving
+        }
+
+        // Transition to Jump.End when landing (but only once)
+        if (isFlying && Math.abs(velocity.y) < verticalThreshold && velocity.length() < totalVelocityThreshold) {
+            if (!playedJumpEnd) { // Play Jump.End only once
+                playAnimation("Jump.End");
+                playedJumpEnd = true;
+                isJumping = false;
+                isFlying = false;
+            }
+            idleTimer = 0f; // Reset idle timer since landing just occurred
+        }
+
+        // If the squirrel is stationary and not jumping or flying, stop movement and trigger idle animations
+        if (!isJumping && !isFlying && velocity.length() < totalVelocityThreshold) {
+            // Stop residual movement
+            squirrelPhysics.setLinearVelocity(Vector3f.ZERO);
+
+            // Increment idle timer
+            idleTimer += tpf;
+
+            if (idleTimer >= idleAnimationInterval) {
+                triggerIdleAnimation(); // Play idle animation
+                idleTimer = 0f; // Reset idle timer
+            }
+        } else {
+            // Reset idle timer when the squirrel starts moving
+            idleTimer = 0f;
+        }
+    }
+
+
+    
+    private void startJump() {
+        if (animComposer != null) {
+            playAnimation("Jump.Begin");
+            isJumping = true; // Set jumping state
+        }
+    }
+    
+    /**
+     * Helper function that plays the specified animation in the animComposer list. Do nothing if not found
+     * @param animationName 
+     */
+    private void playAnimation(String animationName) {
+        if (animComposer != null && animComposer.getAnimClipsNames().contains(animationName)) {
+            animComposer.setCurrentAction(animationName);
+            System.out.println("Playing animation: " + animationName);
+        } else {
+            System.out.println("Animation " + animationName + " not found.");
+        }
+    }
+
+    private void stopAnimation(String animationName) {
+        if (animComposer != null && animComposer.getAnimClipsNames().contains(animationName)) {
+            animComposer.reset(); // Stops the current animation
+            System.out.println("Stopping animation: " + animationName);
+        }
+    }
+    
+    private void triggerIdleAnimation() {
+        int idleAnimationNumber = 5; // Total idle animations available
+        if (animComposer != null) {
+            // Randomly select an idle animation
+            int randomIndex = (int) (Math.random() * idleAnimationNumber);
+            String idleAnimation = "Idle.00" + randomIndex;
+
+            // Check if an idle animation is already playing
+            String currentAnimation = animComposer.getCurrentAction() != null
+                ? animComposer.getCurrentAction().toString() // Get the current animation name
+                : "";
+
+            if (!currentAnimation.startsWith("Idle.")) {
+                playAnimation(idleAnimation);
+                System.out.println("Playing idle animation: " + idleAnimation);
+            }
+        }
+    }
+
+
+
 }
