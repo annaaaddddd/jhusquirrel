@@ -1,5 +1,6 @@
 package mygame;
 
+import com.jme3.asset.AssetManager;
 import com.jme3.audio.AudioNode;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.input.InputManager;
@@ -40,9 +41,9 @@ public class SquirrelControl extends AbstractControl {
     private final float idleChirpInterval = 5.0f; // Chirp every 5 seconds of idling
     private AudioNode chirpSound;
     private AudioNode acornCollectSound;
+    private AssetManager assetManager;
 
-    public SquirrelControl(Camera cam, List<Spatial> trees, List<Spatial> acorns, Node rootNode,
-                            BitmapText acornCounterText, InputManager inputManager, RigidBodyControl squirrelPhysics) {
+    public SquirrelControl(Camera cam, List<Spatial> trees, List<Spatial> acorns, Node rootNode, BitmapText acornCounterText, InputManager inputManager, RigidBodyControl squirrelPhysics, AssetManager assetManager) {
         this.cam = cam;
         this.trees = trees;
         this.acorns = acorns;
@@ -50,6 +51,7 @@ public class SquirrelControl extends AbstractControl {
         this.acornCounterText = acornCounterText;
         this.inputManager = inputManager;
         this.squirrelPhysics = squirrelPhysics;
+        this.assetManager = assetManager; // Assign the AssetManager
         setupMouseControl();
     }
 
@@ -65,13 +67,39 @@ public class SquirrelControl extends AbstractControl {
         updateSquirrelRotation();
         checkProximityToTree();
         checkProximityToAcorns();
+        
+        Vector3f velocity = squirrelPhysics.getLinearVelocity();
+        if (velocity.length() < 0.1f) { // If not moving
+            idleTimer += tpf;
+            if (idleTimer >= idleChirpInterval) {
+                chirpSound.setLocalTranslation(spatial.getWorldTranslation()); // Update position
+                chirpSound.playInstance();
+                idleTimer = 0; // Reset timer after chirp
+            }
+        } else {
+        idleTimer = 0; // Reset timer when moving
+        }
     }
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
         // Not used in this case, so leave it empty
     }
 
-
+    @Override
+    public void setSpatial(Spatial spatial) {
+        super.setSpatial(spatial);
+        if (spatial != null) {
+            acornCollectSound = new AudioNode(assetManager, "Sounds/Effects/acorn-achievement-bell.wav", false);
+            acornCollectSound.setPositional(true);
+            acornCollectSound.setVolume(0.8f);
+            rootNode.attachChild(acornCollectSound);
+            
+            chirpSound = new AudioNode(assetManager, "Sounds/Effects/Chirp.wav", false);
+            chirpSound.setPositional(true);
+            chirpSound.setVolume(0.7f);
+            rootNode.attachChild(chirpSound);
+        }
+    }
     private void checkProximityToAcorns() {
         Vector3f squirrelPos = spatial.getWorldTranslation();
         List<Spatial> collected = new ArrayList<>(); // Temporary list to store collected acorns
@@ -79,6 +107,8 @@ public class SquirrelControl extends AbstractControl {
         for (Spatial acorn : acorns) {
             float distance = squirrelPos.distance(acorn.getWorldTranslation());
             if (distance < 1.0f) {
+                acornCollectSound.setLocalTranslation(acorn.getWorldTranslation()); // Set sound position
+                acornCollectSound.playInstance();
                 collected.add(acorn); // Mark the acorn for removal
             }
         }
@@ -86,8 +116,9 @@ public class SquirrelControl extends AbstractControl {
         // Remove collected acorns safely
         for (Spatial acorn : collected) {
             rootNode.detachChild(acorn);
-            updateAcornCounter();
+            //updateAcornCounter();
             acorns.remove(acorn); 
+            updateAcornCounter(); // attempting to fix bug
         }
 
         // Update the counter text after all acorns are processed

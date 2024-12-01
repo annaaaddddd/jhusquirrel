@@ -98,7 +98,7 @@ public class GameRunningAppState extends AbstractAppState {
         this.guiNode = this.app.getGuiNode();
         this.inputManager = this.app.getInputManager();
         this.cam = this.app.getCamera();
-        this.assetManager = this.app.getAssetManager();
+        this.assetManager = app.getAssetManager();
         trees = new ArrayList<>();  // Initialize the list to hold trees
 
         bulletAppState = new BulletAppState();
@@ -367,7 +367,8 @@ public class GameRunningAppState extends AbstractAppState {
         rootNode,             // Root node
         acornCounterText,     // GUI element for the acorn counter
         inputManager,         // Input manager
-        squirrelPhysics       // Squirrel's physics control
+        squirrelPhysics,       // Squirrel's physics control
+        assetManager        // Pass the AssetManager       
     );
         squirrelModel.addControl(squirrelControl);
         rotateSquirrelToFront();
