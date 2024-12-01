@@ -1,5 +1,6 @@
 package mygame;
 
+import com.jme3.audio.AudioNode;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.input.InputManager;
 import com.jme3.input.MouseInput;
@@ -35,6 +36,10 @@ public class SquirrelControl extends AbstractControl {
     private float pitch = 10f;
     private RigidBodyControl squirrelPhysics;
     private float targetZLevel = -10f;
+    private float idleTimer = 0;
+    private final float idleChirpInterval = 5.0f; // Chirp every 5 seconds of idling
+    private AudioNode chirpSound;
+    private AudioNode acornCollectSound;
 
     public SquirrelControl(Camera cam, List<Spatial> trees, List<Spatial> acorns, Node rootNode,
                             BitmapText acornCounterText, InputManager inputManager, RigidBodyControl squirrelPhysics) {

@@ -70,6 +70,7 @@ public class GameRunningAppState extends AbstractAppState {
     private BitmapText missionText;
     
     private AudioNode ambientSound;
+    private AudioNode bellSound;
     
     // Movement triggers
     private final static Trigger TRIGGER_RUN_FORWARD = new KeyTrigger(KeyInput.KEY_W);
@@ -116,6 +117,12 @@ public class GameRunningAppState extends AbstractAppState {
         ambientSound.setVolume(0.6f);
         ((SimpleApplication) app).getRootNode().attachChild(ambientSound);
         ambientSound.play();
+        
+        bellSound = new AudioNode(assetManager, "Sounds/Environment/church-bell-loop-mono.wav", false);
+        bellSound.setPositional(true);
+        bellSound.setLocalTranslation(10, 15, 0); // Position near Gilman Hall
+        bellSound.setVolume(1.0f);
+        rootNode.attachChild(bellSound);
         
     }
     private void generateRandomCubes(int count) {
@@ -500,9 +507,30 @@ public class GameRunningAppState extends AbstractAppState {
         frontRotation.fromAngleAxis( FastMath.PI , Vector3f.UNIT_Y);
         squirrelModel.setLocalRotation(frontRotation);
         squirrelModel.updateGeometricState();
+    }
+    
+    private float bellTimer = 0;
+    private final float bellInterval = 60.0f; // Ring every 60 seconds (1 minute in-game)
 
+    @Override
+    public void update(float tpf) {
+        super.update(tpf);
+        bellTimer += tpf;
+        if (bellTimer >= bellInterval) {
+            bellSound.playInstance();
+            bellTimer = 0; // Reset timer
+        }
+        updateBellVolume(cam.getLocation());
+    }
+    
+    private void updateBellVolume(Vector3f playerPosition) {
+        float distance = bellSound.getLocalTranslation().distance(playerPosition);
+        float maxDistance = 50.0f; // Maximum distance to hear the bell
+        float volume = Math.max(0, 1 - (distance / maxDistance));
+        bellSound.setVolume(volume);
     }
 
+    
    
 
     @Override
