@@ -38,6 +38,7 @@ import com.jme3.ui.Picture;
 import com.jme3.bullet.control.RigidBodyControl; 
 import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.anim.SkinningControl;
+import com.jme3.material.RenderState;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import java.util.LinkedList;
@@ -280,13 +281,13 @@ public class GameRunningAppState extends AbstractAppState {
         animateModel(squirrelModel, "squirrel");
 
         // Add trees manually and add them to the trees list
-        Spatial tree1 = createTree(campusNode, 5, 0.5f, 0);
+        Spatial tree1 = createTree(campusNode, 5, 0.0f, 0);
         trees.add(tree1);
 
-        Spatial tree2 = createTree(campusNode, 10, 0.5f, -3);
+        Spatial tree2 = createTree(campusNode, 10, 0.0f, -3);
         trees.add(tree2);
 
-        Spatial tree3 = createTree(campusNode, -10, 0.5f, 5);
+        Spatial tree3 = createTree(campusNode, -10, 0.0f, 8);
         trees.add(tree3);
 
         // Add the quad in the center
@@ -327,7 +328,7 @@ public class GameRunningAppState extends AbstractAppState {
         TangentBinormalGenerator.generate(squirrelModel);
         
         // Position, scale, and rotation adjustments
-        squirrelModel.setLocalTranslation(0, 1, 0);
+        squirrelModel.setLocalTranslation(0, 0, 0);
         squirrelModel.setLocalScale(0.3f); // Adjust scale if needed
         RigidBodyControl squirrelPhysics = new RigidBodyControl(1.0f); // mass > 0
         squirrelModel.addControl(squirrelPhysics);
@@ -407,22 +408,33 @@ public class GameRunningAppState extends AbstractAppState {
             System.out.println("No AnimComposer found for the model " + modelname);
         }
     }
-
+    
     private Spatial createTree(Node parentNode, float x, float y, float z) {
-        Box treeBox = new Box(1, 5, 1);
-        Geometry treeGeom = new Geometry("Tree", treeBox);
-        //Load and set a tree bark texture
-        Material treeMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        treeMat.setTexture("DiffuseMap", assetManager.loadTexture("Textures/tree-bark.jpg")); 
-        treeGeom.setMaterial(treeMat);
-        parentNode.attachChild(treeGeom);
-        treeGeom.setLocalTranslation(x, y, z);
-        return treeGeom;  // Return the tree geometry so we can track it
+        Spatial treeGeo = assetManager.loadModel("Models/Tree/laubbaum.j3o");
+        treeGeo.scale(2);
+
+        // Create a material and apply the texture
+        Material treeMaterial = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        treeMaterial.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Tree/texture_laubbaum.png"));
+
+        // Enable transparency for leaves and branches
+        treeMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+        treeGeo.setQueueBucket(RenderQueue.Bucket.Transparent);
+
+        treeGeo.setMaterial(treeMaterial);
+
+        // Position the tree
+        float terrainHeight = 0; // TODO: Replace this with actual terrain height if implemented
+        Vector3f treeLoc = new Vector3f(x, terrainHeight + y, z);
+        treeGeo.setLocalTranslation(treeLoc);
+
+        parentNode.attachChild(treeGeo);
+        return treeGeo;
     }
     
     private void createQuad(Node parentNode, float x, float y, float z) {
         // Flat box for the quad
-        Box quad = new Box(10, 0.1f, 10);
+        Box quad = new Box(25, 0.1f, 25);
         Geometry quadGeom = new Geometry("Quad", quad);
         
         // Apply a grass or dirt texture to the ground
