@@ -39,10 +39,12 @@ import com.jme3.material.RenderState;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.post.FilterPostProcessor;
+import com.jme3.post.filters.CartoonEdgeFilter;
 import com.jme3.post.filters.FogFilter;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
+import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -121,8 +123,10 @@ public class GameRunningAppState extends AbstractAppState {
 
         createGUI();
         startGame();
-        activateFog();
         initializeLight();
+        
+        fpp = new FilterPostProcessor(assetManager);
+        activateFog();
         
         // Load ambient nature sound
         ambientSound = new AudioNode(app.getAssetManager(), "Sounds/Environment/Nature.ogg", true);
@@ -355,10 +359,10 @@ private void generateRandomCubes(int count) {
         Spatial tree1 = createTree(campusNode, 5, 0.0f, 0);
         trees.add(tree1);
 
-        Spatial tree2 = createTree(campusNode, 10, 0.0f, -3);
+        Spatial tree2 = createTree(campusNode, 20, 0.0f, -9);
         trees.add(tree2);
 
-        Spatial tree3 = createTree(campusNode, -10, 0.0f, 8);
+        Spatial tree3 = createTree(campusNode, -10, 0.0f, 20);
         trees.add(tree3);
 
         // Add the quad in the center
@@ -473,7 +477,7 @@ private void generateRandomCubes(int count) {
     
     private void createQuad(Node parentNode, float x, float y, float z) {
         // Flat box for the quad
-        Box quad = new Box(25, 0.1f, 25);
+        Box quad = new Box(35, 0.1f, 35);
         Geometry quadGeom = new Geometry("Quad", quad);
         
         // Apply a grass or dirt texture to the ground
@@ -540,15 +544,14 @@ private void generateRandomCubes(int count) {
 
     private void activateFog(){
         // activate fog
-        fpp = new FilterPostProcessor(assetManager);
         fogFilter = new FogFilter();
         fogFilter.setFogDistance(155);
-        fogFilter.setFogDensity(0.5f);
+        fogFilter.setFogDensity(0.3f);
         //fogFilter.setFogColor(ColorRGBA.Gray);
         fpp.addFilter(fogFilter);
         viewPort.addProcessor(fpp);
     }
-   
+    
 
     @Override
     public void cleanup() {
