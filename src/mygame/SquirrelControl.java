@@ -19,6 +19,7 @@ import com.jme3.font.BitmapText;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class SquirrelControl extends AbstractControl {
@@ -31,7 +32,8 @@ public class SquirrelControl extends AbstractControl {
     private List<Spatial> acorns;
     private Node rootNode;
     private BitmapText acornCounterText;
-    private int collectedAcorns = 0;
+    private static int collectedAcorns = 0;
+    
     private float sensitivity = 0.2f;
     private InputManager inputManager;
     private float yaw = 0f;
@@ -114,41 +116,53 @@ public class SquirrelControl extends AbstractControl {
             rootNode.attachChild(chirpSound);
         }
     }
-    private void checkProximityToAcorns() {
+private void checkProximityToAcorns() {
         Vector3f squirrelPos = spatial.getWorldTranslation();
-        List<Spatial> collected = new ArrayList<>(); // Temporary list to store collected acorns
-
-        for (Spatial acorn : acorns) {
+        Iterator<Spatial> iterator = acorns.iterator();
+        int acornnumber = 0;
+        while (iterator.hasNext()) {
+            Spatial acorn = iterator.next();
             float distance = squirrelPos.distance(acorn.getWorldTranslation());
             if (distance < 1.0f) {
-                acornCollectSound.setLocalTranslation(acorn.getWorldTranslation()); // Set sound position
+                System.out.println("Collecting acorn at: " + acorn.getWorldTranslation());
+                acornCollectSound.setLocalTranslation(acorn.getWorldTranslation());
                 acornCollectSound.playInstance();
-                collected.add(acorn); // Mark the acorn for removal
+                rootNode.detachChild(acorn);
+                iterator.remove(); // Safely remove acorn
+                collectedAcorns++;
+                acornnumber++;
+                System.out.println("Updating counter display: " + collectedAcorns);
+
+                
+                updateAcornCounter(collectedAcorns);
             }
         }
-
-        // Remove collected acorns safely
-        for (Spatial acorn : collected) {
-            rootNode.detachChild(acorn);
-            //updateAcornCounter();
-            acorns.remove(acorn); 
-            updateAcornCounter(); // attempting to fix bug
-        }
-
-        // Update the counter text after all acorns are processed
-     
     }
+private String toRomanNumeral(int number) {
+    switch (number) {
+        case 1: return "I";
+        case 2: return "II";
+        case 3: return "III";
+        default: return ""; // Handle unexpected cases gracefully
+    }
+}
 
 
-    private void updateAcornCounter() {
+private void updateAcornCounter(int count) {
     if (acornCounterText != null) {
-        System.out.println("Updating acorn counter text.");
-        collectedAcorns++;
-        acornCounterText.setText("Acorns Collected: " + collectedAcorns);
+        // Convert count to Roman numeral using the hardcoded method
+        String romanCount = toRomanNumeral(count);
+
+        // Update the text directly
+        acornCounterText.setText("Acorns Collected: " + romanCount);
+
+        System.out.println("Acorns collected (in Roman numerals): " + romanCount);
     } else {
         System.out.println("acornCounterText is null!");
     }
 }
+
+
 
     private void updateCameraPosition() {
         Vector3f squirrelPos = spatial.getWorldTranslation();

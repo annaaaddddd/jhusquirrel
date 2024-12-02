@@ -8,6 +8,7 @@ import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
 import com.jme3.asset.TextureKey;
 import com.jme3.audio.AudioNode;
+import com.jme3.bounding.BoundingBox;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.font.BitmapText;
 import com.jme3.font.BitmapFont;
@@ -132,31 +133,50 @@ public class GameRunningAppState extends AbstractAppState {
         rootNode.attachChild(bellSound);
         
     }
-    private void generateRandomCubes(int count) {
-        for (int i = 0; i < count; i++) {
-            // Create a cube (acorn)
-            Box acornBox = new Box(0.2f, 0.2f, 0.2f);
-            Geometry acorn = new Geometry("Acorn", acornBox);
+private void generateRandomCubes(int count) {
+    for (int i = 0; i < count; i++) {
+        // Create a cube (acorn)
+        Box acornBox = new Box(0.2f, 0.2f, 0.2f);
+        Geometry acorn = new Geometry("Acorn", acornBox);
 
-            // Assign a simple material
-            Material acornMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-            acornMaterial.setColor("Color", ColorRGBA.Brown);
-            acorn.setMaterial(acornMaterial);
+        // Assign a material with a highlight effect
+        Material acornMaterial = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        acornMaterial.setBoolean("UseMaterialColors", true); // Enable color-based shading
+        acornMaterial.setColor("Diffuse", ColorRGBA.Brown); // Diffuse color
+        acornMaterial.setColor("Ambient", ColorRGBA.Brown.mult(0.5f)); // Slight ambient lighting
+        acornMaterial.setColor("Specular", ColorRGBA.Yellow); // Highlight color
+        acornMaterial.setFloat("Shininess", 128f); // High shininess for glossy effect
+        acorn.setMaterial(acornMaterial);
 
-            // Place the acorn at a random position, including random heights
-            float x = (float) (Math.random() * 20 - 10); // Random X between -10 and 10
-            float z = (float) (Math.random() * 20 - 10); // Random Z between -10 and 10
-            float y = (float) (Math.random() * 5 + 0.5f); // Random Y between 0.5 and 5.5
+        // Randomly select a tree to place the acorn near
+        Spatial tree = trees.get((int) (Math.random() * trees.size()));
+        Vector3f treePosition = tree.getLocalTranslation();
 
-            acorn.setLocalTranslation(x, y, z);
+        // Place the acorn slightly higher above the tree
+        float xOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
+        float zOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
+        float yOffset = (float) (Math.random() * 5f + 7f);// Higher than the tree top
 
-            // Add to the scene and the acorns list
-            rootNode.attachChild(acorn);
-            acorns.add(acorn);
-            
-            acorn.setShadowMode(ShadowMode.CastAndReceive);
-        }
+        acorn.setLocalTranslation(
+            treePosition.x + xOffset,
+            treePosition.y + yOffset,
+            treePosition.z + zOffset
+        );
+
+        // Add a glowing effect by enabling blending
+        acornMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+        acorn.setQueueBucket(RenderQueue.Bucket.Transparent);
+
+        // Add the acorn to the scene and acorn list
+        rootNode.attachChild(acorn);
+        acorns.add(acorn);
+
+        // Enable shadow casting and receiving
+        acorn.setShadowMode(ShadowMode.CastAndReceive);
     }
+}
+
+
 
 
     
@@ -185,7 +205,8 @@ public class GameRunningAppState extends AbstractAppState {
         viewPort.addProcessor(dlsr);
         rootNode.setShadowMode(ShadowMode.Off);
     }
-    
+
+
     /**
      * Initialize game level and logic (creating level content, setting up physics, etc.
      * Potential TODO: Add a WorldManagerState object that attaches nodes to the rootNode object, 
@@ -197,7 +218,7 @@ public class GameRunningAppState extends AbstractAppState {
         initializeSquirrelAndCampus();
         addMapping();
         attachCenterMark();   
-        generateRandomCubes(3);
+        generateRandomCubes(2) ;
     }
     
     private void createGUI() {
