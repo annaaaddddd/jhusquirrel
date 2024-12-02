@@ -38,6 +38,8 @@ import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.material.RenderState;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.post.FilterPostProcessor;
+import com.jme3.post.filters.FogFilter;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
@@ -79,6 +81,9 @@ public class GameRunningAppState extends AbstractAppState {
     private AudioNode ambientSound;
     private AudioNode bellSound;
     
+    private FilterPostProcessor fpp;
+    private FogFilter fogFilter;
+    
     // Movement triggers
     private final static Trigger TRIGGER_RUN_FORWARD = new KeyTrigger(KeyInput.KEY_W);
     private final static Trigger TRIGGER_RUN_BACKWARD = new KeyTrigger(KeyInput.KEY_S);
@@ -116,6 +121,7 @@ public class GameRunningAppState extends AbstractAppState {
 
         createGUI();
         startGame();
+        activateFog();
         initializeLight();
         
         // Load ambient nature sound
@@ -451,7 +457,7 @@ private void generateRandomCubes(int count) {
 
         // Enable transparency for leaves and branches
         treeMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-        treeGeo.setQueueBucket(RenderQueue.Bucket.Transparent);
+        treeGeo.setQueueBucket(RenderQueue.Bucket.Opaque);
 
         treeGeo.setMaterial(treeMaterial);
 
@@ -496,12 +502,13 @@ private void generateRandomCubes(int count) {
         
         app.getGuiNode().attachChild(c); // Attach to 2D user interface
     }
+    
     private void rotateSquirrelToFront() {
-    if (squirrelModel == null) {
-        System.out.println("Error: squirrelModel is null!");
-    } else {
-        System.out.println("squirrelModel exists. Current rotation: " + squirrelModel.getLocalRotation());
-    }
+        if (squirrelModel == null) {
+            System.out.println("Error: squirrelModel is null!");
+        } else {
+            System.out.println("squirrelModel exists. Current rotation: " + squirrelModel.getLocalRotation());
+        }
 
         // Rotate the squirrel to face forward along the Z-axis
         Quaternion frontRotation = new Quaternion();
@@ -531,7 +538,16 @@ private void generateRandomCubes(int count) {
         bellSound.setVolume(volume);
     }
 
-    
+    private void activateFog(){
+        // activate fog
+        fpp = new FilterPostProcessor(assetManager);
+        fogFilter = new FogFilter();
+        fogFilter.setFogDistance(155);
+        fogFilter.setFogDensity(0.5f);
+        //fogFilter.setFogColor(ColorRGBA.Gray);
+        fpp.addFilter(fogFilter);
+        viewPort.addProcessor(fpp);
+    }
    
 
     @Override
