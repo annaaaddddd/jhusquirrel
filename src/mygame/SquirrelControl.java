@@ -16,6 +16,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.font.BitmapText;
+import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
 import java.util.ArrayList;
@@ -143,8 +144,22 @@ private String toRomanNumeral(int number) {
         case 1: return "I";
         case 2: return "II";
         case 3: return "III";
+        case 4: return "IIII";
+        case 5: return "IIIII";
         default: return ""; // Handle unexpected cases gracefully
     }
+}
+
+private void endGame() {
+    System.out.println("Congratulations! You have collected all the acorns!");
+
+    // Display a congratulatory message on the screen
+    BitmapText congratsText = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
+    congratsText.setSize(40); // Adjust font size
+    congratsText.setColor(ColorRGBA.Yellow);
+    congratsText.setText("Congratulations!\nYou have collected all the acorns!");
+    congratsText.setLocalTranslation(cam.getWidth() / 2 - 200, cam.getHeight() / 2, 0); // Centered on the screen
+    rootNode.attachChild(congratsText);
 }
 
 
@@ -157,6 +172,9 @@ private void updateAcornCounter(int count) {
         acornCounterText.setText("Acorns Collected: " + romanCount);
 
         System.out.println("Acorns collected (in Roman numerals): " + romanCount);
+        if (count >= 3){
+            endGame();
+        }
     } else {
         System.out.println("acornCounterText is null!");
     }

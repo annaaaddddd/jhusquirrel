@@ -155,7 +155,7 @@ private void generateRandomCubes(int count) {
         // Place the acorn slightly higher above the tree
         float xOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
         float zOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
-        float yOffset = (float) (Math.random() * 5f + 7f);// Higher than the tree top
+        float yOffset = (float) (Math.random() * 10f + 7f);// Higher than the tree top
 
         acorn.setLocalTranslation(
             treePosition.x + xOffset,
