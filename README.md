@@ -88,9 +88,9 @@ New home screen
 
 New setting screen
 <img width="1920" alt="Screenshot 2024-11-06 at 18 52 18" src="https://github.com/user-attachments/assets/906591f4-a6ed-4bfa-812b-21c552da0219">
-### Model
+#### Model
 We used assetManager to load models and add textures, and skinning control to add animated meshes. We also included collision and other physics to further implement our game design.
-#### The Squirrel Model
+##### The Squirrel Model
 
 
 <img width="407" alt="Screenshot 2024-11-06 at 22 06 28" src="https://github.com/user-attachments/assets/68906fa1-460f-40b2-bb7e-be5aee4824ac">
@@ -98,6 +98,58 @@ We used assetManager to load models and add textures, and skinning control to ad
 
 The environment is also updated with treebark and grass, simulating a real-world environment.
 Lighting is added so that the character and other elements appear shaded.
+
+### Third Deliverable
+#### New Features
+Since the second deliverable, the following features have been added to enhance gameplay and visuals:
+
+##### Sound Component
+
+- Ambient sound: Background nature audio such as wind blowing and waterdrops sets the immersive atmosphere.
+- Positional sound: Dynamic sound effects like squirrel chirping and acorn collecting sound adjust based on the player's position. A church bell loop sound is also added in the background that will play every 60 seconds into the game, mimicking the Gilman Hall bell.
+- Additional sound effects: Added menu music in the background and button-clicking sound to increase playability.
+
+
+#### Six Distinct Effects
+
+- Particles: 
+An effect appears when users first enter the game.
+
+- Shadows: 
+Real-time dynamic shadows cast by the squirrel and environmental elements, improving realism.
+
+- Ambient Occlusion: 
+Enhanced depth and lighting contrast, particularly around tree trunks.
+
+- Fog: 
+Subtle fog effects appear during early morning or evening scenes for added environmental depth.
+
+- Skybox: 
+Sunrise/sunset; typical Baltimore skyline
+
+- Volumetric lighting: 
+The squirrel stretches during jumps and squashes slightly when landing to improve fluidity.
+
+#### Playability Enhancements
+The game is now fully playable, featuring clear objectives and rewards:
+
+Players can collect scattered acorns to complete the mission.
+Dynamic feedback provides mission status updates and rewards.
+Screenshot recommendation: Include an image of a "Mission Complete" or "Unlocked Area" popup.
+
+#### Member Contributions
+- Serena: Implemented ambient and positional sound, as well as other sound components to increase playability.
+- Anna:
+- Leo:
+- Collaborative Work:
+Team discussions finalized the selection and implementation of six distinct effects.
+Joint playtesting ensured cohesive gameplay and smooth feature integration.
+
+#### Acknowledgments
+- Assets and References:
+  - Models, sounds, and particle templates were sourced from [Pixabay](https://pixabay.com/music/) [Mixkit](https://mixkit.co/free-sound-effects/).
+  - Learning materials from the jMonkeyEngine Beginner’s Guide and other tutorials were used for development.
+  - Online sources or tools used to implement visual and sound effects: Blender, Audacity.
 
 
 
