@@ -44,6 +44,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.CartoonEdgeFilter;
 import com.jme3.post.filters.FogFilter;
+import com.jme3.post.ssao.SSAOFilter;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
 import com.jme3.shadow.DirectionalLightShadowRenderer;
@@ -130,9 +131,10 @@ public class GameRunningAppState extends AbstractAppState {
 
         createGUI();
         startGame();
-        initializeLight();
         
         fpp = new FilterPostProcessor(assetManager);
+        viewPort.addProcessor(fpp);
+        initializeLight();
         activateFog();
         
         // Load ambient nature sound
@@ -198,6 +200,10 @@ public class GameRunningAppState extends AbstractAppState {
      * Initialize light setting. Add ambient light and sunlight (directional) to the scene.
      */
     private void initializeLight() {
+        
+        SSAOFilter ssaoFilter = new SSAOFilter(20.0f, 5.0f, 0.5f, 1.0f);
+        fpp.addFilter(ssaoFilter);
+        
         // Ambient light to make sure the model is visible
         AmbientLight ambient = new AmbientLight();
         ambient.setColor(ColorRGBA.White.mult(1.3f));
@@ -564,7 +570,6 @@ public class GameRunningAppState extends AbstractAppState {
         fogFilter.setFogDensity(0.3f);
         //fogFilter.setFogColor(ColorRGBA.Gray);
         fpp.addFilter(fogFilter);
-        viewPort.addProcessor(fpp);
     }
     
     private void initDebris() {
