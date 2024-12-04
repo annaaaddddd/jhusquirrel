@@ -34,6 +34,9 @@ import java.util.List;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.ui.Picture;
 import com.jme3.bullet.control.RigidBodyControl; 
+import com.jme3.effect.ParticleEmitter;
+import com.jme3.effect.ParticleMesh;
+import com.jme3.effect.shapes.EmitterSphereShape;
 import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.material.RenderState;
 import com.jme3.math.FastMath;
@@ -85,6 +88,10 @@ public class GameRunningAppState extends AbstractAppState {
     
     private FilterPostProcessor fpp;
     private FogFilter fogFilter;
+    
+    private ParticleEmitter debrisEmitter;
+    private float debrisTimer = 0f;
+    private boolean debrisTriggered = false; // Flag to ensure the shockwave is emitted only once
     
     // Movement triggers
     private final static Trigger TRIGGER_RUN_FORWARD = new KeyTrigger(KeyInput.KEY_W);
@@ -143,51 +150,48 @@ public class GameRunningAppState extends AbstractAppState {
         rootNode.attachChild(bellSound);
         
     }
-private void generateRandomCubes(int count) {
-    for (int i = 0; i < count; i++) {
-        // Create a cube (acorn)
-        Box acornBox = new Box(0.2f, 0.2f, 0.2f);
-        Geometry acorn = new Geometry("Acorn", acornBox);
+    private void generateRandomCubes(int count) {
+        for (int i = 0; i < count; i++) {
+            // Create a cube (acorn)
+            Box acornBox = new Box(0.2f, 0.2f, 0.2f);
+            Geometry acorn = new Geometry("Acorn", acornBox);
 
-        // Assign a material with a highlight effect
-        Material acornMaterial = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        acornMaterial.setBoolean("UseMaterialColors", true); // Enable color-based shading
-        acornMaterial.setColor("Diffuse", ColorRGBA.Brown); // Diffuse color
-        acornMaterial.setColor("Ambient", ColorRGBA.Brown.mult(0.5f)); // Slight ambient lighting
-        acornMaterial.setColor("Specular", ColorRGBA.Yellow); // Highlight color
-        acornMaterial.setFloat("Shininess", 128f); // High shininess for glossy effect
-        acorn.setMaterial(acornMaterial);
+            // Assign a material with a highlight effect
+            Material acornMaterial = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+            acornMaterial.setBoolean("UseMaterialColors", true); // Enable color-based shading
+            acornMaterial.setColor("Diffuse", ColorRGBA.Brown); // Diffuse color
+            acornMaterial.setColor("Ambient", ColorRGBA.Brown.mult(0.5f)); // Slight ambient lighting
+            acornMaterial.setColor("Specular", ColorRGBA.Yellow); // Highlight color
+            acornMaterial.setFloat("Shininess", 128f); // High shininess for glossy effect
+            acorn.setMaterial(acornMaterial);
 
-        // Randomly select a tree to place the acorn near
-        Spatial tree = trees.get((int) (Math.random() * trees.size()));
-        Vector3f treePosition = tree.getLocalTranslation();
+            // Randomly select a tree to place the acorn near
+            Spatial tree = trees.get((int) (Math.random() * trees.size()));
+            Vector3f treePosition = tree.getLocalTranslation();
 
-        // Place the acorn slightly higher above the tree
-        float xOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
-        float zOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
-        float yOffset = (float) (Math.random() * 10f + 7f);// Higher than the tree top
+            // Place the acorn slightly higher above the tree
+            float xOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
+            float zOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
+            float yOffset = (float) (Math.random() * 10f + 7f);// Higher than the tree top
 
-        acorn.setLocalTranslation(
-            treePosition.x + xOffset,
-            treePosition.y + yOffset,
-            treePosition.z + zOffset
-        );
+            acorn.setLocalTranslation(
+                treePosition.x + xOffset,
+                treePosition.y + yOffset,
+                treePosition.z + zOffset
+            );
 
-        // Add a glowing effect by enabling blending
-        acornMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-        acorn.setQueueBucket(RenderQueue.Bucket.Transparent);
+            // Add a glowing effect by enabling blending
+            acornMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+            acorn.setQueueBucket(RenderQueue.Bucket.Transparent);
 
-        // Add the acorn to the scene and acorn list
-        rootNode.attachChild(acorn);
-        acorns.add(acorn);
+            // Add the acorn to the scene and acorn list
+            rootNode.attachChild(acorn);
+            acorns.add(acorn);
 
-        // Enable shadow casting and receiving
-        acorn.setShadowMode(ShadowMode.CastAndReceive);
+            // Enable shadow casting and receiving
+            acorn.setShadowMode(ShadowMode.CastAndReceive);
+        }
     }
-}
-
-
-
 
     
     /**
@@ -228,7 +232,9 @@ private void generateRandomCubes(int count) {
         initializeSquirrelAndCampus();
         addMapping();
         attachCenterMark();   
-        generateRandomCubes(2) ;
+        generateRandomCubes(2);
+        
+        System.out.println("Triggering shockwave effect");
     }
     
     private void createGUI() {
@@ -527,6 +533,15 @@ private void generateRandomCubes(int count) {
     @Override
     public void update(float tpf) {
         super.update(tpf);
+        
+        debrisTimer += tpf;
+        // Trigger debris effect after 5 seconds
+        if (!debrisTriggered && debrisTimer >= 3.0f) {
+            triggerDebrisEffect();
+            debrisTriggered = true; // Ensure it triggers only once
+            System.out.println("Debris effect triggered after 5 seconds.");
+        }
+        
         bellTimer += tpf;
         if (bellTimer >= bellInterval) {
             bellSound.playInstance();
@@ -552,10 +567,57 @@ private void generateRandomCubes(int count) {
         viewPort.addProcessor(fpp);
     }
     
+    private void initDebris() {
+        debrisEmitter = new ParticleEmitter("Debris", ParticleMesh.Type.Triangle, 5);
+        Material debrisMat = new Material(assetManager, "Common/MatDefs/Misc/Particle.j3md");
+        debrisMat.setTexture("Texture", assetManager.loadTexture("Effects/debris.png"));
+        debrisEmitter.setMaterial(debrisMat);
+        debrisEmitter.setImagesX(3);
+        debrisEmitter.setImagesY(3);
+        debrisEmitter.setSelectRandomImage(true);
+
+        debrisEmitter.setRandomAngle(true);
+        debrisEmitter.setRotateSpeed(FastMath.TWO_PI);
+        debrisEmitter.setStartColor(new ColorRGBA(0.8f, 0.8f, 1f, 1.0f));
+        debrisEmitter.setEndColor(new ColorRGBA(.5f, 0.5f, 0.5f, 1f));
+        debrisEmitter.setStartSize(.2f);
+        debrisEmitter.setEndSize(.7f);
+        debrisEmitter.setGravity(0, 30f, 0);
+        debrisEmitter.setLowLife(1.4f);
+        debrisEmitter.setHighLife(1.5f);
+        debrisEmitter.getParticleInfluencer().setInitialVelocity(new Vector3f(0, 15, 0));
+        debrisEmitter.getParticleInfluencer().setVelocityVariation(.50f);
+        debrisEmitter.setShape(new EmitterSphereShape(Vector3f.ZERO, 1f));
+    }
+
+    /**
+    * Trigger the shockwave effect around the squirrel when the game starts.
+    */
+   private void triggerDebrisEffect() {
+        if (debrisEmitter == null) {
+            initDebris();
+        }
+        
+        if (debrisEmitter.getParent() == null) {
+            Node squirrelParentNode = (Node) squirrelModel.getParent();
+            squirrelParentNode.attachChild(debrisEmitter);
+        }
+       
+        debrisEmitter.setLocalTranslation(squirrelModel.getLocalTranslation());
+
+        // Emit all particles at once and stop continuous emission
+        debrisEmitter.emitAllParticles(); // Emit all particles in one burst
+        debrisEmitter.setParticlesPerSec(0); // Stop continuous emission
+        
+        System.out.println("Particle effect emitted.");
+   }
 
     @Override
     public void cleanup() {
         super.cleanup();
+        if (debrisEmitter != null && debrisEmitter.getParent() != null) {
+            debrisEmitter.getParent().detachChild(debrisEmitter);
+        }
         rootNode.detachAllChildren();
         inputManager.removeListener(analogListener);
     }

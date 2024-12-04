@@ -52,7 +52,14 @@ public class SquirrelControl extends AbstractControl {
     private boolean playedJumpEnd = false; // Track if Jump.End has been played
     private final AnimComposer animComposer;
     private float idleTimer = 0f;
-    private final float idleAnimationInterval = 5f; // Trigger idle animation every 5 seconds
+    private final float idleAnimationInterval = 8f; // Trigger idle animation every 5 seconds
+    
+    // Camera shake related fields
+    private boolean isShaking = false;
+    private float shakeIntensity = 0f;
+    private float shakeDuration = 0f;
+    private float shakeTimeElapsed = 0f;
+    private Vector3f originalCameraPosition = null;
 
 
     public SquirrelControl(Camera cam, List<Spatial> trees, List<Spatial> acorns, Node rootNode,
@@ -72,6 +79,7 @@ public class SquirrelControl extends AbstractControl {
 
     @Override
     protected void controlUpdate(float tpf) {
+        processCameraShake(tpf);
         updateSquirrelState(tpf);
         
         if (spatial.getWorldTranslation().z <= targetZLevel) {
@@ -94,9 +102,10 @@ public class SquirrelControl extends AbstractControl {
                 idleTimer = 0; // Reset timer after chirp
             }
         } else {
-        idleTimer = 0; // Reset timer when moving
+            idleTimer = 0; // Reset timer when moving
         }
     }
+    
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
         // Not used in this case, so leave it empty
@@ -117,7 +126,8 @@ public class SquirrelControl extends AbstractControl {
             rootNode.attachChild(chirpSound);
         }
     }
-private void checkProximityToAcorns() {
+    
+    private void checkProximityToAcorns() {
         Vector3f squirrelPos = spatial.getWorldTranslation();
         Iterator<Spatial> iterator = acorns.iterator();
         int acornnumber = 0;
@@ -139,46 +149,47 @@ private void checkProximityToAcorns() {
             }
         }
     }
-private String toRomanNumeral(int number) {
-    switch (number) {
-        case 1: return "I";
-        case 2: return "II";
-        case 3: return "III";
-        case 4: return "IIII";
-        case 5: return "IIIII";
-        default: return ""; // Handle unexpected cases gracefully
-    }
-}
 
-private void endGame() {
-    System.out.println("Congratulations! You have collected all the acorns!");
-
-    // Display a congratulatory message on the screen
-    BitmapText congratsText = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
-    congratsText.setSize(40); // Adjust font size
-    congratsText.setColor(ColorRGBA.Yellow);
-    congratsText.setText("Congratulations!\nYou have collected all the acorns!");
-    congratsText.setLocalTranslation(cam.getWidth() / 2 - 200, cam.getHeight() / 2, 0); // Centered on the screen
-    rootNode.attachChild(congratsText);
-}
-
-
-private void updateAcornCounter(int count) {
-    if (acornCounterText != null) {
-        // Convert count to Roman numeral using the hardcoded method
-        String romanCount = toRomanNumeral(count);
-
-        // Update the text directly
-        acornCounterText.setText("Acorns Collected: " + romanCount);
-
-        System.out.println("Acorns collected (in Roman numerals): " + romanCount);
-        if (count >= 3){
-            endGame();
+    private String toRomanNumeral(int number) {
+        switch (number) {
+            case 1: return "I";
+            case 2: return "II";
+            case 3: return "III";
+            case 4: return "IIII";
+            case 5: return "IIIII";
+            default: return ""; // Handle unexpected cases gracefully
         }
-    } else {
-        System.out.println("acornCounterText is null!");
     }
-}
+
+    private void endGame() {
+        System.out.println("Congratulations! You have collected all the acorns!");
+
+        // Display a congratulatory message on the screen
+        BitmapText congratsText = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
+        congratsText.setSize(40); // Adjust font size
+        congratsText.setColor(ColorRGBA.Yellow);
+        congratsText.setText("Congratulations!\nYou have collected all the acorns!");
+        congratsText.setLocalTranslation(cam.getWidth() / 2 - 200, cam.getHeight() / 2, 0); // Centered on the screen
+        rootNode.attachChild(congratsText);
+    }
+
+
+    private void updateAcornCounter(int count) {
+        if (acornCounterText != null) {
+            // Convert count to Roman numeral using the hardcoded method
+            String romanCount = toRomanNumeral(count);
+
+            // Update the text directly
+            acornCounterText.setText("Acorns Collected: " + romanCount);
+
+            System.out.println("Acorns collected (in Roman numerals): " + romanCount);
+            if (count >= 3){
+                endGame();
+            }
+        } else {
+            System.out.println("acornCounterText is null!");
+        }
+    }
 
 
 
@@ -329,8 +340,40 @@ private void updateAcornCounter(int count) {
     
     private void startJump() {
         if (animComposer != null) {
-            playAnimation("Jump.Begin");
             isJumping = true; // Set jumping state
+            playAnimation("Jump.Begin");
+            
+            cameraShake(1f, 1f);
+        }
+    }
+    
+    private void cameraShake(float intensity, float duration) {
+        isShaking = true;
+        shakeIntensity = intensity;
+        shakeDuration = duration;
+        shakeTimeElapsed = 0f;
+
+        if (originalCameraPosition == null) {
+            originalCameraPosition = cam.getLocation().clone(); // Save the original position
+        }
+    }
+    
+    private void processCameraShake(float tpf) {
+        if (isShaking) {
+            shakeTimeElapsed += tpf;
+
+            if (shakeTimeElapsed < shakeDuration) {
+                // Generate random offsets for the shake
+                float xOffset = (FastMath.rand.nextFloat() - 0.5f) * shakeIntensity;
+                float yOffset = (FastMath.rand.nextFloat() - 0.5f) * shakeIntensity;
+
+                // Apply the shake to the camera's position
+                cam.setLocation(originalCameraPosition.add(xOffset, yOffset, 0));
+            } else {
+                // Shake is complete, reset camera position
+                cam.setLocation(originalCameraPosition);
+                isShaking = false;
+            }
         }
     }
     
@@ -368,7 +411,7 @@ private void updateAcornCounter(int count) {
 
             if (!currentAnimation.startsWith("Idle.")) {
                 playAnimation(idleAnimation);
-                System.out.println("Playing idle animation: " + idleAnimation);
+                // System.out.println("Playing idle animation: " + idleAnimation);
             }
         }
     }
