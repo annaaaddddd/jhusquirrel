@@ -1,6 +1,7 @@
 package mygame;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.renderer.RenderManager;
 
 /**
@@ -14,6 +15,9 @@ public class Main extends SimpleApplication {
     public void simpleInitApp() {
         StartScreenAppState runningGame = new StartScreenAppState();
         stateManager.attach(runningGame);
+        
+        ScreenshotAppState screenShotState = new ScreenshotAppState();
+        this.stateManager.attach(screenShotState);
     }
 
     public static void main(String[] args) {

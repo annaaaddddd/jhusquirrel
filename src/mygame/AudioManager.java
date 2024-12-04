@@ -4,8 +4,8 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.renderer.RenderManager;
 
 /**
- * This is the Main Class of your Game. 
- * @author Anna Dai, Serena Hu, and Leo Zhuang
+ * This is the Audio Manager 
+ * @author Serena Hu
  */
 public class AudioManager extends SimpleApplication {
     private AudioManager audioManager;
