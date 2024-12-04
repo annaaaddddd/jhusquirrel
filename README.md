@@ -154,7 +154,7 @@ However, there are still problems such as 1) the squirrel jumps several times af
 
 
 #### Member Contributions
-- Serena: Implemented ambient and positional sound components with dynamic responses to player actions and environmental cues. Updated the README to document game progress.
+- Serena: Implemented ambient and positional sound components with dynamic responses to player actions and environmental cues. Updated the README.
 - Anna: Enhanced animation and models, main implementer for six visual effects.
 - Leo: Completed game mechanism (collecting and counting acorn), added end game mechanism, refined squirrel control and movement
 - Collaborative Work:
