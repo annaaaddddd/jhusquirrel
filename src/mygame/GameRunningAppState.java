@@ -44,6 +44,7 @@ import com.jme3.math.Quaternion;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.CartoonEdgeFilter;
 import com.jme3.post.filters.FogFilter;
+import com.jme3.post.filters.LightScatteringFilter;
 import com.jme3.post.ssao.SSAOFilter;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
@@ -87,8 +88,10 @@ public class GameRunningAppState extends AbstractAppState {
     private AudioNode ambientSound;
     private AudioNode bellSound;
     
+    private Vector3f sunDir = new Vector3f(0.1f, -1f, 0.95f);
     private FilterPostProcessor fpp;
     private FogFilter fogFilter;
+    private LightScatteringFilter sunLightFilter;
     
     private ParticleEmitter debrisEmitter;
     private float debrisTimer = 0f;
@@ -210,7 +213,7 @@ public class GameRunningAppState extends AbstractAppState {
         
         DirectionalLight sun = new DirectionalLight();
         sun.setColor(ColorRGBA.White);
-        sun.setDirection(new Vector3f(0.1f, -1f, 0.95f).normalizeLocal());
+        sun.setDirection(sunDir.normalizeLocal());
         rootNode.addLight(sun);
         
         
@@ -223,6 +226,10 @@ public class GameRunningAppState extends AbstractAppState {
         dlsr.setLight(sun);
         viewPort.addProcessor(dlsr);
         rootNode.setShadowMode(ShadowMode.Off);
+        
+        // make light beams appear from where sun is on skybox
+        sunLightFilter = new LightScatteringFilter(sunDir.mult(-3000));
+        fpp.addFilter(sunLightFilter);
     }
 
 
