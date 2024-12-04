@@ -122,13 +122,13 @@ Real-time dynamic shadows cast by the squirrel and environmental elements, impro
 Enhanced depth and lighting contrast, particularly around tree trunks.
 
 - Fog: 
-Subtle fog effects appear during early morning or evening scenes for added environmental depth.
+Subtle fog effects for added environmental depth.
 
 - Skybox: 
 Sunrise/sunset; typical Baltimore skyline
 
 - Volumetric lighting: 
-The squirrel stretches during jumps and squashes slightly when landing to improve fluidity.
+??
 
 #### Playability Enhancements
 The game is now fully playable, featuring clear objectives and rewards:
