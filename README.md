@@ -106,7 +106,9 @@ Since the second deliverable, the following features have been added to enhance 
 ##### Sound Component
 
 - Ambient sound: Background nature audio such as wind blowing sets the immersive atmosphere.
+
 - Positional sound: Dynamic sound effects like squirrel chirping when idle and acorn collecting sound adjust based on the player's position. A church bell loop sound is also added in the background playing every 60 seconds into the game, mimicking the Gilman Hall bell.
+
 - Additional sound effects: Added menu music in the background and button-clicking sound to increase playability.
 
 
@@ -141,6 +143,10 @@ The game is now fully playable, featuring clear objectives and rewards:
 Players can collect scattered acorns to complete the mission.
 Dynamic feedback provides mission status updates and rewards.
 <img width="1512" alt="Screenshot 2024-12-03 at 9 47 00 PM" src="https://github.com/user-attachments/assets/1d33fd65-090d-4016-8a04-2e11a544f2f9">
+
+
+
+https://github.com/user-attachments/assets/79d02bb0-93dc-418c-81a6-e1eef0892c95
 
 #### Animation and Model Enhancements
 We replaced the tree polygons with a new tree model, increasing the game's visual appeal. 
