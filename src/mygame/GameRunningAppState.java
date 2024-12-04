@@ -92,6 +92,7 @@ public class GameRunningAppState extends AbstractAppState {
     private FilterPostProcessor fpp;
     private FogFilter fogFilter;
     private LightScatteringFilter sunLightFilter;
+    private SSAOFilter ssaoFilter;
     
     private ParticleEmitter debrisEmitter;
     private float debrisTimer = 0f;
@@ -203,7 +204,7 @@ public class GameRunningAppState extends AbstractAppState {
      * Initialize light setting. Add ambient light and sunlight (directional) to the scene.
      */
     private void initializeLight() {
-        SSAOFilter ssaoFilter = new SSAOFilter(12.94f,43.93f,.33f,.60f);
+        ssaoFilter = new SSAOFilter(12.94f,43.93f,.33f,.60f);
         fpp.addFilter(ssaoFilter);
         
         // Ambient light to make sure the model is visible
@@ -219,6 +220,8 @@ public class GameRunningAppState extends AbstractAppState {
         
         Spatial sky = SkyFactory.createSky(assetManager, 
                 "Textures/Sky/Bright/FullskiesBlueClear03.dds", false);
+        sky.setQueueBucket(RenderQueue.Bucket.Sky);
+        sky.setCullHint(Spatial.CullHint.Never);
         rootNode.attachChild(sky);
         
         DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, 1024, 2);
@@ -245,8 +248,6 @@ public class GameRunningAppState extends AbstractAppState {
         addMapping();
         attachCenterMark();   
         generateRandomCubes(8);
-        
-        System.out.println("Triggering shockwave effect");
     }
     
     private void createGUI() {
@@ -254,7 +255,7 @@ public class GameRunningAppState extends AbstractAppState {
     
         // Acorn counter text
         acornCounterText = new BitmapText(font, false);
-        acornCounterText.setSize(font.getCharSet().getRenderedSize());
+        acornCounterText.setSize(font.getCharSet().getRenderedSize()*3);
         acornCounterText.setColor(ColorRGBA.White);
         acornCounterText.setText("Acorns Collected:");
         acornCounterText.setLocalTranslation(20, cam.getHeight() - 50, 0); // Position on the screen
@@ -301,7 +302,7 @@ public class GameRunningAppState extends AbstractAppState {
 
         // Create and position mission text
         missionText = new BitmapText(font, false);
-        missionText.setSize(font.getCharSet().getRenderedSize() * 1.2f); // Set font size
+        missionText.setSize(font.getCharSet().getRenderedSize() * 3f); // Set font size
         missionText.setColor(ColorRGBA.White); // Text color
         missionText.setText("Missions:\n- Bite 10 students\n- Collect 10 acorns");
 
@@ -389,11 +390,13 @@ public class GameRunningAppState extends AbstractAppState {
         // Attach the campus node to the root node
         rootNode.attachChild(campusNode);
     }
+    
     private void addSquirrel(Node parentNode) {
         System.out.println("Passing acornCounterText to SquirrelControl: " + (acornCounterText != null));
         // Load the squirrel model with animations from the Squirrel2 folder
         System.out.println("Loading squirrel model...");
         squirrelModel = assetManager.loadModel("Textures/Squirrel2/squirrel-anim.j3o");
+        squirrelModel.setQueueBucket(RenderQueue.Bucket.Opaque);
 
         if (squirrelModel == null) {
             System.out.println("Failed to load squirrel model!");
@@ -416,6 +419,8 @@ public class GameRunningAppState extends AbstractAppState {
         squirrelMaterial.setBoolean("UseMaterialColors",true);
         squirrelMaterial.setColor("Ambient", ColorRGBA.Gray);
         squirrelMaterial.setColor("Diffuse", ColorRGBA.White);
+        squirrelMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Off);
+        squirrelMaterial.getAdditionalRenderState().setDepthTest(true);
         squirrelModel.setMaterial(squirrelMaterial);
         
         TangentBinormalGenerator.generate(squirrelModel);
@@ -478,7 +483,7 @@ public class GameRunningAppState extends AbstractAppState {
         treeMaterial.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Tree/texture_laubbaum.png"));
 
         // Enable transparency for leaves and branches
-        treeMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+        // treeMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
         treeGeo.setQueueBucket(RenderQueue.Bucket.Opaque);
 
         treeGeo.setMaterial(treeMaterial);
@@ -574,7 +579,7 @@ public class GameRunningAppState extends AbstractAppState {
         fogFilter = new FogFilter();
         fogFilter.setFogDistance(155);
         fogFilter.setFogDensity(0.3f);
-        //fogFilter.setFogColor(ColorRGBA.Gray);
+        fogFilter.setFogColor(ColorRGBA.Gray);
         fpp.addFilter(fogFilter);
     }
     

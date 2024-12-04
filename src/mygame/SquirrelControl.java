@@ -149,7 +149,7 @@ public class SquirrelControl extends AbstractControl {
             }
         }
     }
-
+    
     private String toRomanNumeral(int number) {
         switch (number) {
             case 1: return "I";
