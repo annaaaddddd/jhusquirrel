@@ -200,8 +200,7 @@ public class GameRunningAppState extends AbstractAppState {
      * Initialize light setting. Add ambient light and sunlight (directional) to the scene.
      */
     private void initializeLight() {
-        
-        SSAOFilter ssaoFilter = new SSAOFilter(20.0f, 5.0f, 0.5f, 1.0f);
+        SSAOFilter ssaoFilter = new SSAOFilter(12.94f,43.93f,.33f,.60f);
         fpp.addFilter(ssaoFilter);
         
         // Ambient light to make sure the model is visible
@@ -238,7 +237,7 @@ public class GameRunningAppState extends AbstractAppState {
         initializeSquirrelAndCampus();
         addMapping();
         attachCenterMark();   
-        generateRandomCubes(2);
+        generateRandomCubes(8);
         
         System.out.println("Triggering shockwave effect");
     }
