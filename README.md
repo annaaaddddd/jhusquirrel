@@ -106,40 +106,56 @@ Since the second deliverable, the following features have been added to enhance 
 ##### Sound Component
 
 - Ambient sound: Background nature audio such as wind blowing and waterdrops sets the immersive atmosphere.
-- Positional sound: Dynamic sound effects like squirrel chirping and acorn collecting sound adjust based on the player's position. A church bell loop sound is also added in the background that will play every 60 seconds into the game, mimicking the Gilman Hall bell.
+- Positional sound: Dynamic sound effects like squirrel chirping when idle and acorn collecting sound adjust based on the player's position. A church bell loop sound is also added in the background that will play every 60 seconds into the game, mimicking the Gilman Hall bell.
 - Additional sound effects: Added menu music in the background and button-clicking sound to increase playability.
 
 
 #### Six Distinct Effects
 
 - Particles: 
-An effect appears when users first enter the game.
+A debris effect appears when users first enter the game. This may be subject to change once we find a more suitable effect.
+<img width="1512" alt="Screenshot 2024-12-03 at 9 43 45 PM" src="https://github.com/user-attachments/assets/6e39ce19-57c3-4d5f-ab5d-655196809d9d">
 
 - Shadows: 
 Real-time dynamic shadows cast by the squirrel and environmental elements, improving realism.
+<img width="1512" alt="Screenshot 2024-12-03 at 9 46 00 PM" src="https://github.com/user-attachments/assets/4ac17d26-5775-4036-993b-2af05e5a5679">
 
 - Ambient Occlusion: 
 Enhanced depth and lighting contrast, particularly around tree trunks.
 
 - Fog: 
-Subtle fog effects for added environmental depth.
+Subtle fog effects for added environmental depth and slightly increased difficulty.
+<img width="1512" alt="Screenshot 2024-12-03 at 9 47 19 PM" src="https://github.com/user-attachments/assets/ee9e4303-444c-433f-b6a7-1f67433498ec">
 
 - Skybox: 
-Sunrise/sunset; typical Baltimore skyline
+Added skybox to resemble outdoor environment.
+<img width="1512" alt="Screenshot 2024-12-03 at 9 39 52 PM" src="https://github.com/user-attachments/assets/8ed440ad-39b2-43b1-861e-c0a9a5de8061">
 
 - Volumetric lighting: 
-??
+Added light beams that pass through the fog, creating a more realistic environment.
+![1061733273100_ pic](https://github.com/user-attachments/assets/be812801-56ca-4f98-9b45-4e47c14e7c57)
 
 #### Playability Enhancements
 The game is now fully playable, featuring clear objectives and rewards:
 
 Players can collect scattered acorns to complete the mission.
 Dynamic feedback provides mission status updates and rewards.
-Screenshot recommendation: Include an image of a "Mission Complete" or "Unlocked Area" popup.
+<img width="1512" alt="Screenshot 2024-12-03 at 9 47 00 PM" src="https://github.com/user-attachments/assets/1d33fd65-090d-4016-8a04-2e11a544f2f9">
+
+#### Animation and Model Enhancements
+We replaced the tree polygons with a new tree model, increasing the game's visual appeal. 
+
+We also modified the squirrel's animation logic as below:
+Case 1: Squirrel is stationary -> a random idle animation (e.g., Idle.000) plays.
+Case 2: Squirrel jumps and lands -> Jump.Begin, Jump.Fly, and Jump.End play in sequence. Idle animations are not triggered until the squirrel is stationary for the required interval.
+Case 3: Squirrel moves after being idle -> Idle animation stops immediately, and movement or jumping animations take over.
+
+However, there are still problems such as 1) the squirrel jumps several times after it stops before it plays idle animation; 2) when the idle animations play there seem to be 2 squirrels.
+
 
 #### Member Contributions
-- Serena: Implemented ambient and positional sound, as well as other sound components to increase playability.
-- Anna:
+- Serena: Implemented sound components to increase playability. Updated the readme and added a screenshot feature in the game.
+- Anna: Enhanced animation and models, main implementer for six visual effects.
 - Leo:
 - Collaborative Work:
 Team discussions finalized the selection and implementation of six distinct effects.
