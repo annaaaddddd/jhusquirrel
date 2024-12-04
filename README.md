@@ -163,9 +163,9 @@ Joint playtesting ensured cohesive gameplay and smooth feature integration.
 
 #### Acknowledgments
 - Assets and References:
-  - Models, sounds, and particle templates were sourced from [Pixabay](https://pixabay.com/music/) [Mixkit](https://mixkit.co/free-sound-effects/).
+  - Models, sounds, and particle templates were sourced from [Pixabay](https://pixabay.com/music/) [Mixkit](https://mixkit.co/free-sound-effects/) [Textures](https://www.textures.com/).
   - Learning materials from the jMonkeyEngine Beginner’s Guide and other tutorials were used for development.
-  - Online sources or tools used to implement visual and sound effects: Blender, Audacity.
+  - Online sources or tools used to implement visual and sound effects, including Blender, Audacity, etc.
 
 
 
