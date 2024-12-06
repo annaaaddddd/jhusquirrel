@@ -278,40 +278,6 @@ public class GameRunningAppState extends AbstractAppState {
         saveIcon.setHeight(64);
         saveIcon.setPosition(cam.getWidth() - 160, cam.getHeight() - 80); // Next to Settings icon
         guiNode.attachChild(saveIcon);
-
-        // Create and position the Mission Block
-        Quad missionQuad = new Quad(300, 150);
-        missionBlock = new Geometry("Mission Block", missionQuad);
-
-        // Set up the semi-transparent material for mission block
-        Material missionMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        missionMat.setBoolean("UseMaterialColors", true);
-        missionMat.setColor("Diffuse", new ColorRGBA(1, 1, 1, 0.5f)); // Semi-transparent white
-        missionMat.setColor("Ambient", new ColorRGBA(1, 1, 1, 0.5f));
-        missionMat.getAdditionalRenderState().setBlendMode(BlendMode.Alpha); // Enable alpha blending
-
-        missionBlock.setMaterial(missionMat);
-        missionBlock.setQueueBucket(RenderQueue.Bucket.Transparent); // Set to transparent bucket
-
-        // Adjust position to ensure it's visible within the screen area
-        missionBlock.setLocalTranslation(20, cam.getHeight() - 200, 0); // Adjusted for better visibility
-        guiNode.attachChild(missionBlock);
-
-        // Debugging print to confirm mission block is added
-        System.out.println("Mission block added at position: " + missionBlock.getLocalTranslation());
-
-        // Create and position mission text
-        missionText = new BitmapText(font, false);
-        missionText.setSize(font.getCharSet().getRenderedSize() * 3f); // Set font size
-        missionText.setColor(ColorRGBA.White); // Text color
-        missionText.setText("Missions:\n- Bite 10 students\n- Collect 10 acorns");
-
-        // Position the text inside the mission block, relative to its translation
-        missionText.setLocalTranslation(30, cam.getHeight() - 130, 0); // Adjust to align within mission block
-        guiNode.attachChild(missionText);
-
-        // Debugging print to confirm mission text is added
-        System.out.println("Mission text added at position: " + missionText.getLocalTranslation());
     }
 
     

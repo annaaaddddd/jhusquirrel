@@ -162,15 +162,12 @@ public class SquirrelControl extends AbstractControl {
     }
 
     private void endGame() {
-        System.out.println("Congratulations! You have collected all the acorns!");
-
-        // Display a congratulatory message on the screen
-        BitmapText congratsText = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
-        congratsText.setSize(40); // Adjust font size
-        congratsText.setColor(ColorRGBA.Yellow);
-        congratsText.setText("Congratulations!\nYou have collected all the acorns!");
-        congratsText.setLocalTranslation(cam.getWidth() / 2 - 200, cam.getHeight() / 2, 0); // Centered on the screen
-        rootNode.attachChild(congratsText);
+        acornCounterText.setText("CONGRATULATIONS!!!!");
+        acornCounterText.setSize(cam.getHeight() / 8);
+        acornCounterText.setColor(ColorRGBA.Yellow);
+        float textWidth = acornCounterText.getLineWidth();
+        float textHeight = acornCounterText.getLineHeight();
+        acornCounterText.setLocalTranslation((cam.getWidth() - textWidth) / 2, (cam.getHeight() + textHeight) / 2, 0);
     }
 
 
