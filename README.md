@@ -105,8 +105,10 @@ Since the second deliverable, the following features have been added to enhance 
 
 ##### Sound Component
 
-- Ambient sound: Background nature audio such as wind blowing and waterdrops sets the immersive atmosphere.
-- Positional sound: Dynamic sound effects like squirrel chirping when idle and acorn collecting sound adjust based on the player's position. A church bell loop sound is also added in the background that will play every 60 seconds into the game, mimicking the Gilman Hall bell.
+- Ambient sound: Background nature audio such as wind blowing sets the immersive atmosphere.
+
+- Positional sound: Dynamic sound effects like squirrel chirping when idle and acorn collecting sound adjust based on the player's position. A church bell loop sound is also added in the background playing every 60 seconds into the game, mimicking the Gilman Hall bell.
+
 - Additional sound effects: Added menu music in the background and button-clicking sound to increase playability.
 
 
@@ -117,7 +119,7 @@ A debris effect appears when users first enter the game. This may be subject to 
 <img width="1512" alt="Screenshot 2024-12-03 at 9 43 45 PM" src="https://github.com/user-attachments/assets/6e39ce19-57c3-4d5f-ab5d-655196809d9d">
 
 - Shadows: 
-Real-time dynamic shadows cast by the squirrel and environmental elements, improving realism.
+Real-time dynamic shadows cast by the squirrel and environmental elements, improve realism.
 <img width="1512" alt="Screenshot 2024-12-03 at 9 46 00 PM" src="https://github.com/user-attachments/assets/4ac17d26-5775-4036-993b-2af05e5a5679">
 
 - Ambient Occlusion: 
@@ -142,6 +144,10 @@ Players can collect scattered acorns to complete the mission.
 Dynamic feedback provides mission status updates and rewards.
 <img width="1512" alt="Screenshot 2024-12-03 at 9 47 00 PM" src="https://github.com/user-attachments/assets/1d33fd65-090d-4016-8a04-2e11a544f2f9">
 
+
+
+https://github.com/user-attachments/assets/79d02bb0-93dc-418c-81a6-e1eef0892c95
+
 #### Animation and Model Enhancements
 We replaced the tree polygons with a new tree model, increasing the game's visual appeal. 
 
@@ -154,18 +160,18 @@ However, there are still problems such as 1) the squirrel jumps several times af
 
 
 #### Member Contributions
-- Serena: Implemented sound components to increase playability. Updated the readme and added a screenshot feature in the game.
+- Serena: Implemented ambient and positional sound components with dynamic responses to player actions and environmental cues. Updated the README.
 - Anna: Enhanced animation and models, main implementer for six visual effects.
-- Leo:
+- Leo: Completed game mechanism (collecting and counting acorn), added end game mechanism, refined squirrel control and movement
 - Collaborative Work:
 Team discussions finalized the selection and implementation of six distinct effects.
 Joint playtesting ensured cohesive gameplay and smooth feature integration.
 
 #### Acknowledgments
 - Assets and References:
-  - Models, sounds, and particle templates were sourced from [Pixabay](https://pixabay.com/music/) [Mixkit](https://mixkit.co/free-sound-effects/).
+  - Models, sounds, and particle templates were sourced from [Pixabay](https://pixabay.com/music/) [Mixkit](https://mixkit.co/free-sound-effects/) [Textures](https://www.textures.com/).
   - Learning materials from the jMonkeyEngine Beginner’s Guide and other tutorials were used for development.
-  - Online sources or tools used to implement visual and sound effects: Blender, Audacity.
+  - Online sources or tools used to implement visual and sound effects, including Blender, Audacity, etc.
 
 
 
