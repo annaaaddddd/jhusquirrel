@@ -41,6 +41,7 @@ import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.material.RenderState;
 import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
 import com.jme3.post.FilterPostProcessor;
 import com.jme3.post.filters.CartoonEdgeFilter;
 import com.jme3.post.filters.FogFilter;
@@ -244,6 +245,7 @@ public class GameRunningAppState extends AbstractAppState {
      */
     private void startGame() {
         // Initialize squirrel, buildings, trees, and the quad
+        createStaticQuad(rootNode);        
         initializeSquirrelAndCampus();
         addMapping();
         attachCenterMark();   
@@ -351,7 +353,7 @@ public class GameRunningAppState extends AbstractAppState {
         trees.add(tree3);
 
         // Add the quad in the center
-        createQuad(campusNode, 0, 0.01f, 0); // Flat box for the quad
+        //createQuad(campusNode, 0, 0.01f, 0); // Flat box for the quad
 
         // Attach the campus node to the root node
         rootNode.attachChild(campusNode);
@@ -464,6 +466,7 @@ public class GameRunningAppState extends AbstractAppState {
         return treeGeo;
     }
     
+    /*
     private void createQuad(Node parentNode, float x, float y, float z) {
         // Flat box for the quad
         Box quad = new Box(35, 0.1f, 35);
@@ -477,6 +480,26 @@ public class GameRunningAppState extends AbstractAppState {
         quadGeom.setLocalTranslation(x, y, z);
         parentNode.attachChild(quadGeom);
         quadGeom.setShadowMode(ShadowMode.Receive);
+    }
+    */
+    private void createStaticQuad(Node parentNode) {
+        float terrainSize = 300; // Width and depth of the terrain
+        Box quad = new Box(terrainSize, 0.1f, terrainSize);
+        Geometry quadGeom = new Geometry("Quad", quad);
+
+        // Apply a ground texture
+        Material quadMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+        quadMat.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Ground.jpg")); // Use your ground texture
+        quadMat.setFloat("Shininess", 0); // Reduce shininess
+        quadGeom.setMaterial(quadMat);
+
+        // Center the quad at the origin
+        quadGeom.setLocalTranslation(0, 0, 0);
+        parentNode.attachChild(quadGeom);
+        
+        // Apply texture scaling
+        //quadMat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha); // Optional transparency
+        //quadGeom.getMesh().scaleTextureCoordinates(new Vector2f(50, 50)); // Adjust the scaling factor
     }
     
     /**
