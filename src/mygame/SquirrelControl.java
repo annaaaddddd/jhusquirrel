@@ -88,6 +88,14 @@ public class SquirrelControl extends AbstractControl {
         } else {
             squirrelPhysics.setGravity(new Vector3f(0, -0.05f, 0));
         }
+        
+        // Ensure the squirrel does not fall below the ground level
+        if (spatial.getWorldTranslation().y < 0) {
+            Vector3f currentPos = spatial.getLocalTranslation();
+            spatial.setLocalTranslation(currentPos.x, 0, currentPos.z); // Reset to ground level
+            squirrelPhysics.setLinearVelocity(Vector3f.ZERO); // Stop downward motion
+        }
+        
         updateCameraPosition();
         updateSquirrelRotation();
         checkProximityToTree();
