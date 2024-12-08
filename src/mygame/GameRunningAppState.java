@@ -157,6 +157,7 @@ public class GameRunningAppState extends AbstractAppState {
         rootNode.attachChild(bellSound);
         
     }
+    /*
     private void generateRandomCubes(int count) {
         for (int i = 0; i < count; i++) {
             // Create a cube (acorn)
@@ -199,7 +200,39 @@ public class GameRunningAppState extends AbstractAppState {
             acorn.setShadowMode(ShadowMode.CastAndReceive);
         }
     }
+    */
+    
+    private void generateRandomAcorns(int count) {
+        for (int i = 0; i < count; i++) {
+            // Load the acorn model
+            Spatial acorn = assetManager.loadModel("Models/Acorn/Eichel_C.j3o");
 
+            // Scale the acorn model to fit the scene
+            acorn.setLocalScale(0.02f); // Adjust the scale as needed
+
+            // Randomly select a tree to place the acorn near
+            Spatial tree = trees.get((int) (Math.random() * trees.size()));
+            Vector3f treePosition = tree.getLocalTranslation();
+
+            // Place the acorn slightly higher above the tree
+            float xOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
+            float zOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
+            float yOffset = (float) (Math.random() * 10f + 7f);// Higher than the tree top
+
+            acorn.setLocalTranslation(
+                treePosition.x + xOffset,
+                treePosition.y + yOffset,
+                treePosition.z + zOffset
+            );
+
+            // Add the acorn model to the scene and acorn list
+            rootNode.attachChild(acorn);
+            acorns.add(acorn);
+
+            // Optional: Add shadow casting and receiving
+            acorn.setShadowMode(ShadowMode.CastAndReceive);
+        }
+    }
     
     /**
      * Initialize light setting. Add ambient light and sunlight (directional) to the scene.
@@ -249,7 +282,8 @@ public class GameRunningAppState extends AbstractAppState {
         initializeSquirrelAndCampus();
         addMapping();
         attachCenterMark();   
-        generateRandomCubes(8);
+        //generateRandomCubes(8);
+        generateRandomAcorns(8);
     }
     
     private void createGUI() {
@@ -498,8 +532,8 @@ public class GameRunningAppState extends AbstractAppState {
         parentNode.attachChild(quadGeom);
         
         // Apply texture scaling
-        //quadMat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha); // Optional transparency
-        //quadGeom.getMesh().scaleTextureCoordinates(new Vector2f(50, 50)); // Adjust the scaling factor
+        quadMat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha); // Optional transparency
+        quadGeom.getMesh().scaleTextureCoordinates(new Vector2f(50, 50)); // Adjust the scaling factor
     }
     
     /**
