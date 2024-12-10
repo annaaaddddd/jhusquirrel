@@ -43,13 +43,12 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.post.FilterPostProcessor;
-import com.jme3.post.filters.CartoonEdgeFilter;
 import com.jme3.post.filters.FogFilter;
 import com.jme3.post.filters.LightScatteringFilter;
 import com.jme3.post.ssao.SSAOFilter;
 import com.jme3.renderer.ViewPort;
 import com.jme3.renderer.queue.RenderQueue.ShadowMode;
-import com.jme3.shadow.DirectionalLightShadowRenderer;
+import com.jme3.shadow.DirectionalLightShadowFilter;
 import com.jme3.texture.Texture;
 import com.jme3.util.SkyFactory;
 import java.util.LinkedList;
@@ -138,10 +137,10 @@ public class GameRunningAppState extends AbstractAppState {
         startGame();
         
         fpp = new FilterPostProcessor(assetManager);
-        viewPort.addProcessor(fpp);
         initializeLight();
         activateFog();
-        
+        viewPort.addProcessor(fpp);
+
         // Load ambient nature sound
         ambientSound = new AudioNode(app.getAssetManager(), "Sounds/Environment/Nature.ogg", true);
         ambientSound.setLooping(true); // Continuous sound
@@ -238,9 +237,6 @@ public class GameRunningAppState extends AbstractAppState {
      * Initialize light setting. Add ambient light and sunlight (directional) to the scene.
      */
     private void initializeLight() {
-        ssaoFilter = new SSAOFilter(12.94f,43.93f,.33f,.60f);
-        fpp.addFilter(ssaoFilter);
-        
         // Ambient light to make sure the model is visible
         AmbientLight ambient = new AmbientLight();
         ambient.setColor(ColorRGBA.White.mult(1.3f));
@@ -258,11 +254,15 @@ public class GameRunningAppState extends AbstractAppState {
         sky.setCullHint(Spatial.CullHint.Never);
         rootNode.attachChild(sky);
         
-        DirectionalLightShadowRenderer dlsr = new DirectionalLightShadowRenderer(assetManager, 1024, 2);
-        dlsr.setShadowIntensity(0.4f);
-        dlsr.setLight(sun);
-        viewPort.addProcessor(dlsr);
-        rootNode.setShadowMode(ShadowMode.Off);
+        DirectionalLightShadowFilter dlsf =
+            new DirectionalLightShadowFilter(assetManager, 1024, 2);
+        dlsf.setShadowIntensity(0.8f);
+        dlsf.setLight(sun);
+        dlsf.setEnabled(true);
+        fpp.addFilter(dlsf);
+        
+        ssaoFilter = new SSAOFilter(12.94f,43.93f,.33f,.60f);
+        fpp.addFilter(ssaoFilter);
         
         // make light beams appear from where sun is on skybox
         sunLightFilter = new LightScatteringFilter(sunDir.mult(-3000));
@@ -277,7 +277,8 @@ public class GameRunningAppState extends AbstractAppState {
      * ScreenshotAppState object that saves rendered scenes as image files to the user's desktop
      */
     private void startGame() {
-        // Initialize squirrel, buildings, trees, and the quad
+        // Initialize squirrel, buildings, trees, and the quadmodel.setQueueBucket(RenderQueue.Bucket.Opaque);
+        rootNode.setShadowMode(ShadowMode.Off);
         createStaticQuad(rootNode);        
         initializeSquirrelAndCampus();
         addMapping();
@@ -398,7 +399,6 @@ public class GameRunningAppState extends AbstractAppState {
         // Load the squirrel model with animations from the Squirrel2 folder
         System.out.println("Loading squirrel model...");
         squirrelModel = assetManager.loadModel("Textures/Squirrel2/squirrel-anim.j3o");
-        squirrelModel.setQueueBucket(RenderQueue.Bucket.Opaque);
 
         if (squirrelModel == null) {
             System.out.println("Failed to load squirrel model!");
@@ -449,10 +449,11 @@ public class GameRunningAppState extends AbstractAppState {
         squirrelModel.addControl(squirrelControl);
         rotateSquirrelToFront();
         
+        squirrelModel.setQueueBucket(RenderQueue.Bucket.Opaque);
+        squirrelModel.setShadowMode(ShadowMode.CastAndReceive);
+        
         parentNode.attachChild(squirrelModel);
         rotateSquirrelToFront();
-        
-        squirrelModel.setShadowMode(ShadowMode.CastAndReceive);
     }
     
     /**
@@ -487,6 +488,7 @@ public class GameRunningAppState extends AbstractAppState {
         // Enable transparency for leaves and branches
         // treeMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
         treeGeo.setQueueBucket(RenderQueue.Bucket.Opaque);
+        treeMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Off);
 
         treeGeo.setMaterial(treeMaterial);
 
@@ -496,6 +498,7 @@ public class GameRunningAppState extends AbstractAppState {
         treeGeo.setLocalTranslation(treeLoc);
 
         parentNode.attachChild(treeGeo);
+        
         treeGeo.setShadowMode(ShadowMode.CastAndReceive);
         return treeGeo;
     }
@@ -530,6 +533,8 @@ public class GameRunningAppState extends AbstractAppState {
         // Center the quad at the origin
         quadGeom.setLocalTranslation(0, 0, 0);
         parentNode.attachChild(quadGeom);
+        
+        quadGeom.setShadowMode(ShadowMode.Receive);
         
         // Apply texture scaling
         quadMat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha); // Optional transparency
