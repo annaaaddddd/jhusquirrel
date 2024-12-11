@@ -6,6 +6,12 @@ The forest presents a mix of opportunity and challenge. Mistimed bursts can send
 Simulation, Open World, Action-Adventure
 
 ## Inspiration
+### Flappy Bird
+Flappy Bird inspires the game by introducing its signature movement mechanic: each key press provides a short, controlled burst of velocity, allowing players to navigate obstacles with precision. This creates a challenging yet rewarding gameplay loop where timing and coordination are key, blending simplicity with skill-based movement in a dynamic environment.
+
+![15561733929231_ pic](https://github.com/user-attachments/assets/3da31e3c-5578-454e-b748-a948e176520c)
+
+
 ### [Untitled Goose Game](https://store.steampowered.com/app/837470/Untitled_Goose_Game/)
 In this game, players control a goose who bothers the inhabitants of an English village. Players must use the goose's abilities to manipulate objects and interact with non-player characters to complete objectives. 
 
@@ -42,9 +48,9 @@ The game sets up at the Blue Hole, a spot said to contain fish from all over the
 [Dave the Diver Original Soundtrack (Full)](https://www.youtube.com/watch?v=JBKhYkRc9u8&t=72s)
 
 ## Gameplay
-The game is played from a *third-person perspective*, with the player controlling the squirrel who is positioned on the center of the screen. The player can move freely across the campus, climb trees and buildings, and interact with the environment by performing actions such as collecting food, grappling onto objects, and solving puzzles. Movement includes running, climbing, and gliding between buildings, offering a fluid and dynamic traversal experience. Climbing is a key feature, allowing the squirrel to scale vertical surfaces like going up and down a tree and explore hidden areas. 
+The game is played from a *third-person perspective*, with the player controlling the squirrel, who is always positioned at the center of the screen. The player navigates a dense forest of towering trees, using precise controls inspired by "Flappy Bird." Each key press—W, A, S, D, Space, or Shift—gives the squirrel a short burst of velocity in the corresponding direction, while gravity constantly pulls them downward, adding a layer of challenge to every move.
 
-Players will engage in a variety of tasks that immerse them in the life of a campus squirrel, such as scavenging for food (nuts, snacks), navigating obstacles like traffic, bikes, and rival squirrels. Along the way, players will explore iconic campus locations and uncover hidden secrets. Objectives will range from preparing for winter by gathering supplies to completing quirky missions involving well-known campus landmarks. The low-to-the-ground perspective enhances the sense of scale and detail, encouraging players to explore every nook and cranny of the environment. Players will feel immersed in the experience of being a squirrel, burrowing through the grass, leaping between branches, and discovering the unseen side of campus life.
+The objective is to collect 3 acorns scattered across the treetops. Players must master the physics-based movement to maintain control, timing bursts carefully to avoid crashing into branches or falling to the ground. 
 
 ## Development
 ### First Deliverable
@@ -75,6 +81,7 @@ The SquirrelControl class manages the movement and climbing behavior, encapsulat
 #### Object-Oriented Structure:
 We extended AbstractControl to create the SquirrelControl class, which manages the squirrel's movement and interaction logic.
 The game state management is handled using an AbstractAppState, as seen in the GameRunningAppState.java file, allowing for organized code for starting game.
+
 The GameRunningAppState includes keyboard mapping and initialization code. It manages input actions, including running and climbing, through the use of AnalogListener. This enables fluid and responsive controls, enhancing player interaction with the game environment.
 
 Home screen:
@@ -183,10 +190,10 @@ A tree collision mechanism at the lower part of the tree is also implemented to 
 
 ## Member Contributions
 - Serena: Implemented ambient and positional sound components with dynamic responses to player actions and environmental cues. Updated the README.
-- Anna: Enhanced animation and models, main implementer for six visual effects,  implemented restart mechanism
+- Anna: Enhanced animation and models, implemented restart mechanism, start menu, setting menu, and six visual effects
 - Leo: Completed game mechanism (collecting and counting acorn), added end game mechanism, refined squirrel control and movement
 - Collaborative Work:
-Team discussions finalized the selection and implementation of six distinct effects.
+Team discussions finalized the selection of six distinct effects.
 Joint playtesting ensured cohesive gameplay and smooth feature integration.
 
 ## Acknowledgments
@@ -203,5 +210,5 @@ If possible, we would like to expand the gameplay to more open-world and explora
 
 Explore the vibrant campus from a squirrel's low perspective, navigating its iconic locations, from the quads to the historic Gilman clock tower. The journey can involve scavenging snacks dropped by students, evading predators, and uncovering pieces of campus history as you complete various objectives. The game features diverse and engaging missions, including sneaking into lecture halls to retrieve stolen acorns, exploring hidden nighttime events where nocturnal predators lurk, and gathering puzzle pieces that unlock secret areas of the campus. With dynamic gameplay like sprinting, gliding between buildings, and even riding scooters, you’ll experience the life of a squirrel with new challenges and achievements at every turn. As the final chapter unfolds, the story leads to an epic graduation day on the iconic Homewood campus.
 
-
+Furthermore, the setting menu is not currently in use. We can also implement more setting so that users can customize setting parameter such as mouse sensitivity, with or without fog, and etc.
 
