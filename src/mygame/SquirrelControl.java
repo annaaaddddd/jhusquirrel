@@ -94,6 +94,10 @@ protected void controlUpdate(float tpf) {
         spatial.setLocalTranslation(currentPos.x, 0.1f, currentPos.z); // Slightly above ground
         squirrelPhysics.setLinearVelocity(new Vector3f(0, 0.5f, 0)); // Apply slight upward velocity
     }
+    else {
+        squirrelPhysics.setGravity(new Vector3f(0, -3.15f, 0));
+    }
+    
 
 
     updateCameraPosition();
@@ -218,44 +222,42 @@ protected void controlUpdate(float tpf) {
         if (!isJumping) {
             startJump();
         }
-        squirrelPhysics.applyCentralForce(cam.getDirection().mult(intensity *100));
+        squirrelPhysics.setLinearVelocity(cam.getDirection().mult(2).setY(squirrelPhysics.getLinearVelocity().y)); // Burst forward
     }
 
     public void moveBackward(float intensity) {
         if (!isJumping) {
             startJump();
         }
-        squirrelPhysics.applyCentralForce(cam.getDirection().mult(-intensity * 100));
+        squirrelPhysics.setLinearVelocity(cam.getDirection().mult(-2).setY(squirrelPhysics.getLinearVelocity().y)); // Burst backward
     }
 
     public void moveLeft(float intensity) {
         if (!isJumping) {
             startJump();
         }
-        squirrelPhysics.applyCentralForce(cam.getLeft().mult(intensity * 100));
+        squirrelPhysics.setLinearVelocity(cam.getLeft().mult(2).setY(squirrelPhysics.getLinearVelocity().y)); // Burst left
     }
 
     public void moveRight(float intensity) {
         if (!isJumping) {
             startJump();
         }
-        squirrelPhysics.applyCentralForce(cam.getLeft().mult(-intensity * 100));
+        squirrelPhysics.setLinearVelocity(cam.getLeft().mult(-2).setY(squirrelPhysics.getLinearVelocity().y)); // Burst right
     }
 
     public void climbUp(float intensity) {
         if (!isJumping) {
             startJump();
         }
-        //if (canClimb) {
-            squirrelPhysics.applyCentralForce(new Vector3f(0, intensity * 100, 0));
-        //}
+        squirrelPhysics.setLinearVelocity(new Vector3f(0, 2, 0)); // Burst upward
     }
 
     public void climbDown(float intensity) {
         if (!isJumping) {
             startJump();
         }
-        squirrelPhysics.applyCentralForce(new Vector3f(0, -intensity * 100, 0));
+        squirrelPhysics.setLinearVelocity(new Vector3f(0, -2, 0)); // Burst downward
     }
 
     private void checkProximityToTree() {
