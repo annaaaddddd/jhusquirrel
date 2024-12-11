@@ -11,6 +11,7 @@ import com.jme3.asset.TextureKey;
 import com.jme3.audio.AudioNode;
 import com.jme3.bounding.BoundingBox;
 import com.jme3.bullet.BulletAppState;
+import com.jme3.bullet.collision.shapes.BoxCollisionShape;
 import com.jme3.font.BitmapText;
 import com.jme3.font.BitmapFont;
 import com.jme3.input.InputManager;
@@ -167,50 +168,6 @@ public class GameRunningAppState extends AbstractAppState {
         rootNode.attachChild(bellSound);
         
     }
-    /*
-    private void generateRandomCubes(int count) {
-        for (int i = 0; i < count; i++) {
-            // Create a cube (acorn)
-            Box acornBox = new Box(0.2f, 0.2f, 0.2f);
-            Geometry acorn = new Geometry("Acorn", acornBox);
-
-            // Assign a material with a highlight effect
-            Material acornMaterial = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-            acornMaterial.setBoolean("UseMaterialColors", true); // Enable color-based shading
-            acornMaterial.setColor("Diffuse", ColorRGBA.Brown); // Diffuse color
-            acornMaterial.setColor("Ambient", ColorRGBA.Brown.mult(0.5f)); // Slight ambient lighting
-            acornMaterial.setColor("Specular", ColorRGBA.Yellow); // Highlight color
-            acornMaterial.setFloat("Shininess", 128f); // High shininess for glossy effect
-            acorn.setMaterial(acornMaterial);
-
-            // Randomly select a tree to place the acorn near
-            Spatial tree = trees.get((int) (Math.random() * trees.size()));
-            Vector3f treePosition = tree.getLocalTranslation();
-
-            // Place the acorn slightly higher above the tree
-            float xOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
-            float zOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
-            float yOffset = (float) (Math.random() * 10f + 7f);// Higher than the tree top
-
-            acorn.setLocalTranslation(
-                treePosition.x + xOffset,
-                treePosition.y + yOffset,
-                treePosition.z + zOffset
-            );
-
-            // Add a glowing effect by enabling blending
-            acornMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-            acorn.setQueueBucket(RenderQueue.Bucket.Transparent);
-
-            // Add the acorn to the scene and acorn list
-            rootNode.attachChild(acorn);
-            acorns.add(acorn);
-
-            // Enable shadow casting and receiving
-            acorn.setShadowMode(ShadowMode.CastAndReceive);
-        }
-    }
-    */
     
     private void generateRandomAcorns(int count) {
         for (int i = 0; i < count; i++) {
@@ -500,9 +457,6 @@ public class GameRunningAppState extends AbstractAppState {
         Spatial tree3 = createTree(campusNode, -10, 0.0f, 20);
         trees.add(tree3);
 
-        // Add the quad in the center
-        //createQuad(campusNode, 0, 0.01f, 0); // Flat box for the quad
-
         // Attach the campus node to the root node
         rootNode.attachChild(campusNode);
     }
@@ -606,10 +560,8 @@ public class GameRunningAppState extends AbstractAppState {
         treeMaterial.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Tree/texture_laubbaum.png"));
 
         // Enable transparency for leaves and branches
-        // treeMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
         treeGeo.setQueueBucket(RenderQueue.Bucket.Opaque);
         treeMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Off);
-
         treeGeo.setMaterial(treeMaterial);
 
         // Position the tree
@@ -619,26 +571,35 @@ public class GameRunningAppState extends AbstractAppState {
 
         parentNode.attachChild(treeGeo);
         
+        // Add collision to the trunk part of the tree
+        addTrunkCollision(treeGeo, terrainHeight);
+        
         treeGeo.setShadowMode(ShadowMode.CastAndReceive);
         return treeGeo;
     }
     
-    /*
-    private void createQuad(Node parentNode, float x, float y, float z) {
-        // Flat box for the quad
-        Box quad = new Box(35, 0.1f, 35);
-        Geometry quadGeom = new Geometry("Quad", quad);
-        
-        // Apply a grass or dirt texture to the ground
-        Material quadMat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-        quadMat.setTexture("DiffuseMap", assetManager.loadTexture("Textures/Ground.jpg")); // Use a ground texture
-        quadGeom.setMaterial(quadMat);
-        
-        quadGeom.setLocalTranslation(x, y, z);
-        parentNode.attachChild(quadGeom);
-        quadGeom.setShadowMode(ShadowMode.Receive);
+    /**
+        * Adds collision only to the trunk of the tree.
+     */
+    private void addTrunkCollision(Spatial treeGeo, float terrainHeight) {
+        // Define the trunk size (adjust these dimensions as needed)
+        float trunkHeight = 7.0f; // Approximate height of the trunk
+        float trunkRadius = 1f; // Approximate radius of the trunk
+
+        // Create a BoxCollisionShape for the trunk area
+        BoxCollisionShape trunkCollisionShape = new BoxCollisionShape(new Vector3f(trunkRadius, trunkHeight / 2, trunkRadius));
+
+        // Create a RigidBodyControl for the trunk collision
+        RigidBodyControl trunkPhysics = new RigidBodyControl(trunkCollisionShape, 0); // Static mass
+        trunkPhysics.setPhysicsLocation(treeGeo.getLocalTranslation().add(0, trunkHeight / 2, 0)); // Position at the trunk
+
+        // Add the physics control to the BulletAppState
+        bulletAppState.getPhysicsSpace().add(trunkPhysics);
+
+        // Attach the control to the tree model
+        treeGeo.addControl(trunkPhysics);
     }
-    */
+
     private void createStaticQuad(Node parentNode) {
         float terrainSize = 300; // Width and depth of the terrain
         Box quad = new Box(terrainSize, 0.1f, terrainSize);
@@ -671,7 +632,7 @@ public class GameRunningAppState extends AbstractAppState {
     
         
         // Set the correct terrain height
-        float terrainHeight = (float) -1.5; // Adjust this if your terrain has varying heights
+        float terrainHeight = (float) -1.5; 
         Vector3f finalPosition = new Vector3f(0, terrainHeight, 50); 
 
         // Adjust the position
@@ -696,6 +657,7 @@ public class GameRunningAppState extends AbstractAppState {
 
         System.out.println("Gilman Hall positioned at: " + gilmanHall.getLocalTranslation());
     }
+    
     /**
      * Method that attaches a square center mark for picking
      */
