@@ -54,6 +54,8 @@ public class SquirrelControl extends AbstractControl {
     private final AnimComposer animComposer;
     private float idleTimer = 0f;
     private final float idleAnimationInterval = 8f; // Trigger idle animation every 5 seconds
+    private String currentAnimation = null; // Keeps track of the current animation
+
     
     // Camera shake related fields
     private boolean isShaking = false;
@@ -282,12 +284,25 @@ protected void controlUpdate(float tpf) {
 
     private void setupMouseControl() {
         inputManager.setCursorVisible(false);
-        inputManager.addMapping("MouseLeft", new MouseAxisTrigger(MouseInput.AXIS_X, true));
-        inputManager.addMapping("MouseRight", new MouseAxisTrigger(MouseInput.AXIS_X, false));
-        inputManager.addMapping("MouseUp", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
-        inputManager.addMapping("MouseDown", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
+
+        // Add mappings only if they don't already exist
+        if (!inputManager.hasMapping("MouseLeft")) {
+            inputManager.addMapping("MouseLeft", new MouseAxisTrigger(MouseInput.AXIS_X, true));
+        }
+        if (!inputManager.hasMapping("MouseRight")) {
+            inputManager.addMapping("MouseRight", new MouseAxisTrigger(MouseInput.AXIS_X, false));
+        }
+        if (!inputManager.hasMapping("MouseUp")) {
+            inputManager.addMapping("MouseUp", new MouseAxisTrigger(MouseInput.AXIS_Y, true));
+        }
+        if (!inputManager.hasMapping("MouseDown")) {
+            inputManager.addMapping("MouseDown", new MouseAxisTrigger(MouseInput.AXIS_Y, false));
+        }
+
+        // Add the listener only once
         inputManager.addListener(analogListener, "MouseLeft", "MouseRight", "MouseUp", "MouseDown");
     }
+
 
     private final AnalogListener analogListener = (name, value, tpf) -> {
         if (name.equals("MouseLeft")) {
@@ -353,6 +368,8 @@ protected void controlUpdate(float tpf) {
     
     private void startJump() {
         if (animComposer != null) {
+            animComposer.reset();
+            playAnimation("Jump.End");
             isJumping = true; // Set jumping state
             playAnimation("Jump.Begin");
             
@@ -395,20 +412,36 @@ protected void controlUpdate(float tpf) {
      * @param animationName 
      */
     private void playAnimation(String animationName) {
-        if (animComposer != null && animComposer.getAnimClipsNames().contains(animationName)) {
+        if (animComposer == null) {
+            System.out.println("AnimComposer is null.");
+            return;
+        }
+
+        // Check if the animation is already playing
+        if (animationName.equals(currentAnimation)) {
+            System.out.println("Animation " + animationName + " is already playing. Skipping.");
+            return;
+        }
+
+        if (animComposer.getAnimClipsNames().contains(animationName)) {
             animComposer.setCurrentAction(animationName);
+            currentAnimation = animationName; // Update the current animation tracker
             System.out.println("Playing animation: " + animationName);
         } else {
             System.out.println("Animation " + animationName + " not found.");
         }
     }
 
+
+
     private void stopAnimation(String animationName) {
         if (animComposer != null && animComposer.getAnimClipsNames().contains(animationName)) {
             animComposer.reset(); // Stops the current animation
             System.out.println("Stopping animation: " + animationName);
+            currentAnimation = null; // Reset the current animation tracker
         }
     }
+
     
     private void triggerIdleAnimation() {
         int idleAnimationNumber = 5; // Total idle animations available

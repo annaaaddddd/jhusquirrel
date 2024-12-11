@@ -813,7 +813,6 @@ public class GameRunningAppState extends AbstractAppState {
             }
             setGameCompleted(true); // Update the game completion state
             awaitingRestartConfirmation = false;
-            System.out.println("Game marked as completed.");
             return null;
         });
     }
