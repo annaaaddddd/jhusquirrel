@@ -270,7 +270,7 @@ public class GameRunningAppState extends AbstractAppState {
         acornCounterText = new BitmapText(font, false);
         acornCounterText.setSize(font.getCharSet().getRenderedSize()*3);
         acornCounterText.setColor(ColorRGBA.White);
-        acornCounterText.setText("Acorns Collected:" + initialAcornsCollected+" out of III");
+        acornCounterText.setText("Acorns Collected:" + initialAcornsCollected +" out of III");
         acornCounterText.setLocalTranslation(20, cam.getHeight() - 50, 0); // Position on the screen
         guiNode.attachChild(acornCounterText);
         System.out.println("guiNode children count: " + guiNode.getQuantity());
