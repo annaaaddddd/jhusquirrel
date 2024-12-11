@@ -202,6 +202,9 @@ The game environment has been enriched with new assets, including monuments and 
 
 A tree collision mechanism has also been implemented, specifically for the lower part of the tree, ensuring that the squirrel cannot pass through the trunk. This enhancement adds realism and consistency to the game physics. However, collision mechanics were intentionally omitted for the upper parts of the trees, as adding them would make gameplay overly challenging. This balance maintains realism while keeping the game enjoyable and accessible.
 
+A building (originally Stieff Silver Building) is added to mimic campus environment.
+<img width="1512" alt="Screenshot 2024-12-11 at 3 17 56 PM" src="https://github.com/user-attachments/assets/34009cbd-4ac7-467b-a3f3-49b0e7547378" />
+
 ## Demo
 The file is too big so we uploaded it to drive: https://drive.google.com/file/d/1rb97wYGjivudkPmiCa7ondFjtoTWuktU/view?usp=sharing 
 
