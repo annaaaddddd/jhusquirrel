@@ -196,7 +196,7 @@ protected void controlUpdate(float tpf) {
             String romanCount = toRomanNumeral(count);
 
             // Update the text directly
-            acornCounterText.setText("Acorns Collected: " + romanCount);
+            acornCounterText.setText("Acorns Collected: " + romanCount + " out of III");
 
             System.out.println("Acorns collected (in Roman numerals): " + romanCount);
             if (count >= 3){
@@ -465,6 +465,9 @@ protected void controlUpdate(float tpf) {
         }
     }
 
+    public int getCollectedAcorns() {
+        return collectedAcorns;
+    }
 
 
 }

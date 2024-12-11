@@ -70,6 +70,7 @@ public class GameRunningAppState extends AbstractAppState {
     private List<Spatial> trees; // List to store tree references
     private BulletAppState bulletAppState;
     private AnimComposer composer;
+    private SquirrelControl squirrelControl;
         
     private List<Spatial> acorns = new ArrayList<>(); // List to store acorn geometries
     
@@ -262,10 +263,14 @@ public class GameRunningAppState extends AbstractAppState {
         BitmapFont font = assetManager.loadFont("Interface/Fonts/Default.fnt");
     
         // Acorn counter text
+        
+        // Get the initial number of acorns collected
+        int initialAcornsCollected = (squirrelControl != null) ? squirrelControl.getCollectedAcorns() : 0;
+        
         acornCounterText = new BitmapText(font, false);
         acornCounterText.setSize(font.getCharSet().getRenderedSize()*3);
         acornCounterText.setColor(ColorRGBA.White);
-        acornCounterText.setText("Acorns Collected:");
+        acornCounterText.setText("Acorns Collected:" + initialAcornsCollected+" out of III");
         acornCounterText.setLocalTranslation(20, cam.getHeight() - 50, 0); // Position on the screen
         guiNode.attachChild(acornCounterText);
         System.out.println("guiNode children count: " + guiNode.getQuantity());
@@ -339,7 +344,7 @@ public class GameRunningAppState extends AbstractAppState {
     private AnalogListener analogListener = new AnalogListener() {
         @Override
         public void onAnalog(String name, float intensity, float tpf) {
-            SquirrelControl control = squirrelModel.getControl(SquirrelControl.class);
+            SquirrelControl control = squirrelControl;
             //if (control == null) {
                 //System.out.println("Control is null, skipping movement.");
                 //return;
@@ -361,7 +366,7 @@ public class GameRunningAppState extends AbstractAppState {
         @Override 
         public void onAction(String name, boolean isPressed, float tpf) {
             if (MAPPING_CLIMB_UP.equals(name) && isPressed) {
-                SquirrelControl control = squirrelModel.getControl(SquirrelControl.class);
+                SquirrelControl control = squirrelControl;
                 if (control != null) {
                     control.climbUp();
                 }
@@ -641,7 +646,7 @@ public class GameRunningAppState extends AbstractAppState {
         bulletAppState.getPhysicsSpace().add(squirrelPhysics);
 
         // Add control for squirrel-specific movement
-        SquirrelControl squirrelControl = new SquirrelControl(
+        squirrelControl = new SquirrelControl(
         this,
         cam,                  // Camera
         trees,                // List of trees
