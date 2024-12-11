@@ -1,7 +1,6 @@
 ## Game Summary
-In this game, you embody a **squirrel on the Johns Hopkins University Homewood campus**—but with a twist: the squirrel is actually the resurrected form of an alumnus who graduated over a decade ago. Explore the vibrant campus from a squirrel's low perspective, navigating its iconic locations, from the quads to the historic Gilman clock tower. Your journey involves scavenging snacks dropped by students, evading predators, and uncovering pieces of campus history as you complete various objectives.
-
-The game features diverse and engaging missions, including sneaking into lecture halls to retrieve stolen acorns, exploring hidden nighttime events where nocturnal predators lurk, and gathering puzzle pieces that unlock secret areas of the campus. With dynamic gameplay like sprinting, gliding between buildings, and even riding scooters, you’ll experience the life of a squirrel with new challenges and achievements at every turn. As the final chapter unfolds, the story leads to an epic graduation day on the iconic Homewood campus.
+In this game, you embody a **squirrel on the Johns Hopkins University Homewood campus**—but with a twist: the squirrel is actually the resurrected form of an alumnus who graduated over a decade ago. Your mission is straightforward yet demanding: navigate a dense forest of towering trees to collect every acorn scattered among the high branches. Using quick bursts of velocity in any direction, you must master the squirrel’s unique movement while battling the constant pull of gravity.
+The forest presents a mix of opportunity and challenge. Mistimed bursts can send you crashing into branches or plummeting to the forest floor, forcing you to restart your ascent. Success requires sharp reflexes, impeccable timing, and strategic planning as you soar, dip, and dart your way through the canopy. With every acorn collected, you inch closer to victory, proving that even a resurrected squirrel can conquer the treetops!
 
 ## Genre
 Simulation, Open World, Action-Adventure
@@ -158,21 +157,51 @@ Case 3: Squirrel moves after being idle -> Idle animation stops immediately, and
 
 However, there are still problems such as 1) the squirrel jumps several times after it stops before it plays idle animation; 2) when the idle animations play there seem to be 2 squirrels.
 
+### Fourth Deliverable
+#### Modified Gameplay
+The changes include:
 
-#### Member Contributions
+Preventing Below-Plane Falling: Implement a restriction to stop the squirrel from falling below the ground plane, ensuring gameplay continuity.
+
+Adding Flappy Bird Movement: Introduce a movement mechanism where pressing directional keys gives the squirrel a velocity burst in the respective direction, mimicking "flappy bird" mechanics. Note that this differs from the first proposed gameplay we suggested.
+
+Stabilizing Gravity: Adjust gravity to apply a more stable and consistent downward force for smoother, predictable movement.
+
+#### New User Interaction
+Restarting mechanism is implemented. When users press R in game, the game will confirm if users want to restart. After users win the game, pressing R will restart the game without confirmation.
+
+#### Animation Enhancements
+We fixed the bug where several squirrels are generated. Additionally, idle animation will be propoerly triggered if the squirrel remains stationary. Every pressing on the space (jump upward) will interrupt the current animation and retrigger a jump. When squirrel is grounded again, the current jumping animation will stop shortly and retrigger random idle animation.
+
+#### Scene Enhancements
+New environmental assets such as monuments and more trees are added to the scene. Shadow rendering bug in the last deliverable (where shadow is too dark and possibly rendered after models) is fixed. 
+
+A tree collision mechanism at the lower part of the tree is also implemented to guarantee that the squirrel will not pass throught the trunk.
+
+## Demo
+
+
+## Member Contributions
 - Serena: Implemented ambient and positional sound components with dynamic responses to player actions and environmental cues. Updated the README.
-- Anna: Enhanced animation and models, main implementer for six visual effects.
+- Anna: Enhanced animation and models, main implementer for six visual effects, 
 - Leo: Completed game mechanism (collecting and counting acorn), added end game mechanism, refined squirrel control and movement
 - Collaborative Work:
 Team discussions finalized the selection and implementation of six distinct effects.
 Joint playtesting ensured cohesive gameplay and smooth feature integration.
 
-#### Acknowledgments
+## Acknowledgments
 - Assets and References:
   - Models, sounds, and particle templates were sourced from [Pixabay](https://pixabay.com/music/) [Mixkit](https://mixkit.co/free-sound-effects/) [Textures](https://www.textures.com/).
   - Learning materials from the jMonkeyEngine Beginner’s Guide and other tutorials were used for development.
   - Online sources or tools used to implement visual and sound effects, including Blender, Audacity, etc.
+ 
 
+## Download
+
+## Future Work
+If possible, we would like to expand the gameplay to more open-world and explorative as we initially proposed. 
+
+Explore the vibrant campus from a squirrel's low perspective, navigating its iconic locations, from the quads to the historic Gilman clock tower. The journey can involve scavenging snacks dropped by students, evading predators, and uncovering pieces of campus history as you complete various objectives. The game features diverse and engaging missions, including sneaking into lecture halls to retrieve stolen acorns, exploring hidden nighttime events where nocturnal predators lurk, and gathering puzzle pieces that unlock secret areas of the campus. With dynamic gameplay like sprinting, gliding between buildings, and even riding scooters, you’ll experience the life of a squirrel with new challenges and achievements at every turn. As the final chapter unfolds, the story leads to an epic graduation day on the iconic Homewood campus.
 
 
 
