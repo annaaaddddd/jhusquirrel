@@ -204,7 +204,7 @@ public class GameRunningAppState extends AbstractAppState {
     private void initializeLight() {
         // Ambient light to make sure the model is visible
         AmbientLight ambient = new AmbientLight();
-        ambient.setColor(ColorRGBA.White.mult(1.3f));
+        ambient.setColor(ColorRGBA.White.mult(1.5f));
         rootNode.addLight(ambient);
         
         DirectionalLight sun = new DirectionalLight();
@@ -221,7 +221,7 @@ public class GameRunningAppState extends AbstractAppState {
         
         DirectionalLightShadowFilter dlsf =
             new DirectionalLightShadowFilter(assetManager, 1024, 2);
-        dlsf.setShadowIntensity(0.8f);
+        dlsf.setShadowIntensity(0.5f);
         dlsf.setLight(sun);
         dlsf.setEnabled(true);
         fpp.addFilter(dlsf);
@@ -230,7 +230,8 @@ public class GameRunningAppState extends AbstractAppState {
         fpp.addFilter(ssaoFilter);
         
         // make light beams appear from where sun is on skybox
-        sunLightFilter = new LightScatteringFilter(sunDir.mult(-3000));
+        sunLightFilter = new LightScatteringFilter(sunDir.mult(-5000));
+        sunLightFilter.setLightDensity(2.0f);
         fpp.addFilter(sunLightFilter);
     }
 
@@ -293,6 +294,7 @@ public class GameRunningAppState extends AbstractAppState {
      * Method that add mapping for keyboard triggers
      */
     private void addMapping() {
+        System.out.println("Adding input mappings...");
         if (!inputManager.hasMapping(MAPPING_RUN_FORWARD)) {
             inputManager.addMapping(MAPPING_RUN_FORWARD, TRIGGER_RUN_FORWARD);
             inputManager.addMapping(MAPPING_RUN_BACKWARD, TRIGGER_RUN_BACKWARD);
@@ -307,7 +309,9 @@ public class GameRunningAppState extends AbstractAppState {
             inputManager.addListener(analogListener, 
                     MAPPING_RUN_FORWARD, MAPPING_RUN_BACKWARD, MAPPING_RUN_LEFT, MAPPING_RUN_RIGHT);  
             inputManager.addListener(actionListener, MAPPING_RESTART, MAPPING_CLIMB_UP);
-        }
+        } else {
+        System.out.println("Input mappings already exist.");
+    }
 //        
 //        inputManager.addMapping("ToggleToSecondState", new KeyTrigger(KeyInput.KEY_T));
 //        inputManager.addListener(actionListener, "ToggleToSecondState");
@@ -713,8 +717,8 @@ public class GameRunningAppState extends AbstractAppState {
         super.update(tpf);
         
         debrisTimer += tpf;
-        // Trigger debris effect after 5 seconds
-        if (!debrisTriggered && debrisTimer >= 3.0f) {
+        // Trigger debris effect after 2 seconds
+        if (!debrisTriggered && debrisTimer >= 2.0f) {
             triggerDebrisEffect();
             debrisTriggered = true; // Ensure it triggers only once
             System.out.println("Debris effect triggered after 5 seconds.");
@@ -738,8 +742,8 @@ public class GameRunningAppState extends AbstractAppState {
     private void activateFog(){
         // activate fog
         fogFilter = new FogFilter();
-        fogFilter.setFogDistance(155);
-        fogFilter.setFogDensity(0.3f);
+        fogFilter.setFogDistance(50);
+        fogFilter.setFogDensity(0.5f);
         fogFilter.setFogColor(ColorRGBA.Gray);
         fpp.addFilter(fogFilter);
     }
@@ -791,30 +795,58 @@ public class GameRunningAppState extends AbstractAppState {
    
     private void restartGame() {
         System.out.println("Restarting game...");
+
         if (restartInProgress) {
             System.out.println("Restart already in progress. Skipping duplicate restart in restartGame().");
             return; // Avoid duplicate restarts
         }
-        restartInProgress = true;
-        gameCompleted = false; // Reset game state
-        awaitingRestartConfirmation = false; // Clear restart confirmation state
-        collectedAcorns = 0; // Reset acorn count
-        acorns.clear(); // Clear existing acorns
-        
-        inputManager.reset(); // Clear all current key states to avoid lingering input
-    
-        app.enqueue(() -> {
-            rootNode.detachAllChildren(); // Detach all children from the root node
-            guiNode.detachAllChildren(); // Detach all GUI elements
 
-            // Recreate GUI and game objects
-            createGUI();
-            startGame();
-            ambientSound.play(); // Restart ambient sound
-            restartInProgress = false;
+        restartInProgress = true;
+
+        // Enqueue the restart process
+        app.enqueue(() -> {
+            // Stop sounds
+            if (ambientSound != null) {
+                ambientSound.stop();
+            }
+
+            // Detach this AppState
+            AppStateManager stateManager = app.getStateManager();
+            stateManager.detach(this); // Detach the current instance of GameRunningAppState
+
+            clearInputMappings();
+            
+            // Create a new instance of GameRunningAppState
+            GameRunningAppState newGameState = new GameRunningAppState();
+
+            // Attach the new instance to reset the game
+            stateManager.attach(newGameState);
+
+            restartInProgress = false; // Reset the restart flag
             return null;
         });
     }
+    
+    private void clearInputMappings() {
+        String[] mappingsToRemove = {
+            MAPPING_RUN_FORWARD, 
+            MAPPING_RUN_BACKWARD, 
+            MAPPING_RUN_LEFT, 
+            MAPPING_RUN_RIGHT, 
+            MAPPING_CLIMB_UP, 
+            MAPPING_RESTART
+        };
+
+        for (String mapping : mappingsToRemove) {
+            if (inputManager.hasMapping(mapping)) {
+                inputManager.deleteMapping(mapping);
+            }
+        }
+
+        System.out.println("Input mappings cleared.");
+    }
+
+
     
     private void setGameCompleted(boolean completed) {
         this.gameCompleted = completed;
@@ -853,9 +885,11 @@ public class GameRunningAppState extends AbstractAppState {
         if (debrisEmitter != null && debrisEmitter.getParent() != null) {
             debrisEmitter.getParent().detachChild(debrisEmitter);
         }
+        inputManager.removeListener(analogListener);
+        inputManager.removeListener(actionListener);
+        clearInputMappings();
         rootNode.detachAllChildren();
         guiNode.detachAllChildren();
-        inputManager.removeListener(analogListener);
     }
 }
 

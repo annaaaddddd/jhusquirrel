@@ -36,7 +36,7 @@ public class SquirrelControl extends AbstractControl {
     private static int collectedAcorns = 2;
     private GameRunningAppState gameRunningAppState;
     
-    private float sensitivity = 0.2f;
+    private float sensitivity = 0.4f;
     private InputManager inputManager;
     private float yaw = 0f;
     private float pitch = 10f;
@@ -53,7 +53,7 @@ public class SquirrelControl extends AbstractControl {
     private boolean playedJumpEnd = false; // Track if Jump.End has been played
     private final AnimComposer animComposer;
     private float idleTimer = 0f;
-    private final float idleAnimationInterval = 8f; // Trigger idle animation every 5 seconds
+    private final float idleAnimationInterval = 5f; // Trigger idle animation every 5 seconds
     private String currentAnimation = null; // Keeps track of the current animation
 
     
@@ -94,9 +94,10 @@ protected void controlUpdate(float tpf) {
 
     // Prevent the squirrel from sinking below the ground
     if (position.y < 0) {
-        Vector3f currentPos = spatial.getWorldTranslation();
-        spatial.setLocalTranslation(currentPos.x, 0.1f, currentPos.z); // Slightly above ground
-        squirrelPhysics.setLinearVelocity(new Vector3f(0, 0.5f, 0)); // Apply slight upward velocity
+        spatial.setLocalTranslation(position.x, 0.1f, position.z); // Slightly above ground
+        Vector3f currentVelocity = squirrelPhysics.getLinearVelocity();
+        // Remove any downward velocity when clamping
+        squirrelPhysics.setLinearVelocity(new Vector3f(currentVelocity.x, Math.max(0, currentVelocity.y), currentVelocity.z));
     }
     else {
         squirrelPhysics.setGravity(new Vector3f(0, -3.15f, 0));
@@ -321,62 +322,60 @@ protected void controlUpdate(float tpf) {
     
     private void updateSquirrelState(float tpf) {
         Vector3f velocity = squirrelPhysics.getLinearVelocity();
-
-        // Thresholds for stopping the jump
-        float verticalThreshold = 0.01f; // Small vertical velocity threshold
-        float totalVelocityThreshold = 0.1f; // Small total velocity threshold
-
-        // Transition to Jump.Fly while in the air
-        if (isJumping && !isFlying && velocity.y > verticalThreshold) {
-            playAnimation("Jump.Fly");
-            isFlying = true;
-            playedJumpEnd = false; // Reset the flag to allow Jump.End later
-            idleTimer = 0f; // Reset idle timer since the squirrel is moving
-        }
-        // Check if the squirrel is falling (negative vertical velocity)
-        if (velocity.y < -verticalThreshold) {
-            if (!isFlying) {
-                playAnimation("Jump.Fly"); // Transition to flying animation
-                isFlying = true;
-                isJumping = false; // No longer in a jumping state
-                playedJumpEnd = false; // Reset the landing state
-            }
-        }
-
-        // Transition to Jump.End when landing (but only once)
-        if (isFlying && Math.abs(velocity.y) < verticalThreshold && velocity.length() < totalVelocityThreshold) {
-            if (!playedJumpEnd) { // Play Jump.End only once
-                playAnimation("Jump.End");
-                playedJumpEnd = true;
-                isJumping = false;
+        Vector3f position = spatial.getWorldTranslation();
+        
+        float groundLevel = 0.1f; // Ground height
+        boolean isGrounded = position.y - 0.02f <= groundLevel;
+        if (isGrounded) {
+            // If transitioning from air to ground
+            if (isFlying) { // || isJumping
+                animComposer.reset();
+                playAnimation("Jump.End"); // Play landing animation
+                System.out.println("No jump animation.");
                 isFlying = false;
+                isJumping = false;
+                playedJumpEnd = true;
             }
-            idleTimer = 0f; // Reset idle timer since landing just occurred
-        }
 
-        // If the squirrel is stationary and not jumping or flying, stop movement and trigger idle animations
-        if (!isJumping && !isFlying && velocity.length() < totalVelocityThreshold) {
-            // Stop residual movement
-            squirrelPhysics.setLinearVelocity(Vector3f.ZERO);
-
-            // Increment idle timer
-            idleTimer += tpf;
-
-            if (idleTimer >= idleAnimationInterval) {
-                triggerIdleAnimation(); // Play idle animation
-                idleTimer = 0f; // Reset idle timer
+            // Stop downward motion and ensure smooth landing
+            squirrelPhysics.setLinearVelocity(new Vector3f(velocity.x, Math.max(0, velocity.y), velocity.z));
+            spatial.setLocalTranslation(position.x, groundLevel, position.z);
+            
+            // Increment idle timer when stationary
+            if (velocity.length() < 0.055f) {
+                idleTimer += tpf;
+                if (idleTimer >= idleAnimationInterval) {
+                    animComposer.reset();
+                    triggerIdleAnimation();
+                    idleTimer = 0f; // Reset idle timer
+                }
+            } else if (velocity.length() > 0.2f) { // Add buffer to avoid resetting idleTimer unnecessarily
+                idleTimer = 0f;
             }
         } else {
-            // Reset idle timer when the squirrel starts moving
-            idleTimer = 0f;
+            // Squirrel is in the air
+            idleTimer = 0f; // Reset idle timer
+            if (velocity.y > 0) {
+                // Ascending
+                if (!isJumping) {
+                    playAnimation("Jump.Fly"); // Play flying animation
+                    System.out.println("flying upwards");
+                    isJumping = true;
+                }
+            } else if (velocity.y < 0) {
+                // Descending
+                if (!isFlying) {
+                    playAnimation("Jump.Fly"); // Play flying animation
+                    System.out.println("flying downwards");
+                    isFlying = true;
+                }
+            }
         }
     }
 
-
-    
     private void startJump() {
         if (animComposer != null) {
-            if (isJumping) {
+            if (isJumping || isFlying) {
                 // Interrupt the current jump
                 animComposer.reset(); // Stop current animation
             }
