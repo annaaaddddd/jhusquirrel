@@ -102,14 +102,12 @@ We used assetManager to load models and add textures, and skinning control to ad
 <img width="407" alt="Screenshot 2024-11-06 at 22 06 28" src="https://github.com/user-attachments/assets/68906fa1-460f-40b2-bb7e-be5aee4824ac">
 
 
-The environment is also updated with treebark and grass, simulating a real-world environment.
-Lighting is added so that the character and other elements appear shaded.
+The environment has been enhanced with detailed tree bark textures and grass, simulating a more realistic and immersive world. Ambient and directional lighting have been implemented, adding shading to the character and other elements for a more visually engaging experience.
+
+A tree collision system has also been introduced, allowing the squirrel to interact with trees. When the squirrel is close enough, pressing T transitions the squirrel's actions from running to climbing. However, this mechanism still requires refinement, as the transition does not consistently function as intended. Further adjustments will ensure smoother and more reliable gameplay.
 
 ### Third Deliverable
-#### New Features
-Since the second deliverable, the following features have been added to enhance gameplay and visuals:
-
-##### Sound Component
+#### Sound Component
 
 - Ambient sound: Background nature audio such as wind blowing sets the immersive atmosphere.
 
@@ -144,7 +142,7 @@ Added light beams that pass through the fog, creating a more realistic environme
 ![1061733273100_ pic](https://github.com/user-attachments/assets/be812801-56ca-4f98-9b45-4e47c14e7c57)
 
 #### Playability Enhancements
-The game is now fully playable, featuring clear objectives and rewards:
+The game is now playable, featuring clear objectives and winning state:
 
 Players can collect scattered acorns to complete the mission.
 Dynamic feedback provides mission status updates and rewards.
@@ -158,8 +156,11 @@ https://github.com/user-attachments/assets/79d02bb0-93dc-418c-81a6-e1eef0892c95
 We replaced the tree polygons with a new tree model, increasing the game's visual appeal. 
 
 We also modified the squirrel's animation logic as below:
+
 Case 1: Squirrel is stationary -> a random idle animation (e.g., Idle.000) plays.
+
 Case 2: Squirrel jumps and lands -> Jump.Begin, Jump.Fly, and Jump.End play in sequence. Idle animations are not triggered until the squirrel is stationary for the required interval.
+
 Case 3: Squirrel moves after being idle -> Idle animation stops immediately, and movement or jumping animations take over.
 
 However, there are still problems such as 1) the squirrel jumps several times after it stops before it plays idle animation; 2) when the idle animations play there seem to be 2 squirrels.
@@ -175,23 +176,25 @@ Adding Flappy Bird Movement: Introduce a movement mechanism where pressing direc
 Stabilizing Gravity: Adjust gravity to apply a more stable and consistent downward force for smoother, predictable movement.
 
 #### New User Interaction
-Restarting mechanism is implemented. When users press R in game, the game will confirm if users want to restart. The game will pause and the confirmation message will time out after 5 seconds. After users win the game, pressing R will restart the game without confirmation.
+A restarting mechanism has been implemented to enhance user control. When players press R during gameplay, a confirmation prompt appears, asking if they want to restart. The game pauses during this prompt, which times out after 5 seconds if no response is provided. However, after winning the game, pressing R will restart the game immediately without requiring confirmation, streamlining the experience.
+
+Additionally, a timeout mechanism has been introduced to increase gameplay challenge. If players fail to collect three acorns before the timer runs out, the game ends, and a prompt appears, giving users the option to restart. This feature adds a strategic element to the game, encouraging players to manage their time effectively.
 
 #### Animation Enhancements
-We fixed the bug where several squirrels are generated. Additionally, idle animation will be propoerly triggered if the squirrel remains stationary. Every pressing on the space (jump upward) will interrupt the current animation and retrigger a jump. When squirrel is grounded again, the current jumping animation will stop shortly and retrigger random idle animation.
+We fixed the bug where several squirrels are generated. Additionally, idle animation will be properly triggered if the squirrel remains stationary. Every pressing on the space (jump upward) will interrupt the current animation and retrigger a jump. When squirrel is grounded again, the current jumping animation will stop shortly and retrigger random idle animation.
 
 #### Scene Enhancements
-New environmental assets such as monuments and more trees are added to the scene. Shadow rendering bug in the last deliverable (where shadow is too dark and possibly rendered after models) is fixed. 
+The game environment has been enriched with new assets, including monuments and additional trees, creating a more immersive and visually dynamic scene. A shadow rendering issue from the previous deliverable, where shadows appeared overly dark and were possibly rendered after the models, has been resolved, improving overall visual quality.
 
-A tree collision mechanism at the lower part of the tree is also implemented to guarantee that the squirrel will not pass throught the trunk.
+A tree collision mechanism has also been implemented, specifically for the lower part of the tree, ensuring that the squirrel cannot pass through the trunk. This enhancement adds realism and consistency to the game physics. However, collision mechanics were intentionally omitted for the upper parts of the trees, as adding them would make gameplay overly challenging. This balance maintains realism while keeping the game enjoyable and accessible.
 
 ## Demo
 
 
 ## Member Contributions
-- Serena: Implemented ambient and positional sound components with dynamic responses to player actions and environmental cues. Updated the README.
-- Anna: Enhanced animation and models, implemented restart mechanism, start menu, setting menu, and six visual effects
-- Leo: Completed game mechanism (collecting and counting acorn), added end game mechanism, refined squirrel control and movement
+- Serena: Implemented initial scene graph, textures,  ambient and positional sound components with dynamic responses to player actions and environmental cues. Updated the README.
+- Anna: Enhanced animation and models, implemented squirrel control (partially), lighting, restart and timeout mechanism, start menu, setting menu, and post-processing effects
+- Leo: Implemented gameplay (collecting and counting acorn) with physics, added win game mechanism, refined squirrel control and movement
 - Collaborative Work:
 Team discussions finalized the selection of six distinct effects.
 Joint playtesting ensured cohesive gameplay and smooth feature integration.
@@ -206,9 +209,10 @@ Joint playtesting ensured cohesive gameplay and smooth feature integration.
 ## Download
 
 ## Future Work
-If possible, we would like to expand the gameplay to more open-world and explorative as we initially proposed. 
+We envision expanding the gameplay to embrace a more open-world and explorative design, aligning with our initial proposal. Players will explore the vibrant Johns Hopkins Homewood campus from a squirrel's unique low perspective, navigating iconic locations such as the quads and the historic Gilman clock tower. The journey will involve scavenging snacks dropped by students, evading predators, and uncovering hidden pieces of campus history while completing various objectives.
 
-Explore the vibrant campus from a squirrel's low perspective, navigating its iconic locations, from the quads to the historic Gilman clock tower. The journey can involve scavenging snacks dropped by students, evading predators, and uncovering pieces of campus history as you complete various objectives. The game features diverse and engaging missions, including sneaking into lecture halls to retrieve stolen acorns, exploring hidden nighttime events where nocturnal predators lurk, and gathering puzzle pieces that unlock secret areas of the campus. With dynamic gameplay like sprinting, gliding between buildings, and even riding scooters, you’ll experience the life of a squirrel with new challenges and achievements at every turn. As the final chapter unfolds, the story leads to an epic graduation day on the iconic Homewood campus.
+The game will feature a diverse range of engaging missions, such as sneaking into lecture halls to retrieve stolen acorns, exploring hidden nighttime events filled with lurking nocturnal predators, and gathering puzzle pieces to unlock secret areas of the campus. Dynamic gameplay mechanics like sprinting, gliding between buildings, and even riding scooters will provide players with fresh challenges and achievements at every turn. The narrative culminates in an epic graduation day, celebrating the player's journey as the squirrel on the iconic Homewood campus.
 
-Furthermore, the setting menu is not currently in use. We can also implement more setting so that users can customize setting parameter such as mouse sensitivity, with or without fog, and etc.
+In addition, we aim to enhance the game’s usability and customization options. The currently unused settings menu will be developed to allow users to adjust parameters such as mouse sensitivity, enable or disable visual features like fog, and configure other gameplay settings. We also plan to create a cleaner and more intuitive quitting mechanism to improve user experience.
 
+Finally, the incorporation of terrain into the game environment will add depth and realism to the campus landscape, enriching the player’s exploration. These enhancements will bring the game closer to its full potential, offering players an immersive and dynamic experience.
