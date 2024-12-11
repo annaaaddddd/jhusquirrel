@@ -328,7 +328,7 @@ protected void controlUpdate(float tpf) {
         boolean isGrounded = position.y - 0.02f <= groundLevel;
         if (isGrounded) {
             // If transitioning from air to ground
-            if (isFlying) { // || isJumping
+            if (isFlying && !playedJumpEnd) { // || isJumping
                 animComposer.reset();
                 playAnimation("Jump.End"); // Play landing animation
                 System.out.println("No jump animation.");
@@ -362,7 +362,7 @@ protected void controlUpdate(float tpf) {
                     System.out.println("flying upwards");
                     isJumping = true;
                 }
-            } else if (velocity.y < 0) {
+            } else if (velocity.y < 0.02f) {
                 // Descending
                 if (!isFlying) {
                     playAnimation("Jump.Fly"); // Play flying animation

@@ -81,7 +81,7 @@ public class GameRunningAppState extends AbstractAppState {
     private Picture settingsIcon;
     private Picture saveIcon;
     private BitmapText restartMessage;
-    private float timeRemaining = 10.0f; // 60 seconds countdown with 5 s buffer time
+    private float timeRemaining = 30.0f; // 60 seconds countdown with 5 s buffer time
     private BitmapText timerText;       // GUI element to display the timer
     private boolean isTimeUp = false;   // Flag to track if time is up
     
@@ -305,7 +305,7 @@ public class GameRunningAppState extends AbstractAppState {
         timerText.setSize(font.getCharSet().getRenderedSize() * 3);
         timerText.setColor(ColorRGBA.White);
         timerText.setText("Time Remaining: 60"); // Initial text
-        timerText.setLocalTranslation(cam.getWidth()/2, cam.getHeight() - 50, 0); // Position on the screen
+        timerText.setLocalTranslation(cam.getWidth()/2 -150, cam.getHeight() - 50, 0); // Position on the screen
         guiNode.attachChild(timerText);
 
     }
@@ -837,7 +837,7 @@ public class GameRunningAppState extends AbstractAppState {
     public void update(float tpf) {
         super.update(tpf);
         // Timer countdown logic
-        if (!isTimeUp) {
+        if (!isTimeUp && !gameCompleted) {
             timeRemaining -= tpf; // Decrement timer
             if (timeRemaining <= 0) {
                 timeRemaining = 0;
