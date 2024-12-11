@@ -236,4 +236,4 @@ https://github.com/annaaaddddd/jhusquirrel/blob/main/dist.zip
 
 - Enhance the game’s usability and customization options. The currently unused settings menu will be developed to allow users to adjust parameters such as mouse sensitivity, enable or disable visual features like fog, and configure other gameplay settings. We also plan to create a cleaner and more intuitive quitting mechanism to improve user experience.
 
-- Incorporation of terrain into the game environment with iconic JHU campus buildings. These enhancements will bring the game closer to its full potential, offering players an immersive and dynamic experience. This is, however, greatly limited by the availability of free JHU building models and difficulty of incorporating large terrain with alpha map and height map.
+- Incorporation of terrain into the game environment with iconic JHU campus buildings. These enhancements will bring the game closer to its full potential, offering players an immersive and dynamic experience. This is, however, greatly limited by the availability of free JHU building models.
