@@ -77,43 +77,43 @@ public class SquirrelControl extends AbstractControl {
         this.animComposer = animComposer;
     }
 
-    @Override
-    protected void controlUpdate(float tpf) {
-        processCameraShake(tpf);
-        updateSquirrelState(tpf);
-        
-        if (spatial.getWorldTranslation().z <= targetZLevel) {
-            //squirrelPhysics.setGravity(Vector3f.ZERO);
-            squirrelPhysics.setGravity(new Vector3f(0, -0.05f, 0));
-        } else {
-            squirrelPhysics.setGravity(new Vector3f(0, -0.05f, 0));
-        }
-        
-        // Ensure the squirrel does not fall below the ground level
-        if (spatial.getWorldTranslation().y < 0) {
-            Vector3f currentPos = spatial.getLocalTranslation();
-            spatial.setLocalTranslation(currentPos.x, 0, currentPos.z); // Reset to ground level
-            squirrelPhysics.setLinearVelocity(Vector3f.ZERO); // Stop downward motion
-        }
-        
-        updateCameraPosition();
-        updateSquirrelRotation();
-        checkProximityToTree();
-        checkProximityToAcorns();
-        
-        Vector3f velocity = squirrelPhysics.getLinearVelocity();
-        if (velocity.length() < 0.1f) { // If not moving
-            idleTimer += tpf;
-            if (idleTimer >= idleChirpInterval) {
-                chirpSound.setLocalTranslation(spatial.getWorldTranslation()); // Update position
-                chirpSound.playInstance();
-                idleTimer = 0; // Reset timer after chirp
-            }
-        } else {
-            idleTimer = 0; // Reset timer when moving
-        }
+@Override
+protected void controlUpdate(float tpf) {
+    processCameraShake(tpf);
+    updateSquirrelState(tpf);
+
+    // Get the squirrel's current position
+    Vector3f position = spatial.getWorldTranslation();
+
+    // Print the XYZ values in real-time
+    System.out.printf("Squirrel Position - X: %.2f, Y: %.2f, Z: %.2f%n", position.x, position.y, position.z);
+
+    // Prevent the squirrel from sinking below the ground
+    if (position.y < 0) {
+        Vector3f currentPos = spatial.getWorldTranslation();
+        spatial.setLocalTranslation(currentPos.x, 0.1f, currentPos.z); // Slightly above ground
+        squirrelPhysics.setLinearVelocity(new Vector3f(0, 0.5f, 0)); // Apply slight upward velocity
     }
-    
+
+
+    updateCameraPosition();
+    updateSquirrelRotation();
+    checkProximityToTree();
+    checkProximityToAcorns();
+
+    Vector3f velocity = squirrelPhysics.getLinearVelocity();
+    if (velocity.length() < 0.1f) { // If not moving
+        idleTimer += tpf;
+        if (idleTimer >= idleChirpInterval) {
+            chirpSound.setLocalTranslation(spatial.getWorldTranslation()); // Update position
+            chirpSound.playInstance();
+            idleTimer = 0; // Reset timer after chirp
+        }
+    } else {
+        idleTimer = 0; // Reset timer when moving
+    }
+}
+
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
         // Not used in this case, so leave it empty
@@ -218,7 +218,7 @@ public class SquirrelControl extends AbstractControl {
         if (!isJumping) {
             startJump();
         }
-        squirrelPhysics.applyCentralForce(cam.getDirection().mult(intensity * 100));
+        squirrelPhysics.applyCentralForce(cam.getDirection().mult(intensity *100));
     }
 
     public void moveBackward(float intensity) {
