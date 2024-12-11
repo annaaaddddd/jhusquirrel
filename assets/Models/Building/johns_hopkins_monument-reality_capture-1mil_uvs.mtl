@@ -1,0 +1,13 @@
+#
+# Wavefront material file
+# Created in RealityCapture
+# Engine version v1.1.1.15122
+#
+
+newmtl johns_hopkins_monument-reality_capture-1mil_uvs_u1_v1
+Ka 1 1 1
+Kd 1 1 1
+d 1
+Ns 0
+illum 1
+map_Kd ../Textures/Building/johns_hopkins_monument-reality_capture-1mil_uvs_ul_vl.png

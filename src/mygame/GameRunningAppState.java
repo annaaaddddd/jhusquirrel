@@ -1,5 +1,6 @@
 package mygame;
 
+import com.bulletphysics.collision.shapes.CollisionShape;
 import com.jme3.anim.AnimComposer;
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
@@ -34,6 +35,7 @@ import java.util.List;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.ui.Picture;
 import com.jme3.bullet.control.RigidBodyControl; 
+import com.jme3.bullet.util.CollisionShapeFactory;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.effect.shapes.EmitterSphereShape;
@@ -290,10 +292,16 @@ public class GameRunningAppState extends AbstractAppState {
         rootNode.setShadowMode(ShadowMode.Off);
         createStaticQuad(rootNode);        
         initializeSquirrelAndCampus();
+        
+        // Ensure the squirrel is facing the desired direction
+        //rotateSquirrelToFront();
+        System.out.println("Squirrel's final rotation: " + squirrelModel.getLocalRotation());
+
         addMapping();
         attachCenterMark();   
         //generateRandomCubes(8);
         generateRandomAcorns(2);
+        addBuilding();
     }
     
     private void createGUI() {
@@ -564,7 +572,8 @@ public class GameRunningAppState extends AbstractAppState {
         squirrelModel.setShadowMode(ShadowMode.CastAndReceive);
         
         parentNode.attachChild(squirrelModel);
-        rotateSquirrelToFront();
+        //rotateSquirrelToFront();
+        System.out.println("Squirrel's final rotation: " + squirrelModel.getLocalRotation());
     }
     
     /**
@@ -652,6 +661,41 @@ public class GameRunningAppState extends AbstractAppState {
         //quadGeom.getMesh().scaleTextureCoordinates(new Vector2f(50, 50)); // Adjust the scaling factor
     }
     
+    private void addBuilding() {
+        System.out.println("Squirrel's initial rotation: " + squirrelModel.getLocalRotation());
+        // Load the Gilman Hall model
+        Spatial gilmanHall = assetManager.loadModel("Models/Building/johns_hopkins_monument-reality_capture-1mil_uvs.j3o");
+
+        // Scale the model to fit the scene
+        gilmanHall.setLocalScale(3.5f); // Adjust this value based on the size of the terrain
+    
+        
+        // Set the correct terrain height
+        float terrainHeight = (float) -1.5; // Adjust this if your terrain has varying heights
+        Vector3f finalPosition = new Vector3f(0, terrainHeight, 50); 
+
+        // Adjust the position
+        gilmanHall.setLocalTranslation(finalPosition);
+
+        // Fix the rotation to make the base parallel to the ground
+        gilmanHall.setLocalRotation(new Quaternion()
+                .fromAngles(FastMath.HALF_PI, FastMath.PI, FastMath.PI)
+        );
+        
+        // Add shadow casting and receiving for better visuals
+        gilmanHall.setShadowMode(ShadowMode.CastAndReceive);
+
+        // Attach the model to the root node
+        rootNode.attachChild(gilmanHall);
+
+        // Make the building solid with a simple box collision shape
+        com.jme3.bullet.collision.shapes.CollisionShape buildingShape = CollisionShapeFactory.createBoxShape(gilmanHall);
+        RigidBodyControl buildingPhysics = new RigidBodyControl(buildingShape, 0.0f); // Static object with mass 0
+        gilmanHall.addControl(buildingPhysics);
+        bulletAppState.getPhysicsSpace().add(buildingPhysics);
+
+        System.out.println("Gilman Hall positioned at: " + gilmanHall.getLocalTranslation());
+    }
     /**
      * Method that attaches a square center mark for picking
      */
@@ -678,9 +722,11 @@ public class GameRunningAppState extends AbstractAppState {
 
         // Rotate the squirrel to face forward along the Z-axis
         Quaternion frontRotation = new Quaternion();
-        frontRotation.fromAngleAxis( FastMath.PI , Vector3f.UNIT_Y);
+        frontRotation.fromAngleAxis(FastMath.PI, Vector3f.UNIT_Y);
         squirrelModel.setLocalRotation(frontRotation);
         squirrelModel.updateGeometricState();
+        System.out.println("Squirrel's final rotation: " + squirrelModel.getLocalRotation());
+
     }
     
     private float bellTimer = 0;
