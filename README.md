@@ -187,8 +187,11 @@ Stabilizing Gravity: Adjust gravity to apply a more stable and consistent downwa
 
 #### New User Interaction
 A restarting mechanism has been implemented to enhance user control. When players press R during gameplay, a confirmation prompt appears, asking if they want to restart. The game pauses during this prompt, which times out after 5 seconds if no response is provided. However, after winning the game, pressing R will restart the game immediately without requiring confirmation, streamlining the experience.
+<img width="1512" alt="Screenshot 2024-12-11 at 13 27 57" src="https://github.com/user-attachments/assets/cffdeccf-aeb6-49d4-8a02-0f2269d6d00e" />
+
 
 Additionally, a timeout mechanism has been introduced to increase gameplay challenge. If players fail to collect three acorns before the timer runs out, the game ends, and a prompt appears, giving users the option to restart. This feature adds a strategic element to the game, encouraging players to manage their time effectively.
+<img width="1512" alt="Screenshot 2024-12-11 at 13 46 07" src="https://github.com/user-attachments/assets/28fd4804-a665-4ae7-b992-9e993c8ebdf4" />
 
 #### Animation Enhancements
 We fixed the bug where several squirrels are generated. Additionally, idle animation will be properly triggered if the squirrel remains stationary. Every pressing on the space (jump upward) will interrupt the current animation and retrigger a jump. When squirrel is grounded again, the current jumping animation will stop shortly and retrigger random idle animation.
