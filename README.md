@@ -203,7 +203,7 @@ The game environment has been enriched with new assets, including monuments and 
 A tree collision mechanism has also been implemented, specifically for the lower part of the tree, ensuring that the squirrel cannot pass through the trunk. This enhancement adds realism and consistency to the game physics. However, collision mechanics were intentionally omitted for the upper parts of the trees, as adding them would make gameplay overly challenging. This balance maintains realism while keeping the game enjoyable and accessible.
 
 ## Demo
-
+The file is too big so we uploaded it to drive: https://drive.google.com/file/d/1rb97wYGjivudkPmiCa7ondFjtoTWuktU/view?usp=sharing 
 
 ## Member Contributions
 - Serena: Implemented initial scene graph, textures,  ambient and positional sound components with dynamic responses to player actions and environmental cues. Updated the README.
