@@ -85,6 +85,8 @@ public class GameRunningAppState extends AbstractAppState {
     
     private AudioNode ambientSound;
     private AudioNode bellSound;
+    private float bellTimer = 0;
+    private final float bellInterval = 60.0f; // Ring every 60 seconds (1 minute in-game)
     
     private Vector3f sunDir = new Vector3f(0.1f, -1f, 0.95f);
     private FilterPostProcessor fpp;
@@ -121,6 +123,7 @@ public class GameRunningAppState extends AbstractAppState {
     private final static String MAPPING_CLIMB_UP = "Climb Up";
     private final static String MAPPING_RESTART = "Restart";
     
+    // Lifecycle Methods
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
@@ -162,155 +165,51 @@ public class GameRunningAppState extends AbstractAppState {
         rootNode.attachChild(bellSound);
         
     }
-    
-    private void generateRandomAcorns(int count) {
-        for (int i = 0; i < count; i++) {
-            // Load the acorn model
-            Spatial acorn = assetManager.loadModel("Models/Acorn/Eichel_C.j3o");
-            
-            // Scale the acorn model to fit the scene
-            acorn.setLocalScale(0.02f); // Adjust the scale as needed
-            
-            Quaternion flipX = new Quaternion().fromAngleAxis(FastMath.PI, Vector3f.UNIT_X);
-            acorn.setLocalRotation(flipX);
-            
-            // Randomly select a tree to place the acorn near
-            Spatial tree = trees.get((int) (Math.random() * trees.size()));
-            Vector3f treePosition = tree.getLocalTranslation();
 
-            // Place the acorn slightly higher above the tree
-            float xOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
-            float zOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
-            float yOffset = (float) (Math.random() * 10f + 7f);// Higher than the tree top
-
-            acorn.setLocalTranslation(
-                treePosition.x + xOffset,
-                treePosition.y + yOffset,
-                treePosition.z + zOffset
-            );
-
-            // Add the acorn model to the scene and acorn list
-            rootNode.attachChild(acorn);
-            acorns.add(acorn);
-
-            // Optional: Add shadow casting and receiving
-            acorn.setShadowMode(ShadowMode.CastAndReceive);
+    @Override
+    public void update(float tpf) {
+        super.update(tpf);
+        // Timer countdown logic
+        if (!isTimeUp && !gameCompleted) {
+            timeRemaining -= tpf; // Decrement timer
+            if (timeRemaining <= 0) {
+                timeRemaining = 0;
+                isTimeUp = true; // Mark as time-up
+                handleTimeUp();  // Handle the timeout logic
+            }
+            updateTimerDisplay(); // Update the timer display
         }
+        
+        debrisTimer += tpf;
+        // Trigger debris effect after 2 seconds
+        if (!debrisTriggered && debrisTimer >= 2.0f) {
+            triggerDebrisEffect();
+            debrisTriggered = true; // Ensure it triggers only once
+            System.out.println("Debris effect triggered after 5 seconds.");
+        }
+        
+        bellTimer += tpf;
+        if (bellTimer >= bellInterval) {
+            bellSound.playInstance();
+            bellTimer = 0; // Reset timer
+        }
+        updateBellVolume(cam.getLocation());
     }
     
-    /**
-     * Initialize light setting. Add ambient light and sunlight (directional) to the scene.
-     */
-    private void initializeLight() {
-        // Ambient light to make sure the model is visible
-        AmbientLight ambient = new AmbientLight();
-        ambient.setColor(ColorRGBA.White.mult(1.5f));
-        rootNode.addLight(ambient);
-        
-        DirectionalLight sun = new DirectionalLight();
-        sun.setColor(ColorRGBA.White);
-        sun.setDirection(sunDir.normalizeLocal());
-        rootNode.addLight(sun);
-        
-        
-        Spatial sky = SkyFactory.createSky(assetManager, 
-                "Textures/Sky/Bright/FullskiesBlueClear03.dds", false);
-        sky.setQueueBucket(RenderQueue.Bucket.Sky);
-        sky.setCullHint(Spatial.CullHint.Never);
-        rootNode.attachChild(sky);
-        
-        DirectionalLightShadowFilter dlsf =
-            new DirectionalLightShadowFilter(assetManager, 1024, 2);
-        dlsf.setShadowIntensity(0.5f);
-        dlsf.setLight(sun);
-        dlsf.setEnabled(true);
-        fpp.addFilter(dlsf);
-        
-        ssaoFilter = new SSAOFilter(12.94f,43.93f,.33f,.60f);
-        fpp.addFilter(ssaoFilter);
-        
-        // make light beams appear from where sun is on skybox
-        sunLightFilter = new LightScatteringFilter(sunDir.mult(-5000));
-        sunLightFilter.setLightDensity(2.0f);
-        fpp.addFilter(sunLightFilter);
+    @Override
+    public void cleanup() {
+        super.cleanup();
+        if (debrisEmitter != null && debrisEmitter.getParent() != null) {
+            debrisEmitter.getParent().detachChild(debrisEmitter);
+        }
+        inputManager.removeListener(analogListener);
+        inputManager.removeListener(actionListener);
+        clearInputMappings();
+        rootNode.detachAllChildren();
+        guiNode.detachAllChildren();
     }
 
-
-    /**
-     * Initialize game level and logic (creating level content, setting up physics, etc.
-     * Potential TODO: Add a WorldManagerState object that attaches nodes to the rootNode object, 
-     * a PhysicsState object that handles falling and colliding objects, and a 
-     * ScreenshotAppState object that saves rendered scenes as image files to the user's desktop
-     */
-    private void startGame() {
-        // Initialize squirrel, buildings, trees, and the quadmodel.setQueueBucket(RenderQueue.Bucket.Opaque);
-        rootNode.setShadowMode(ShadowMode.Off);
-        createStaticQuad(rootNode);        
-        initializeSquirrelAndCampus();
-        
-        // Ensure the squirrel is facing the desired direction
-        //rotateSquirrelToFront();
-        System.out.println("Squirrel's final rotation: " + squirrelModel.getLocalRotation());
-
-        addMapping();
-        attachCenterMark();   
-        //generateRandomCubes(8);
-        generateRandomAcorns(2);
-        addBuilding();
-    }
-    
-    private void createGUI() {
-        BitmapFont font = assetManager.loadFont("Interface/Fonts/Default.fnt");
-    
-        // Acorn counter text
-        
-        // Get the initial number of acorns collected
-        int initialAcornsCollected = (squirrelControl != null) ? squirrelControl.getCollectedAcorns() : 0;
-        
-        acornCounterText = new BitmapText(font, false);
-        acornCounterText.setSize(font.getCharSet().getRenderedSize()*3);
-        acornCounterText.setColor(ColorRGBA.White);
-        acornCounterText.setText("Acorns Collected:" + initialAcornsCollected +" out of III");
-        acornCounterText.setLocalTranslation(20, cam.getHeight() - 50, 0); // Position on the screen
-        guiNode.attachChild(acornCounterText);
-        System.out.println("guiNode children count: " + guiNode.getQuantity());
-        System.out.println("acornCounterText is attached: " + (guiNode.hasChild(acornCounterText)));
-
-        // Create Settings icon
-        settingsIcon = new Picture("Settings Icon");
-        settingsIcon.setImage(assetManager, "Interface/In Game GUI/setting.png", true); 
-        settingsIcon.setWidth(64);
-        settingsIcon.setHeight(64);
-        settingsIcon.setPosition(cam.getWidth() - 80, cam.getHeight() - 80); // Top-right corner
-        guiNode.attachChild(settingsIcon);
-
-        // Create Save icon
-        saveIcon = new Picture("Save Icon");
-        saveIcon.setImage(assetManager, "Interface/In Game GUI/save.png", true);
-        saveIcon.setWidth(64);
-        saveIcon.setHeight(64);
-        saveIcon.setPosition(cam.getWidth() - 160, cam.getHeight() - 80); // Next to Settings icon
-        guiNode.attachChild(saveIcon);
-        
-        // Restart message
-        restartMessage = new BitmapText(font, false);
-        restartMessage.setSize(font.getCharSet().getRenderedSize() * 2); // Adjust font size
-        restartMessage.setColor(ColorRGBA.White);
-        restartMessage.setText("Press R to Restart");
-        restartMessage.setLocalTranslation(20, cam.getHeight() - 200, 0); // Position on the screen
-        guiNode.attachChild(restartMessage);
-        
-        // Timer text
-        timerText = new BitmapText(font, false);
-        timerText.setSize(font.getCharSet().getRenderedSize() * 3);
-        timerText.setColor(ColorRGBA.White);
-        timerText.setText("Time Remaining: 60"); // Initial text
-        timerText.setLocalTranslation(cam.getWidth()/2 -150, cam.getHeight() - 50, 0); // Position on the screen
-        guiNode.attachChild(timerText);
-
-    }
-
-    
+    // Input Mapping and Handling
     /**
      * Method that add mapping for keyboard triggers
      */
@@ -393,174 +292,84 @@ public class GameRunningAppState extends AbstractAppState {
         }
     };
     
-    private void freezeScreen() {
-        System.out.println("Freezing screen...");
-
-        addGrayFilter(); // Add gray filter
-        
-        // Stop all input handling
-        clearInputMappings();
-        if (!inputManager.hasMapping(MAPPING_RESTART)) {
-            inputManager.addMapping(MAPPING_RESTART, TRIGGER_RESTART);
-            inputManager.addListener(actionListener, MAPPING_RESTART);
-        }
-
-        // Pause physics simulation
-        bulletAppState.setEnabled(false);
-
-        // Pause animations
-        if (composer != null) {
-            composer.setEnabled(false);
-        }
-        
-        if (!isTimeUp){
-            // Display freeze message
-            BitmapText freezeMessage = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
-            freezeMessage.setSize(100); // Adjust font size
-            freezeMessage.setColor(ColorRGBA.Black);
-            freezeMessage.setText("Game Paused");
-            freezeMessage.setLocalTranslation(
-                (cam.getWidth() - freezeMessage.getLineWidth()) / 2,
-                (cam.getHeight() / 2 + 50 ),
-                0
-            );
-            guiNode.attachChild(freezeMessage);
-        }
-
-        isFrozen = true; // Mark the game as frozen
-    }
+    // Setup Methods
     
-    private void unfreezeScreen() {
-        System.out.println("Unfreezing screen...");
-        removeGrayFilter(); // Remove gray filter
-        // Resume input handling
-        addMapping();
-
-        // Resume physics simulation
-        bulletAppState.setEnabled(true);
-
-        // Resume animations
-        if (composer != null) {
-            composer.setEnabled(true);
-        }
-
-        // Remove freeze message
-        guiNode.detachAllChildren(); // Assuming no other GUI elements need to persist
-
-        isFrozen = false; // Mark the game as unfrozen
-    }
-    
-    private Geometry grayOverlay;
-
-    private void initializeGrayFilter() {
-        // Create a full-screen quad for the gray filter
-        grayOverlay = new Geometry("GrayOverlay", new Box(1, 1, 0));
-        Material grayMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        grayMaterial.setColor("Color", new ColorRGBA(0.2f, 0.2f, 0.2f, 0.5f)); // Semi-transparent gray
-        grayMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-        grayOverlay.setMaterial(grayMaterial);
-
-        // Scale the quad to cover the screen
-        grayOverlay.setLocalScale(cam.getWidth() / 2, cam.getHeight() / 2, 1);
-        grayOverlay.setLocalTranslation(cam.getWidth() / 2, cam.getHeight() / 2, 0); // Center the overlay
-        grayOverlay.setQueueBucket(RenderQueue.Bucket.Gui); // Render on top of the game
-    }
-
-    private void addGrayFilter() {
-        if (grayOverlay != null && grayOverlay.getParent() == null) {
-            guiNode.attachChild(grayOverlay);
-        }
-    }
-
-    private void removeGrayFilter() {
-        if (grayOverlay != null && grayOverlay.getParent() != null) {
-            guiNode.detachChild(grayOverlay);
-        }
-    }
-
-
-    private ActionListener confirmationListener = new ActionListener() {
-        @Override
-        public void onAction(String name, boolean isPressed, float tpf) {
-            if (isPressed) {
-                if ("ConfirmRestart".equals(name)) {
-                    System.out.println("Restart confirmed.");
-                    awaitingRestartConfirmation = false;
-                    unregisterConfirmationInputs(); // Remove Y and N listeners
-                    restartGame(); // Restart the game
-                } else if ("CancelRestart".equals(name)) {
-                    System.out.println("Restart canceled.");
-                    awaitingRestartConfirmation = false;
-                    unregisterConfirmationInputs(); // Remove Y and N listeners
-                }
-            }
-        }
-    };
-
-    private void registerConfirmationInputs() {
-        if (!inputManager.hasMapping("ConfirmRestart")) {
-            inputManager.addMapping("ConfirmRestart", new KeyTrigger(KeyInput.KEY_Y));
-        }
-        if (!inputManager.hasMapping("CancelRestart")) {
-            inputManager.addMapping("CancelRestart", new KeyTrigger(KeyInput.KEY_N));
-        }
-        inputManager.addListener(confirmationListener, "ConfirmRestart", "CancelRestart");
-    }
-
-    private void unregisterConfirmationInputs() {
-        if (inputManager.hasMapping("ConfirmRestart")) {
-            inputManager.deleteMapping("ConfirmRestart");
-        }
-        if (inputManager.hasMapping("CancelRestart")) {
-            inputManager.deleteMapping("CancelRestart");
-        }
-        inputManager.removeListener(confirmationListener);
-    }
-
-    private void showRestartConfirmation() {
-        if (gameCompleted) {
-            return; // Do not show confirmation if the game is completed
-        }
-        
-        BitmapText confirmationText = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
-        confirmationText.setSize(30); // Adjust font size
-        confirmationText.setColor(ColorRGBA.Yellow);
-        confirmationText.setText("Are you sure you want to restart? Press Y to confirm or N to cancel.");
-        
-        // Calculate centered position
-        float textWidth = confirmationText.getLineWidth();
-        float textHeight = confirmationText.getLineHeight();
-        confirmationText.setLocalTranslation(
-            (cam.getWidth() - textWidth) / 2,
-            (cam.getHeight() + textHeight) / 2 - 150,
-            0
-        );
-        guiNode.attachChild(confirmationText);
-        
-        app.enqueue(() -> {
-            guiNode.attachChild(confirmationText); // Safely attach to guiNode
-            return null;
-        });
-
-        // Automatically remove the text when the confirmation is complete
-        new java.util.Timer().schedule(new java.util.TimerTask() {
-            @Override
-            public void run() {
-                app.enqueue(() -> {
-                    guiNode.detachChild(confirmationText);
-                    if (awaitingRestartConfirmation) {
-                        System.out.println("Restart confirmation timed out. Resuming game.");
-                        awaitingRestartConfirmation = false;
-                        unfreezeScreen();
-                    }
-                    return null;
-                });
-            }
-        }, 5000); // Remove the message after 5 seconds
-    }
-
     /**
-     * Method to create squirrel model and campus assets (currently as boxes)
+     * Initialize game level and logic (creating level content, setting up physics, etc.
+     * Potential TODO: Add a WorldManagerState object that attaches nodes to the rootNode object, 
+     * a PhysicsState object that handles falling and colliding objects, and a 
+     * ScreenshotAppState object that saves rendered scenes as image files to the user's desktop
+     */
+    private void startGame() {
+        // Initialize squirrel, buildings, trees, and the quadmodel.setQueueBucket(RenderQueue.Bucket.Opaque);
+        rootNode.setShadowMode(ShadowMode.Off);
+        createStaticQuad(rootNode);        
+        initializeSquirrelAndCampus();
+        
+        // Ensure the squirrel is facing the desired direction
+        //rotateSquirrelToFront();
+        System.out.println("Squirrel's final rotation: " + squirrelModel.getLocalRotation());
+
+        addMapping();
+        attachCenterMark();   
+        //generateRandomCubes(8);
+        generateRandomAcorns(2);
+        addBuilding();
+    }
+    
+    private void createGUI() {
+        BitmapFont font = assetManager.loadFont("Interface/Fonts/Default.fnt");
+    
+        // Acorn counter text
+        
+        // Get the initial number of acorns collected
+        int initialAcornsCollected = (squirrelControl != null) ? squirrelControl.getCollectedAcorns() : 0;
+        
+        acornCounterText = new BitmapText(font, false);
+        acornCounterText.setSize(font.getCharSet().getRenderedSize()*3);
+        acornCounterText.setColor(ColorRGBA.White);
+        acornCounterText.setText("Acorns Collected:" + initialAcornsCollected +" out of III");
+        acornCounterText.setLocalTranslation(20, cam.getHeight() - 50, 0); // Position on the screen
+        guiNode.attachChild(acornCounterText);
+        System.out.println("guiNode children count: " + guiNode.getQuantity());
+        System.out.println("acornCounterText is attached: " + (guiNode.hasChild(acornCounterText)));
+
+        // Create Settings icon
+        settingsIcon = new Picture("Settings Icon");
+        settingsIcon.setImage(assetManager, "Interface/In Game GUI/setting.png", true); 
+        settingsIcon.setWidth(64);
+        settingsIcon.setHeight(64);
+        settingsIcon.setPosition(cam.getWidth() - 80, cam.getHeight() - 80); // Top-right corner
+        guiNode.attachChild(settingsIcon);
+
+        // Create Save icon
+        saveIcon = new Picture("Save Icon");
+        saveIcon.setImage(assetManager, "Interface/In Game GUI/save.png", true);
+        saveIcon.setWidth(64);
+        saveIcon.setHeight(64);
+        saveIcon.setPosition(cam.getWidth() - 160, cam.getHeight() - 80); // Next to Settings icon
+        guiNode.attachChild(saveIcon);
+        
+        // Restart message
+        restartMessage = new BitmapText(font, false);
+        restartMessage.setSize(font.getCharSet().getRenderedSize() * 2); // Adjust font size
+        restartMessage.setColor(ColorRGBA.White);
+        restartMessage.setText("Press R to Restart");
+        restartMessage.setLocalTranslation(20, cam.getHeight() - 200, 0); // Position on the screen
+        guiNode.attachChild(restartMessage);
+        
+        // Timer text
+        timerText = new BitmapText(font, false);
+        timerText.setSize(font.getCharSet().getRenderedSize() * 3);
+        timerText.setColor(ColorRGBA.White);
+        timerText.setText("Time Remaining: 60"); // Initial text
+        timerText.setLocalTranslation(cam.getWidth()/2 -150, cam.getHeight() - 50, 0); // Position on the screen
+        guiNode.attachChild(timerText);
+
+    }
+    
+    /**
+     * Method to create squirrel model and campus assets
      */
     private void initializeSquirrelAndCampus() {
         // Create a parent node for both the squirrel and environment objects
@@ -800,6 +609,42 @@ public class GameRunningAppState extends AbstractAppState {
     /**
      * Method that attaches a square center mark for picking
      */
+        
+    private void generateRandomAcorns(int count) {
+        for (int i = 0; i < count; i++) {
+            // Load the acorn model
+            Spatial acorn = assetManager.loadModel("Models/Acorn/Eichel_C.j3o");
+            
+            // Scale the acorn model to fit the scene
+            acorn.setLocalScale(0.02f); // Adjust the scale as needed
+            
+            Quaternion flipX = new Quaternion().fromAngleAxis(FastMath.PI, Vector3f.UNIT_X);
+            acorn.setLocalRotation(flipX);
+            
+            // Randomly select a tree to place the acorn near
+            Spatial tree = trees.get((int) (Math.random() * trees.size()));
+            Vector3f treePosition = tree.getLocalTranslation();
+
+            // Place the acorn slightly higher above the tree
+            float xOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
+            float zOffset = (float) (Math.random() * 0.5f - 0.25f); // Small random horizontal offset
+            float yOffset = (float) (Math.random() * 10f + 7f);// Higher than the tree top
+
+            acorn.setLocalTranslation(
+                treePosition.x + xOffset,
+                treePosition.y + yOffset,
+                treePosition.z + zOffset
+            );
+
+            // Add the acorn model to the scene and acorn list
+            rootNode.attachChild(acorn);
+            acorns.add(acorn);
+
+            // Optional: Add shadow casting and receiving
+            acorn.setShadowMode(ShadowMode.CastAndReceive);
+        }
+    }
+
     private void attachCenterMark() {
         Geometry c = new Geometry("center mark", new Box(1, 1, 1));
         Material mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
@@ -828,39 +673,6 @@ public class GameRunningAppState extends AbstractAppState {
         squirrelModel.updateGeometricState();
         System.out.println("Squirrel's final rotation: " + squirrelModel.getLocalRotation());
 
-    }
-    
-    private float bellTimer = 0;
-    private final float bellInterval = 60.0f; // Ring every 60 seconds (1 minute in-game)
-
-    @Override
-    public void update(float tpf) {
-        super.update(tpf);
-        // Timer countdown logic
-        if (!isTimeUp && !gameCompleted) {
-            timeRemaining -= tpf; // Decrement timer
-            if (timeRemaining <= 0) {
-                timeRemaining = 0;
-                isTimeUp = true; // Mark as time-up
-                handleTimeUp();  // Handle the timeout logic
-            }
-            updateTimerDisplay(); // Update the timer display
-        }
-        
-        debrisTimer += tpf;
-        // Trigger debris effect after 2 seconds
-        if (!debrisTriggered && debrisTimer >= 2.0f) {
-            triggerDebrisEffect();
-            debrisTriggered = true; // Ensure it triggers only once
-            System.out.println("Debris effect triggered after 5 seconds.");
-        }
-        
-        bellTimer += tpf;
-        if (bellTimer >= bellInterval) {
-            bellSound.playInstance();
-            bellTimer = 0; // Reset timer
-        }
-        updateBellVolume(cam.getLocation());
     }
     
     private void updateBellVolume(Vector3f playerPosition) {
@@ -895,6 +707,45 @@ public class GameRunningAppState extends AbstractAppState {
             awaitingRestartConfirmation = false;
             return null;
         });
+    }
+   
+    // Rendering and Effects
+        
+    /**
+     * Initialize light setting. Add ambient light and sunlight (directional) to the scene.
+     */
+    private void initializeLight() {
+        // Ambient light to make sure the model is visible
+        AmbientLight ambient = new AmbientLight();
+        ambient.setColor(ColorRGBA.White.mult(1.5f));
+        rootNode.addLight(ambient);
+        
+        DirectionalLight sun = new DirectionalLight();
+        sun.setColor(ColorRGBA.White);
+        sun.setDirection(sunDir.normalizeLocal());
+        rootNode.addLight(sun);
+        
+        
+        Spatial sky = SkyFactory.createSky(assetManager, 
+                "Textures/Sky/Bright/FullskiesBlueClear03.dds", false);
+        sky.setQueueBucket(RenderQueue.Bucket.Sky);
+        sky.setCullHint(Spatial.CullHint.Never);
+        rootNode.attachChild(sky);
+        
+        DirectionalLightShadowFilter dlsf =
+            new DirectionalLightShadowFilter(assetManager, 1024, 2);
+        dlsf.setShadowIntensity(0.5f);
+        dlsf.setLight(sun);
+        dlsf.setEnabled(true);
+        fpp.addFilter(dlsf);
+        
+        ssaoFilter = new SSAOFilter(12.94f,43.93f,.33f,.60f);
+        fpp.addFilter(ssaoFilter);
+        
+        // make light beams appear from where sun is on skybox
+        sunLightFilter = new LightScatteringFilter(sunDir.mult(-5000));
+        sunLightFilter.setLightDensity(2.0f);
+        fpp.addFilter(sunLightFilter);
     }
     
     private void activateFog(){
@@ -951,6 +802,174 @@ public class GameRunningAppState extends AbstractAppState {
         System.out.println("Particle effect emitted.");
     }
    
+    // Restart and Pause Mechanisms
+    
+    private void freezeScreen() {
+        System.out.println("Freezing screen...");
+
+        addGrayFilter(); // Add gray filter
+        
+        // Stop all input handling
+        clearInputMappings();
+        if (!inputManager.hasMapping(MAPPING_RESTART)) {
+            inputManager.addMapping(MAPPING_RESTART, TRIGGER_RESTART);
+            inputManager.addListener(actionListener, MAPPING_RESTART);
+        }
+
+        // Pause physics simulation
+        bulletAppState.setEnabled(false);
+
+        // Pause animations
+        if (composer != null) {
+            composer.setEnabled(false);
+        }
+        
+        if (!isTimeUp){
+            // Display freeze message
+            BitmapText freezeMessage = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
+            freezeMessage.setSize(100); // Adjust font size
+            freezeMessage.setColor(ColorRGBA.Black);
+            freezeMessage.setText("Game Paused");
+            freezeMessage.setLocalTranslation(
+                (cam.getWidth() - freezeMessage.getLineWidth()) / 2,
+                (cam.getHeight() / 2 + 50 ),
+                0
+            );
+            guiNode.attachChild(freezeMessage);
+        }
+
+        isFrozen = true; // Mark the game as frozen
+    }
+    
+    private void unfreezeScreen() {
+        System.out.println("Unfreezing screen...");
+        removeGrayFilter(); // Remove gray filter
+        // Resume input handling
+        addMapping();
+
+        // Resume physics simulation
+        bulletAppState.setEnabled(true);
+
+        // Resume animations
+        if (composer != null) {
+            composer.setEnabled(true);
+        }
+
+        // Remove freeze message
+        guiNode.detachAllChildren(); // Assuming no other GUI elements need to persist
+
+        isFrozen = false; // Mark the game as unfrozen
+    }
+    
+    private Geometry grayOverlay;
+
+    private void initializeGrayFilter() {
+        // Create a full-screen quad for the gray filter
+        grayOverlay = new Geometry("GrayOverlay", new Box(1, 1, 0));
+        Material grayMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        grayMaterial.setColor("Color", new ColorRGBA(0.2f, 0.2f, 0.2f, 0.5f)); // Semi-transparent gray
+        grayMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+        grayOverlay.setMaterial(grayMaterial);
+
+        // Scale the quad to cover the screen
+        grayOverlay.setLocalScale(cam.getWidth() / 2, cam.getHeight() / 2, 1);
+        grayOverlay.setLocalTranslation(cam.getWidth() / 2, cam.getHeight() / 2, 0); // Center the overlay
+        grayOverlay.setQueueBucket(RenderQueue.Bucket.Gui); // Render on top of the game
+    }
+
+    private void addGrayFilter() {
+        if (grayOverlay != null && grayOverlay.getParent() == null) {
+            guiNode.attachChild(grayOverlay);
+        }
+    }
+
+    private void removeGrayFilter() {
+        if (grayOverlay != null && grayOverlay.getParent() != null) {
+            guiNode.detachChild(grayOverlay);
+        }
+    }
+
+
+    private ActionListener confirmationListener = new ActionListener() {
+        @Override
+        public void onAction(String name, boolean isPressed, float tpf) {
+            if (isPressed) {
+                if ("ConfirmRestart".equals(name)) {
+                    System.out.println("Restart confirmed.");
+                    awaitingRestartConfirmation = false;
+                    unregisterConfirmationInputs(); // Remove Y and N listeners
+                    restartGame(); // Restart the game
+                } else if ("CancelRestart".equals(name)) {
+                    System.out.println("Restart canceled.");
+                    awaitingRestartConfirmation = false;
+                    unregisterConfirmationInputs(); // Remove Y and N listeners
+                }
+            }
+        }
+    };
+
+    private void registerConfirmationInputs() {
+        if (!inputManager.hasMapping("ConfirmRestart")) {
+            inputManager.addMapping("ConfirmRestart", new KeyTrigger(KeyInput.KEY_Y));
+        }
+        if (!inputManager.hasMapping("CancelRestart")) {
+            inputManager.addMapping("CancelRestart", new KeyTrigger(KeyInput.KEY_N));
+        }
+        inputManager.addListener(confirmationListener, "ConfirmRestart", "CancelRestart");
+    }
+
+    private void unregisterConfirmationInputs() {
+        if (inputManager.hasMapping("ConfirmRestart")) {
+            inputManager.deleteMapping("ConfirmRestart");
+        }
+        if (inputManager.hasMapping("CancelRestart")) {
+            inputManager.deleteMapping("CancelRestart");
+        }
+        inputManager.removeListener(confirmationListener);
+    }
+
+    private void showRestartConfirmation() {
+        if (gameCompleted) {
+            return; // Do not show confirmation if the game is completed
+        }
+        
+        BitmapText confirmationText = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
+        confirmationText.setSize(30); // Adjust font size
+        confirmationText.setColor(ColorRGBA.Yellow);
+        confirmationText.setText("Are you sure you want to restart? Press Y to confirm or N to cancel.");
+        
+        // Calculate centered position
+        float textWidth = confirmationText.getLineWidth();
+        float textHeight = confirmationText.getLineHeight();
+        confirmationText.setLocalTranslation(
+            (cam.getWidth() - textWidth) / 2,
+            (cam.getHeight() + textHeight) / 2 - 150,
+            0
+        );
+        guiNode.attachChild(confirmationText);
+        
+        app.enqueue(() -> {
+            guiNode.attachChild(confirmationText); // Safely attach to guiNode
+            return null;
+        });
+
+        // Automatically remove the text when the confirmation is complete
+        new java.util.Timer().schedule(new java.util.TimerTask() {
+            @Override
+            public void run() {
+                app.enqueue(() -> {
+                    guiNode.detachChild(confirmationText);
+                    if (awaitingRestartConfirmation) {
+                        System.out.println("Restart confirmation timed out. Resuming game.");
+                        awaitingRestartConfirmation = false;
+                        unfreezeScreen();
+                    }
+                    return null;
+                });
+            }
+        }, 5000); // Remove the message after 5 seconds
+    }
+    
     private void restartGame() {
         System.out.println("Restarting game...");
 
@@ -1034,20 +1053,6 @@ public class GameRunningAppState extends AbstractAppState {
             awaitingRestartConfirmation = false;
             return null;
         });
-    }
-
-
-    @Override
-    public void cleanup() {
-        super.cleanup();
-        if (debrisEmitter != null && debrisEmitter.getParent() != null) {
-            debrisEmitter.getParent().detachChild(debrisEmitter);
-        }
-        inputManager.removeListener(analogListener);
-        inputManager.removeListener(actionListener);
-        clearInputMappings();
-        rootNode.detachAllChildren();
-        guiNode.detachAllChildren();
     }
 }
 

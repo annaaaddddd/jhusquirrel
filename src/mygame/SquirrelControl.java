@@ -51,7 +51,7 @@ public class SquirrelControl extends AbstractControl {
     private boolean playedJumpEnd = false; // Track if Jump.End has been played
     private final AnimComposer animComposer;
     private float idleTimer = 0f;
-    private final float idleAnimationInterval = 5f; // Trigger idle animation every 5 seconds
+    private final float idleAnimationInterval = 8f; // Trigger idle animation every 5 seconds
     private String currentAnimation = null; // Keeps track of the current animation
 
     
