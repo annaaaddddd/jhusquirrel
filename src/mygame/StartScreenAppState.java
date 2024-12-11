@@ -56,7 +56,7 @@ public class StartScreenAppState extends AbstractAppState {
 
         this.startY = cam.getHeight() * 0.3f; // Y coordinate to place buttons
         createStartMenu();
-        
+      
         // Load background music for the menu
         menuMusic = new AudioNode(app.getAssetManager(), "Sounds/Environment/MenuMusic.wav", true);
         menuMusic.setLooping(true);
@@ -174,6 +174,7 @@ public class StartScreenAppState extends AbstractAppState {
                 if (isClickOnButton(clickX, clickY, buttonX, optionsY, settingButtonPath)) {
                     System.out.println("Navigating to options menu.");
                      isTransitioning = true;
+                     menuMusic.stop();
                     OptionsScreenAppState optionsScreen = new OptionsScreenAppState();
                     app.getStateManager().detach(StartScreenAppState.this);
                     app.getStateManager().attach(optionsScreen);

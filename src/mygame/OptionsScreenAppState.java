@@ -5,6 +5,7 @@ import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.asset.AssetManager;
+import com.jme3.audio.AudioNode;
 import com.jme3.input.InputManager;
 import com.jme3.input.MouseInput;
 import com.jme3.scene.Node;
@@ -32,6 +33,10 @@ public class OptionsScreenAppState extends AbstractAppState {
     // Starting Y position for vertical centering
     private float startY;
     
+    // For avoiding menu music conflict
+    private AudioNode menuMusic;
+
+    
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
@@ -41,9 +46,10 @@ public class OptionsScreenAppState extends AbstractAppState {
         this.cam = this.app.getCamera();
         this.assetManager  = this.app.getAssetManager();
         this.startY = (cam.getHeight() - ((buttonHeight * 3) + (spacing * 2))) / 2; // 3 buttons with 2 spaces
+        this.menuMusic = menuMusic;
         createOptionsMenu();
     }
-
+    
     // TODO: add more options for customizing keyboard layout, graphic quality, or difficulty. (buttons, sliders, etc.)
     private void createOptionsMenu() {
         Picture background = new Picture("MenuBackground");
@@ -102,7 +108,9 @@ public class OptionsScreenAppState extends AbstractAppState {
                 // Check if the Save button was clicked
                 if (isClickOnButton(clickX, clickY, saveX, saveY)) {
                     System.out.println("Returning to home screen.");
+                    
                     StartScreenAppState startScreen = new StartScreenAppState();
+                    
                     app.getStateManager().detach(OptionsScreenAppState.this);
                     app.getStateManager().attach(startScreen);
                 }
