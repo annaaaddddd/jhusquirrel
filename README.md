@@ -3,7 +3,7 @@ In this game, you embody a **squirrel on the Johns Hopkins University Homewood c
 The forest presents a mix of opportunity and challenge. Mistimed bursts can send you crashing into branches or plummeting to the forest floor, forcing you to restart your ascent. Success requires sharp reflexes, impeccable timing, and strategic planning as you soar, dip, and dart your way through the canopy. With every acorn collected, you inch closer to victory, proving that even a resurrected squirrel can conquer the treetops!
 
 ## Genre
-Simulation, Open World, Action-Adventure
+Simulation, Arcade, Action
 
 ## Inspiration
 ### Flappy Bird
@@ -210,7 +210,7 @@ The file is too big so we uploaded it to drive: https://drive.google.com/file/d/
 - Anna: Enhanced animation and models, implemented squirrel control (partially), lighting, restart and timeout mechanism, start menu, setting menu, and post-processing effects
 - Leo: Implemented gameplay (collecting and counting acorn) with physics, added win game mechanism, refined squirrel control and movement
 - Collaborative Work:
-Team discussions finalized the selection of six distinct effects.
+Team discussions finalized the selection of models and six distinct effects.
 Joint playtesting ensured cohesive gameplay and smooth feature integration.
 
 ## Acknowledgments
@@ -224,7 +224,7 @@ Joint playtesting ensured cohesive gameplay and smooth feature integration.
 https://github.com/annaaaddddd/jhusquirrel/blob/main/dist.zip
 
 ## Future Work
-We envision expanding the gameplay to embrace a more open-world and explorative design, aligning with our initial proposal. Players will explore the vibrant Johns Hopkins Homewood campus from a squirrel's unique low perspective, navigating iconic locations such as the quads and the historic Gilman clock tower. The journey will involve scavenging snacks dropped by students, evading predators, and uncovering hidden pieces of campus history while completing various objectives.
+We envision expanding the gameplay to embrace a more open-world and explorative design, aligning with our initial proposal. Players will explore the vibrant Johns Hopkins Homewood campus from a squirrel's unique low perspective, navigating iconic locations such as the quads and the historic Gilman clock tower. We would like to incorporate a more comprehensive storyline, which involves scavenging snacks dropped by students, evading predators, and uncovering hidden pieces of campus history while completing various objectives.
 
 The game will feature a diverse range of engaging missions, such as sneaking into lecture halls to retrieve stolen acorns, exploring hidden nighttime events filled with lurking nocturnal predators, and gathering puzzle pieces to unlock secret areas of the campus. Dynamic gameplay mechanics like sprinting, gliding between buildings, and even riding scooters will provide players with fresh challenges and achievements at every turn. The narrative culminates in an epic graduation day, celebrating the player's journey as the squirrel on the iconic Homewood campus.
 
