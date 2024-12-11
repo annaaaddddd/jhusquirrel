@@ -574,12 +574,12 @@ public class GameRunningAppState extends AbstractAppState {
     
     private void addBuilding() {
         System.out.println("Squirrel's initial rotation: " + squirrelModel.getLocalRotation());
+        //Building 1
         // Load the Gilman Hall model
         Spatial gilmanHall = assetManager.loadModel("Models/Building/johns_hopkins_monument-reality_capture-1mil_uvs.j3o");
 
         // Scale the model to fit the scene
         gilmanHall.setLocalScale(3.5f); // Adjust this value based on the size of the terrain
-    
         
         // Set the correct terrain height
         float terrainHeight = (float) -1.5; 
@@ -606,6 +606,24 @@ public class GameRunningAppState extends AbstractAppState {
         bulletAppState.getPhysicsSpace().add(buildingPhysics);
 
         System.out.println("Gilman Hall positioned at: " + gilmanHall.getLocalTranslation());
+        
+        // Add second building (Building2)
+        Spatial building2 = assetManager.loadModel("Models/Building2/model.j3o");
+        building2.setLocalScale(1.0f); // Adjust the scale for building2
+        building2.setLocalTranslation(50, -2, 30); // Position for building2
+        building2.setLocalRotation(new Quaternion().fromAngles(0, FastMath.QUARTER_PI, 0)); // Rotate if needed
+        building2.setShadowMode(ShadowMode.CastAndReceive);
+        rootNode.attachChild(building2);
+
+        // Make the second building solid
+com.jme3.bullet.collision.shapes.CollisionShape building2Shape = CollisionShapeFactory.createBoxShape(building2);
+RigidBodyControl building2Physics = new RigidBodyControl(building2Shape, 0.0f); // Static object
+building2Physics.setPhysicsLocation(building2.getWorldTranslation()); // Ensure correct physics location
+building2.addControl(building2Physics);
+bulletAppState.getPhysicsSpace().add(building2Physics);
+
+System.out.println("Building2 positioned at: " + building2.getLocalTranslation());
+System.out.println("Building2 Physics Location: " + building2Physics.getPhysicsLocation());
     }
     
     /**
