@@ -224,10 +224,15 @@ Joint playtesting ensured cohesive gameplay and smooth feature integration.
 https://github.com/annaaaddddd/jhusquirrel/blob/main/dist.zip
 
 ## Future Work
-We envision expanding the gameplay to embrace a more open-world and explorative design, aligning with our initial proposal. Players will explore the vibrant Johns Hopkins Homewood campus from a squirrel's unique low perspective, navigating iconic locations such as the quads and the historic Gilman clock tower. We would like to incorporate a more comprehensive storyline, which involves scavenging snacks dropped by students, evading predators, and uncovering hidden pieces of campus history while completing various objectives.
+- A more open-world and explorative design, aligning with our initial proposal. Players will explore the vibrant Johns Hopkins Homewood campus from a squirrel's unique low perspective, navigating iconic locations such as the quads and the historic Gilman clock tower.
+- Incorporate a more comprehensive storyline, which involves scavenging snacks dropped by students, evading predators, and uncovering hidden pieces of campus history while completing various objectives. The narrative culminates in an epic graduation day, celebrating the player's journey as the squirrel on the iconic Homewood campus.
 
-The game will feature a diverse range of engaging missions, such as sneaking into lecture halls to retrieve stolen acorns, exploring hidden nighttime events filled with lurking nocturnal predators, and gathering puzzle pieces to unlock secret areas of the campus. Dynamic gameplay mechanics like sprinting, gliding between buildings, and even riding scooters will provide players with fresh challenges and achievements at every turn. The narrative culminates in an epic graduation day, celebrating the player's journey as the squirrel on the iconic Homewood campus.
+- Feature a diverse range of engaging missions, such as sneaking into lecture halls to retrieve stolen acorns, exploring hidden nighttime events filled with lurking nocturnal predators, and gathering puzzle pieces to unlock secret areas of the campus.
 
-In addition, we aim to enhance the game’s usability and customization options. The currently unused settings menu will be developed to allow users to adjust parameters such as mouse sensitivity, enable or disable visual features like fog, and configure other gameplay settings. We also plan to create a cleaner and more intuitive quitting mechanism to improve user experience.
+- Add interactive NPCs, wildlife, or objects. 
+  
+- Dynamic gameplay mechanics like sprinting, gliding between buildings, and even riding scooters will provide players with fresh challenges and achievements.
 
-Finally, the incorporation of terrain into the game environment will add depth and realism to the campus landscape, enriching the player’s exploration. These enhancements will bring the game closer to its full potential, offering players an immersive and dynamic experience.
+- Enhance the game’s usability and customization options. The currently unused settings menu will be developed to allow users to adjust parameters such as mouse sensitivity, enable or disable visual features like fog, and configure other gameplay settings. We also plan to create a cleaner and more intuitive quitting mechanism to improve user experience.
+
+- Incorporation of terrain into the game environment with iconic JHU campus buildings. These enhancements will bring the game closer to its full potential, offering players an immersive and dynamic experience.
