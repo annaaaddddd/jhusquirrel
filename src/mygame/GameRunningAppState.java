@@ -167,10 +167,13 @@ public class GameRunningAppState extends AbstractAppState {
         for (int i = 0; i < count; i++) {
             // Load the acorn model
             Spatial acorn = assetManager.loadModel("Models/Acorn/Eichel_C.j3o");
-
+            
             // Scale the acorn model to fit the scene
             acorn.setLocalScale(0.02f); // Adjust the scale as needed
-
+            
+            Quaternion flipX = new Quaternion().fromAngleAxis(FastMath.PI, Vector3f.UNIT_X);
+            acorn.setLocalRotation(flipX);
+            
             // Randomly select a tree to place the acorn near
             Spatial tree = trees.get((int) (Math.random() * trees.size()));
             Vector3f treePosition = tree.getLocalTranslation();
@@ -442,14 +445,31 @@ public class GameRunningAppState extends AbstractAppState {
         addSquirrel(campusNode);
 
         // Add trees manually and add them to the trees list
-        Spatial tree1 = createTree(campusNode, 5, 0.0f, 0);
+        //left side trees
+        Spatial tree1 = createTree(campusNode, 10, 0.0f, 0);
         trees.add(tree1);
 
-        Spatial tree2 = createTree(campusNode, 20, 0.0f, -9);
+        Spatial tree2 = createTree(campusNode, 10, 0.0f, 10);
         trees.add(tree2);
-
+        
+        Spatial tree5 = createTree(campusNode, 10, 0.0f, 20);
+        trees.add(tree5);
+        
+        Spatial tree8 = createTree(campusNode, -10, 0.0f, 30);
+        trees.add(tree8);
+        
+        //right side trees
         Spatial tree3 = createTree(campusNode, -10, 0.0f, 20);
         trees.add(tree3);
+        
+        Spatial tree4 = createTree(campusNode, -10, 0.0f, 30);
+        trees.add(tree4);
+        
+        Spatial tree6 = createTree(campusNode, -10, 0.0f, 0);
+        trees.add(tree6);
+        
+        Spatial tree7 = createTree(campusNode, -10, 0.0f, 10);
+        trees.add(tree7);
 
         // Attach the campus node to the root node
         rootNode.attachChild(campusNode);
