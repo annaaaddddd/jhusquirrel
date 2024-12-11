@@ -168,7 +168,7 @@ Adding Flappy Bird Movement: Introduce a movement mechanism where pressing direc
 Stabilizing Gravity: Adjust gravity to apply a more stable and consistent downward force for smoother, predictable movement.
 
 #### New User Interaction
-Restarting mechanism is implemented. When users press R in game, the game will confirm if users want to restart. After users win the game, pressing R will restart the game without confirmation.
+Restarting mechanism is implemented. When users press R in game, the game will confirm if users want to restart. The game will pause and the confirmation message will time out after 5 seconds. After users win the game, pressing R will restart the game without confirmation.
 
 #### Animation Enhancements
 We fixed the bug where several squirrels are generated. Additionally, idle animation will be propoerly triggered if the squirrel remains stationary. Every pressing on the space (jump upward) will interrupt the current animation and retrigger a jump. When squirrel is grounded again, the current jumping animation will stop shortly and retrigger random idle animation.
@@ -183,7 +183,7 @@ A tree collision mechanism at the lower part of the tree is also implemented to 
 
 ## Member Contributions
 - Serena: Implemented ambient and positional sound components with dynamic responses to player actions and environmental cues. Updated the README.
-- Anna: Enhanced animation and models, main implementer for six visual effects, 
+- Anna: Enhanced animation and models, main implementer for six visual effects,  implemented restart mechanism
 - Leo: Completed game mechanism (collecting and counting acorn), added end game mechanism, refined squirrel control and movement
 - Collaborative Work:
 Team discussions finalized the selection and implementation of six distinct effects.
