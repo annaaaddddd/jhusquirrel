@@ -89,22 +89,32 @@ Home screen:
 
 ### Second Deliverable
 #### Updated home screen design
+We utilized the guiNode to enhance the graphical user interface (GUI) by adding essential elements such as text, icons, and an acorn collection indicator for better gameplay tracking.
+
+
 New home screen
 <img width="1920" alt="Screenshot 2024-11-06 at 18 52 11" src="https://github.com/user-attachments/assets/345bcdd2-3498-480d-b016-8da26f1379cf">
 
 New setting screen
 <img width="1920" alt="Screenshot 2024-11-06 at 18 52 18" src="https://github.com/user-attachments/assets/906591f4-a6ed-4bfa-812b-21c552da0219">
 #### Model
-We used assetManager to load models and add textures, and skinning control to add animated meshes. We also included collision and other physics to further implement our game design.
+We leveraged the assetManager to efficiently load 3D models into the game. Textures were added using the loadTexture method, TextureKey class, and the Material class. Animated meshes were incorporated using SkinningControl, while UV mapping and model details were fine-tuned in Blender to improve the visual quality and overall experience.
 ##### The Squirrel Model
-
-
 <img width="407" alt="Screenshot 2024-11-06 at 22 06 28" src="https://github.com/user-attachments/assets/68906fa1-460f-40b2-bb7e-be5aee4824ac">
 
+![image](https://github.com/user-attachments/assets/c0647f0c-9f3e-4e82-a1c8-8f155a0453e8)
 
-The environment has been enhanced with detailed tree bark textures and grass, simulating a more realistic and immersive world. Ambient and directional lighting have been implemented, adding shading to the character and other elements for a more visually engaging experience.
+##### The Tree Model
+<img width="1002" alt="Screenshot 2024-12-11 at 1 24 57 PM" src="https://github.com/user-attachments/assets/1b312bdb-6a44-47f4-b1f9-e2cc499b2a55" />
 
-A tree collision system has also been introduced, allowing the squirrel to interact with trees. When the squirrel is close enough, pressing T transitions the squirrel's actions from running to climbing. However, this mechanism still requires refinement, as the transition does not consistently function as intended. Further adjustments will ensure smoother and more reliable gameplay.
+#### Environment: Textures & Lighting
+The environment has been enhanced with realistic textures for tree and grass, creating an immersive setting for players. 
+Lighting was implemented using AmbientLight and DirectionalLight to add depth and shading, improving the appearance of characters and environmental elements.
+
+####  Physics: Gravity & Collision
+A tree collision system has been introduced, allowing the squirrel to interact with trees naturally. When close to a tree, pressing "T" transitions the squirrel from running to climbing. Although functional, the climbing transition requires further refinement for consistent performance and smoother gameplay.
+
+Additionally, we experimented with new gameplay mechanics, including a flying squirrel mode and a climbing squirrel mode. Both modes allow players to collect acorns, enabling diverse playing styles by integrating unique physics interactions into the game. We intended to add a transition method that allows the player to switch between the flying and climbing mode.
 
 ### Third Deliverable
 #### Sound Component
@@ -185,6 +195,7 @@ We fixed the bug where several squirrels are generated. Additionally, idle anima
 
 #### Scene Enhancements
 The game environment has been enriched with new assets, including monuments and additional trees, creating a more immersive and visually dynamic scene. A shadow rendering issue from the previous deliverable, where shadows appeared overly dark and were possibly rendered after the models, has been resolved, improving overall visual quality.
+<img width="1512" alt="Screenshot 2024-12-11 at 1 24 06 PM" src="https://github.com/user-attachments/assets/a8c923d3-bbb5-4015-8cb7-770723fbcfc5" />
 
 A tree collision mechanism has also been implemented, specifically for the lower part of the tree, ensuring that the squirrel cannot pass through the trunk. This enhancement adds realism and consistency to the game physics. However, collision mechanics were intentionally omitted for the upper parts of the trees, as adding them would make gameplay overly challenging. This balance maintains realism while keeping the game enjoyable and accessible.
 
