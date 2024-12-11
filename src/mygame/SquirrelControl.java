@@ -16,10 +16,8 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.control.AbstractControl;
 import com.jme3.font.BitmapText;
-import com.jme3.math.ColorRGBA;
 import com.jme3.renderer.RenderManager;
 import com.jme3.renderer.ViewPort;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 

@@ -67,13 +67,10 @@ public class GameRunningAppState extends AbstractAppState {
     private ViewPort viewPort;
     
     private Spatial squirrelModel;  // Updated to use squirrelModel instead of squirrelGeom
-    private Spatial treeModel;
     private List<Spatial> trees; // List to store tree references
     private BulletAppState bulletAppState;
     private AnimComposer composer;
-    final private Queue<String> anims = new LinkedList<>();
-    private boolean playAnim = true;
-    
+        
     private List<Spatial> acorns = new ArrayList<>(); // List to store acorn geometries
     
     // GUI element
@@ -110,7 +107,6 @@ public class GameRunningAppState extends AbstractAppState {
 
     // Climbing triggers
     private final static Trigger TRIGGER_CLIMB_UP = new KeyTrigger(KeyInput.KEY_SPACE);
-    private final static Trigger TRIGGER_CLIMB_DOWN = new KeyTrigger(KeyInput.KEY_LSHIFT);
     
     // Restart trigger
     private final static Trigger TRIGGER_RESTART = new KeyTrigger(KeyInput.KEY_R);
@@ -122,7 +118,6 @@ public class GameRunningAppState extends AbstractAppState {
     private final static String MAPPING_RUN_LEFT = "Run Left";
     private final static String MAPPING_RUN_RIGHT = "Run Right";
     private final static String MAPPING_CLIMB_UP = "Climb Up";
-    private final static String MAPPING_CLIMB_DOWN = "Climb Down";
     private final static String MAPPING_RESTART = "Restart";
     
     @Override
