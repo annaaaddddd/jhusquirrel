@@ -221,6 +221,7 @@ Joint playtesting ensured cohesive gameplay and smooth feature integration.
  
 
 ## Download
+https://github.com/annaaaddddd/jhusquirrel/blob/main/dist.zip
 
 ## Future Work
 We envision expanding the gameplay to embrace a more open-world and explorative design, aligning with our initial proposal. Players will explore the vibrant Johns Hopkins Homewood campus from a squirrel's unique low perspective, navigating iconic locations such as the quads and the historic Gilman clock tower. The journey will involve scavenging snacks dropped by students, evading predators, and uncovering hidden pieces of campus history while completing various objectives.
