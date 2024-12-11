@@ -80,8 +80,7 @@ public class GameRunningAppState extends AbstractAppState {
 
     private Picture settingsIcon;
     private Picture saveIcon;
-    private Geometry missionBlock;
-    private BitmapText missionText;
+    private BitmapText restartMessage;
     
     private AudioNode ambientSound;
     private AudioNode bellSound;
@@ -112,6 +111,7 @@ public class GameRunningAppState extends AbstractAppState {
     
     // Restart trigger
     private final static Trigger TRIGGER_RESTART = new KeyTrigger(KeyInput.KEY_R);
+    private boolean isFrozen = false; // Track whether the game is frozen
     
     // Mappings
     private final static String MAPPING_RUN_FORWARD = "Run Forward";
@@ -140,6 +140,7 @@ public class GameRunningAppState extends AbstractAppState {
         bulletAppState.getPhysicsSpace().setGravity(new Vector3f(0, -0.81f, 0));
 
         createGUI();
+        initializeGrayFilter();
         startGame();
         
         fpp = new FilterPostProcessor(assetManager);
@@ -287,6 +288,14 @@ public class GameRunningAppState extends AbstractAppState {
         saveIcon.setHeight(64);
         saveIcon.setPosition(cam.getWidth() - 160, cam.getHeight() - 80); // Next to Settings icon
         guiNode.attachChild(saveIcon);
+        
+        // Restart message
+        restartMessage = new BitmapText(font, false);
+        restartMessage.setSize(font.getCharSet().getRenderedSize() * 2); // Adjust font size
+        restartMessage.setColor(ColorRGBA.White);
+        restartMessage.setText("Press R to Restart");
+        restartMessage.setLocalTranslation(20, cam.getHeight() - 200, 0); // Position on the screen
+        guiNode.attachChild(restartMessage);
     }
 
     
@@ -356,21 +365,102 @@ public class GameRunningAppState extends AbstractAppState {
                     System.out.println("Input ignored during restart.");
                     return; // Ignore all inputs during the restart process
                 }
-                if (isPressed && MAPPING_RESTART.equals(name)) {
-                    if (gameCompleted) {
-                        // Restart directly if the game is completed
-                        System.out.println("Restarting game without confirmation.");
-                        restartGame();
-                    } else if (!awaitingRestartConfirmation) {
-                        awaitingRestartConfirmation = true;
-                        showRestartConfirmation(); // Show confirmation message
-                        registerConfirmationInputs(); // Register Y and N inputs
-                    }
+                if (gameCompleted) {
+                    // Skip confirmation and restart directly after game completion
+                    System.out.println("Restarting game without confirmation after game completion.");
+                    restartGame();
+                } else if (!awaitingRestartConfirmation && !isFrozen) {
+                    // In-game restart request: Freeze the screen and ask for confirmation
+                    System.out.println("Showing restart confirmation.");
+                    awaitingRestartConfirmation = true;
+                    freezeScreen(); // Freeze the game while showing confirmation
+                    showRestartConfirmation();
+                    registerConfirmationInputs(); // Register Y and N inputs
                 }
             }
         }
     };
     
+    private void freezeScreen() {
+        System.out.println("Freezing screen...");
+
+        addGrayFilter(); // Add gray filter
+        
+        // Stop all input handling
+        clearInputMappings();
+
+        // Pause physics simulation
+        bulletAppState.setEnabled(false);
+
+        // Pause animations
+        if (composer != null) {
+            composer.setEnabled(false);
+        }
+
+        // Display freeze message
+        BitmapText freezeMessage = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
+        freezeMessage.setSize(80); // Adjust font size
+        freezeMessage.setColor(ColorRGBA.Black);
+        freezeMessage.setText("Game Paused");
+        freezeMessage.setLocalTranslation(
+            (cam.getWidth() - freezeMessage.getLineWidth()) / 2,
+            (cam.getHeight() / 2 + 50 ),
+            0
+        );
+        guiNode.attachChild(freezeMessage);
+
+        isFrozen = true; // Mark the game as frozen
+    }
+    
+    private void unfreezeScreen() {
+        System.out.println("Unfreezing screen...");
+        removeGrayFilter(); // Remove gray filter
+        // Resume input handling
+        addMapping();
+
+        // Resume physics simulation
+        bulletAppState.setEnabled(true);
+
+        // Resume animations
+        if (composer != null) {
+            composer.setEnabled(true);
+        }
+
+        // Remove freeze message
+        guiNode.detachAllChildren(); // Assuming no other GUI elements need to persist
+
+        isFrozen = false; // Mark the game as unfrozen
+    }
+    
+    private Geometry grayOverlay;
+
+    private void initializeGrayFilter() {
+        // Create a full-screen quad for the gray filter
+        grayOverlay = new Geometry("GrayOverlay", new Box(1, 1, 0));
+        Material grayMaterial = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+        grayMaterial.setColor("Color", new ColorRGBA(0.2f, 0.2f, 0.2f, 0.5f)); // Semi-transparent gray
+        grayMaterial.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+        grayOverlay.setMaterial(grayMaterial);
+
+        // Scale the quad to cover the screen
+        grayOverlay.setLocalScale(cam.getWidth() / 2, cam.getHeight() / 2, 1);
+        grayOverlay.setLocalTranslation(cam.getWidth() / 2, cam.getHeight() / 2, 0); // Center the overlay
+        grayOverlay.setQueueBucket(RenderQueue.Bucket.Gui); // Render on top of the game
+    }
+
+    private void addGrayFilter() {
+        if (grayOverlay != null && grayOverlay.getParent() == null) {
+            guiNode.attachChild(grayOverlay);
+        }
+    }
+
+    private void removeGrayFilter() {
+        if (grayOverlay != null && grayOverlay.getParent() != null) {
+            guiNode.detachChild(grayOverlay);
+        }
+    }
+
+
     private ActionListener confirmationListener = new ActionListener() {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
@@ -418,7 +508,15 @@ public class GameRunningAppState extends AbstractAppState {
         confirmationText.setSize(30); // Adjust font size
         confirmationText.setColor(ColorRGBA.Yellow);
         confirmationText.setText("Are you sure you want to restart? Press Y to confirm or N to cancel.");
-        confirmationText.setLocalTranslation(200, cam.getHeight() / 2, 0); // Adjust position
+        
+        // Calculate centered position
+        float textWidth = confirmationText.getLineWidth();
+        float textHeight = confirmationText.getLineHeight();
+        confirmationText.setLocalTranslation(
+            (cam.getWidth() - textWidth) / 2,
+            (cam.getHeight() + textHeight) / 2 - 150,
+            0
+        );
         guiNode.attachChild(confirmationText);
         
         app.enqueue(() -> {
@@ -432,6 +530,11 @@ public class GameRunningAppState extends AbstractAppState {
             public void run() {
                 app.enqueue(() -> {
                     guiNode.detachChild(confirmationText);
+                    if (awaitingRestartConfirmation) {
+                        System.out.println("Restart confirmation timed out. Resuming game.");
+                        awaitingRestartConfirmation = false;
+                        unfreezeScreen();
+                    }
                     return null;
                 });
             }
