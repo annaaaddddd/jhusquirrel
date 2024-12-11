@@ -337,16 +337,15 @@ public class GameRunningAppState extends AbstractAppState {
             inputManager.addMapping(MAPPING_RUN_LEFT, TRIGGER_RUN_LEFT);
             inputManager.addMapping(MAPPING_RUN_RIGHT, TRIGGER_RUN_RIGHT);
             inputManager.addMapping(MAPPING_CLIMB_UP, TRIGGER_CLIMB_UP);
-            inputManager.addMapping(MAPPING_CLIMB_DOWN, TRIGGER_CLIMB_DOWN);
+            //inputManager.addMapping(MAPPING_CLIMB_DOWN, TRIGGER_CLIMB_DOWN);
             
             inputManager.addMapping(MAPPING_RESTART, TRIGGER_RESTART);
+            
+            
+            inputManager.addListener(analogListener, 
+                    MAPPING_RUN_FORWARD, MAPPING_RUN_BACKWARD, MAPPING_RUN_LEFT, MAPPING_RUN_RIGHT);  
+            inputManager.addListener(actionListener, MAPPING_RESTART, MAPPING_CLIMB_UP);
         }
-        
-        inputManager.addListener(analogListener, 
-                MAPPING_RUN_FORWARD, MAPPING_RUN_BACKWARD, MAPPING_RUN_LEFT, MAPPING_RUN_RIGHT, 
-                MAPPING_CLIMB_UP, MAPPING_CLIMB_DOWN);  
-        inputManager.addListener(actionListener, MAPPING_RESTART);
-        
 //        
 //        inputManager.addMapping("ToggleToSecondState", new KeyTrigger(KeyInput.KEY_T));
 //        inputManager.addListener(actionListener, "ToggleToSecondState");
@@ -371,10 +370,6 @@ public class GameRunningAppState extends AbstractAppState {
                 control.moveLeft(tpf);
             } else if (name.equals(MAPPING_RUN_RIGHT)) {
                 control.moveRight(tpf);
-            } else if (name.equals(MAPPING_CLIMB_UP)) {
-                control.climbUp(tpf);
-            } else if (name.equals(MAPPING_CLIMB_DOWN)) {
-                control.climbDown(tpf);
             }
         }
     };
@@ -383,6 +378,13 @@ public class GameRunningAppState extends AbstractAppState {
     private ActionListener actionListener = new ActionListener() {
         @Override 
         public void onAction(String name, boolean isPressed, float tpf) {
+            if (MAPPING_CLIMB_UP.equals(name) && isPressed) {
+                SquirrelControl control = squirrelModel.getControl(SquirrelControl.class);
+                if (control != null) {
+                    control.climbUp();
+                }
+            }
+            
             if (MAPPING_RESTART.equals(name) && isPressed) {
                 if (restartInProgress) {
                     System.out.println("Input ignored during restart.");
@@ -498,6 +500,11 @@ public class GameRunningAppState extends AbstractAppState {
     }
     
     private void addSquirrel(Node parentNode) {
+        if (squirrelModel != null) {
+            System.out.println("Squirrel model already exists: " + squirrelModel);
+            return;
+        }
+        
         System.out.println("Passing acornCounterText to SquirrelControl: " + (acornCounterText != null));
         // Load the squirrel model with animations from the Squirrel2 folder
         System.out.println("Loading squirrel model...");

@@ -254,11 +254,10 @@ protected void controlUpdate(float tpf) {
         squirrelPhysics.setLinearVelocity(cam.getLeft().mult(-2).setY(squirrelPhysics.getLinearVelocity().y)); // Burst right
     }
 
-    public void climbUp(float intensity) {
-        if (!isJumping) {
-            startJump();
-        }
-        squirrelPhysics.setLinearVelocity(new Vector3f(0, 2, 0)); // Burst upward
+    public void climbUp() {
+        startJump();
+        
+        squirrelPhysics.setLinearVelocity(new Vector3f(0, 3, 0)); // Burst upward
     }
 
     public void climbDown(float intensity) {
@@ -334,6 +333,15 @@ protected void controlUpdate(float tpf) {
             playedJumpEnd = false; // Reset the flag to allow Jump.End later
             idleTimer = 0f; // Reset idle timer since the squirrel is moving
         }
+        // Check if the squirrel is falling (negative vertical velocity)
+        if (velocity.y < -verticalThreshold) {
+            if (!isFlying) {
+                playAnimation("Jump.Fly"); // Transition to flying animation
+                isFlying = true;
+                isJumping = false; // No longer in a jumping state
+                playedJumpEnd = false; // Reset the landing state
+            }
+        }
 
         // Transition to Jump.End when landing (but only once)
         if (isFlying && Math.abs(velocity.y) < verticalThreshold && velocity.length() < totalVelocityThreshold) {
@@ -368,12 +376,15 @@ protected void controlUpdate(float tpf) {
     
     private void startJump() {
         if (animComposer != null) {
-            animComposer.reset();
-            playAnimation("Jump.End");
+            if (isJumping) {
+                // Interrupt the current jump
+                animComposer.reset(); // Stop current animation
+            }
+
+            // Start a new jump
             isJumping = true; // Set jumping state
-            playAnimation("Jump.Begin");
-            
-            cameraShake(1f, 1f);
+            playAnimation("Jump.Begin"); // Play the jump start animation
+            cameraShake(1f, 1f); // Add camera shake for effect
         }
     }
     

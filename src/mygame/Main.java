@@ -3,6 +3,7 @@ package mygame;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.renderer.RenderManager;
+import com.jme3.system.AppSettings;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -14,6 +15,9 @@ public class Main extends SimpleApplication {
     
     @Override
     public void simpleInitApp() {
+        setDisplayFps(false);                         // hide frames-per-sec display
+        setDisplayStatView(false);                    // hide debug statistics display
+        
         StartScreenAppState startScreen = new StartScreenAppState();
         stateManager.attach(startScreen);
         
@@ -27,7 +31,7 @@ public class Main extends SimpleApplication {
         
         Logger animLogger = Logger.getLogger("com.jme3.anim.SkinningControl");
         animLogger.setLevel(Level.WARNING); // Suppress info logs for skinning
-
+        
         Main app = new Main();
         app.start();
     }

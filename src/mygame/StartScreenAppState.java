@@ -41,6 +41,8 @@ public class StartScreenAppState extends AbstractAppState {
     
     private AudioNode menuMusic;
     private AudioNode buttonClickSound;
+    
+    private boolean isTransitioning = false;
 
     
     @Override
@@ -141,6 +143,10 @@ public class StartScreenAppState extends AbstractAppState {
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
             if (isPressed) {
+                if (isTransitioning) {
+                    System.out.println("Transition in progress. Ignoring additional clicks.");
+                    return;
+                }
                 buttonClickSound.playInstance(); // Play click sound
                 
                 // Get mouse click position
@@ -154,6 +160,7 @@ public class StartScreenAppState extends AbstractAppState {
                 float playY = startY;
                 if (isClickOnButton(clickX, clickY, buttonX, playY, playButtonPath)) {
                     System.out.println("Navigating to running game.");
+                    isTransitioning = true;
                     GameRunningAppState gameRunning = new GameRunningAppState();
                     app.getStateManager().detach(StartScreenAppState.this);
                     // Stop menu music before transitioning
@@ -166,6 +173,7 @@ public class StartScreenAppState extends AbstractAppState {
                 float optionsY = playY - getButtonHeight(playButtonPath) - spacing;
                 if (isClickOnButton(clickX, clickY, buttonX, optionsY, settingButtonPath)) {
                     System.out.println("Navigating to options menu.");
+                     isTransitioning = true;
                     OptionsScreenAppState optionsScreen = new OptionsScreenAppState();
                     app.getStateManager().detach(StartScreenAppState.this);
                     app.getStateManager().attach(optionsScreen);
