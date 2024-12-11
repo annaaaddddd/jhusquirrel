@@ -99,6 +99,7 @@ public class GameRunningAppState extends AbstractAppState {
     private boolean debrisTriggered = false; // Flag to ensure the shockwave is emitted only once
     
     private boolean awaitingRestartConfirmation = false;
+    private BitmapText confirmationText;
     private boolean gameCompleted = false;
     private boolean restartInProgress = false;
     
@@ -114,6 +115,7 @@ public class GameRunningAppState extends AbstractAppState {
     // Restart trigger
     private final static Trigger TRIGGER_RESTART = new KeyTrigger(KeyInput.KEY_R);
     private boolean isFrozen = false; // Track whether the game is frozen
+    private BitmapText freezeMessage;
     
     // Mappings
     private final static String MAPPING_RUN_FORWARD = "Run Forward";
@@ -170,7 +172,7 @@ public class GameRunningAppState extends AbstractAppState {
     public void update(float tpf) {
         super.update(tpf);
         // Timer countdown logic
-        if (!isTimeUp && !gameCompleted) {
+        if (!isTimeUp && !gameCompleted && !isFrozen) {
             timeRemaining -= tpf; // Decrement timer
             if (timeRemaining <= 0) {
                 timeRemaining = 0;
@@ -826,7 +828,7 @@ public class GameRunningAppState extends AbstractAppState {
         
         if (!isTimeUp){
             // Display freeze message
-            BitmapText freezeMessage = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
+            freezeMessage = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
             freezeMessage.setSize(100); // Adjust font size
             freezeMessage.setColor(ColorRGBA.Black);
             freezeMessage.setText("Game Paused");
@@ -855,8 +857,15 @@ public class GameRunningAppState extends AbstractAppState {
             composer.setEnabled(true);
         }
 
-        // Remove freeze message
-        guiNode.detachAllChildren(); // Assuming no other GUI elements need to persist
+        if (freezeMessage != null && guiNode.hasChild(freezeMessage)) {
+            guiNode.detachChild(freezeMessage);
+            freezeMessage = null; // Clear the reference
+        }
+         // Remove the confirmation message (if it exists)
+        if (confirmationText != null && guiNode.hasChild(confirmationText)) {
+            guiNode.detachChild(confirmationText);
+            confirmationText = null; // Clear the reference
+        }
 
         isFrozen = false; // Mark the game as unfrozen
     }
@@ -902,6 +911,8 @@ public class GameRunningAppState extends AbstractAppState {
                 } else if ("CancelRestart".equals(name)) {
                     System.out.println("Restart canceled.");
                     awaitingRestartConfirmation = false;
+                    unfreezeScreen();
+                    
                     unregisterConfirmationInputs(); // Remove Y and N listeners
                 }
             }
@@ -933,7 +944,7 @@ public class GameRunningAppState extends AbstractAppState {
             return; // Do not show confirmation if the game is completed
         }
         
-        BitmapText confirmationText = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
+        confirmationText = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
         confirmationText.setSize(30); // Adjust font size
         confirmationText.setColor(ColorRGBA.Yellow);
         confirmationText.setText("Are you sure you want to restart? Press Y to confirm or N to cancel.");
@@ -946,7 +957,6 @@ public class GameRunningAppState extends AbstractAppState {
             (cam.getHeight() + textHeight) / 2 - 150,
             0
         );
-        guiNode.attachChild(confirmationText);
         
         app.enqueue(() -> {
             guiNode.attachChild(confirmationText); // Safely attach to guiNode
