@@ -37,6 +37,7 @@ import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.effect.ParticleEmitter;
 import com.jme3.effect.ParticleMesh;
 import com.jme3.effect.shapes.EmitterSphereShape;
+import com.jme3.input.controls.ActionListener;
 import com.jme3.util.TangentBinormalGenerator;
 import com.jme3.material.RenderState;
 import com.jme3.math.FastMath;
@@ -98,6 +99,10 @@ public class GameRunningAppState extends AbstractAppState {
     private float debrisTimer = 0f;
     private boolean debrisTriggered = false; // Flag to ensure the shockwave is emitted only once
     
+    private boolean awaitingRestartConfirmation = false;
+    private boolean gameCompleted = false;
+    private boolean restartInProgress = false;
+    
     // Movement triggers
     private final static Trigger TRIGGER_RUN_FORWARD = new KeyTrigger(KeyInput.KEY_W);
     private final static Trigger TRIGGER_RUN_BACKWARD = new KeyTrigger(KeyInput.KEY_S);
@@ -108,6 +113,9 @@ public class GameRunningAppState extends AbstractAppState {
     private final static Trigger TRIGGER_CLIMB_UP = new KeyTrigger(KeyInput.KEY_SPACE);
     private final static Trigger TRIGGER_CLIMB_DOWN = new KeyTrigger(KeyInput.KEY_LSHIFT);
     
+    // Restart trigger
+    private final static Trigger TRIGGER_RESTART = new KeyTrigger(KeyInput.KEY_R);
+    
     // Mappings
     private final static String MAPPING_RUN_FORWARD = "Run Forward";
     private final static String MAPPING_RUN_BACKWARD = "Run Backward";
@@ -115,6 +123,7 @@ public class GameRunningAppState extends AbstractAppState {
     private final static String MAPPING_RUN_RIGHT = "Run Right";
     private final static String MAPPING_CLIMB_UP = "Climb Up";
     private final static String MAPPING_CLIMB_DOWN = "Climb Down";
+    private final static String MAPPING_RESTART = "Restart";
     
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
@@ -329,11 +338,14 @@ public class GameRunningAppState extends AbstractAppState {
             inputManager.addMapping(MAPPING_RUN_RIGHT, TRIGGER_RUN_RIGHT);
             inputManager.addMapping(MAPPING_CLIMB_UP, TRIGGER_CLIMB_UP);
             inputManager.addMapping(MAPPING_CLIMB_DOWN, TRIGGER_CLIMB_DOWN);
+            
+            inputManager.addMapping(MAPPING_RESTART, TRIGGER_RESTART);
         }
         
         inputManager.addListener(analogListener, 
                 MAPPING_RUN_FORWARD, MAPPING_RUN_BACKWARD, MAPPING_RUN_LEFT, MAPPING_RUN_RIGHT, 
                 MAPPING_CLIMB_UP, MAPPING_CLIMB_DOWN);  
+        inputManager.addListener(actionListener, MAPPING_RESTART);
         
 //        
 //        inputManager.addMapping("ToggleToSecondState", new KeyTrigger(KeyInput.KEY_T));
@@ -366,6 +378,97 @@ public class GameRunningAppState extends AbstractAppState {
             }
         }
     };
+    
+    
+    private ActionListener actionListener = new ActionListener() {
+        @Override 
+        public void onAction(String name, boolean isPressed, float tpf) {
+            if (MAPPING_RESTART.equals(name) && isPressed) {
+                if (restartInProgress) {
+                    System.out.println("Input ignored during restart.");
+                    return; // Ignore all inputs during the restart process
+                }
+                if (isPressed && MAPPING_RESTART.equals(name)) {
+                    if (gameCompleted) {
+                        // Restart directly if the game is completed
+                        System.out.println("Restarting game without confirmation.");
+                        restartGame();
+                    } else if (!awaitingRestartConfirmation) {
+                        awaitingRestartConfirmation = true;
+                        showRestartConfirmation(); // Show confirmation message
+                        registerConfirmationInputs(); // Register Y and N inputs
+                    }
+                }
+            }
+        }
+    };
+    
+    private ActionListener confirmationListener = new ActionListener() {
+        @Override
+        public void onAction(String name, boolean isPressed, float tpf) {
+            if (isPressed) {
+                if ("ConfirmRestart".equals(name)) {
+                    System.out.println("Restart confirmed.");
+                    awaitingRestartConfirmation = false;
+                    unregisterConfirmationInputs(); // Remove Y and N listeners
+                    restartGame(); // Restart the game
+                } else if ("CancelRestart".equals(name)) {
+                    System.out.println("Restart canceled.");
+                    awaitingRestartConfirmation = false;
+                    unregisterConfirmationInputs(); // Remove Y and N listeners
+                }
+            }
+        }
+    };
+
+    private void registerConfirmationInputs() {
+        if (!inputManager.hasMapping("ConfirmRestart")) {
+            inputManager.addMapping("ConfirmRestart", new KeyTrigger(KeyInput.KEY_Y));
+        }
+        if (!inputManager.hasMapping("CancelRestart")) {
+            inputManager.addMapping("CancelRestart", new KeyTrigger(KeyInput.KEY_N));
+        }
+        inputManager.addListener(confirmationListener, "ConfirmRestart", "CancelRestart");
+    }
+
+    private void unregisterConfirmationInputs() {
+        if (inputManager.hasMapping("ConfirmRestart")) {
+            inputManager.deleteMapping("ConfirmRestart");
+        }
+        if (inputManager.hasMapping("CancelRestart")) {
+            inputManager.deleteMapping("CancelRestart");
+        }
+        inputManager.removeListener(confirmationListener);
+    }
+
+    private void showRestartConfirmation() {
+        if (gameCompleted) {
+            return; // Do not show confirmation if the game is completed
+        }
+        
+        BitmapText confirmationText = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
+        confirmationText.setSize(30); // Adjust font size
+        confirmationText.setColor(ColorRGBA.Yellow);
+        confirmationText.setText("Are you sure you want to restart? Press Y to confirm or N to cancel.");
+        confirmationText.setLocalTranslation(200, cam.getHeight() / 2, 0); // Adjust position
+        guiNode.attachChild(confirmationText);
+        
+        app.enqueue(() -> {
+            guiNode.attachChild(confirmationText); // Safely attach to guiNode
+            return null;
+        });
+
+        // Automatically remove the text when the confirmation is complete
+        new java.util.Timer().schedule(new java.util.TimerTask() {
+            @Override
+            public void run() {
+                app.enqueue(() -> {
+                    guiNode.detachChild(confirmationText);
+                    return null;
+                });
+            }
+        }, 5000); // Remove the message after 5 seconds
+    }
 
     /**
      * Method to create squirrel model and campus assets (currently as boxes)
@@ -436,6 +539,7 @@ public class GameRunningAppState extends AbstractAppState {
 
         // Add control for squirrel-specific movement
         SquirrelControl squirrelControl = new SquirrelControl(
+        this,
         cam,                  // Camera
         trees,                // List of trees
         acorns,               // List of acorns
@@ -537,8 +641,8 @@ public class GameRunningAppState extends AbstractAppState {
         quadGeom.setShadowMode(ShadowMode.Receive);
         
         // Apply texture scaling
-        quadMat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha); // Optional transparency
-        quadGeom.getMesh().scaleTextureCoordinates(new Vector2f(50, 50)); // Adjust the scaling factor
+        //quadMat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha); // Optional transparency
+        //quadGeom.getMesh().scaleTextureCoordinates(new Vector2f(50, 50)); // Adjust the scaling factor
     }
     
     /**
@@ -637,7 +741,7 @@ public class GameRunningAppState extends AbstractAppState {
     /**
     * Trigger the shockwave effect around the squirrel when the game starts.
     */
-   private void triggerDebrisEffect() {
+    private void triggerDebrisEffect() {
         if (debrisEmitter == null) {
             initDebris();
         }
@@ -654,7 +758,66 @@ public class GameRunningAppState extends AbstractAppState {
         debrisEmitter.setParticlesPerSec(0); // Stop continuous emission
         
         System.out.println("Particle effect emitted.");
-   }
+    }
+   
+    private void restartGame() {
+        System.out.println("Restarting game...");
+        if (restartInProgress) {
+            System.out.println("Restart already in progress. Skipping duplicate restart in restartGame().");
+            return; // Avoid duplicate restarts
+        }
+        restartInProgress = true;
+        gameCompleted = false; // Reset game state
+        awaitingRestartConfirmation = false; // Clear restart confirmation state
+        collectedAcorns = 0; // Reset acorn count
+        acorns.clear(); // Clear existing acorns
+        
+        inputManager.reset(); // Clear all current key states to avoid lingering input
+    
+        app.enqueue(() -> {
+            rootNode.detachAllChildren(); // Detach all children from the root node
+            guiNode.detachAllChildren(); // Detach all GUI elements
+
+            // Recreate GUI and game objects
+            createGUI();
+            startGame();
+            ambientSound.play(); // Restart ambient sound
+            restartInProgress = false;
+            return null;
+        });
+    }
+    
+    private void setGameCompleted(boolean completed) {
+        this.gameCompleted = completed;
+        System.out.println("GameCompleted state updated to: " + completed);
+    }
+    
+    public boolean isGameCompleted() {
+        return gameCompleted;
+    }
+    
+    public void endGame() {
+        app.enqueue(() -> {
+            BitmapText acornCounterText = this.acornCounterText; // Access the GUI element safely
+            if (acornCounterText != null) {
+                acornCounterText.setText("CONGRATULATIONS!!!!\nPress R to Restart");
+                acornCounterText.setSize(cam.getHeight() / 8);
+                acornCounterText.setColor(ColorRGBA.Yellow);
+                float textWidth = acornCounterText.getLineWidth();
+                float textHeight = acornCounterText.getLineHeight();
+                acornCounterText.setLocalTranslation(
+                    (cam.getWidth() - textWidth) / 2,
+                    (cam.getHeight() + textHeight) / 2,
+                    0
+                );
+            }
+            setGameCompleted(true); // Update the game completion state
+            awaitingRestartConfirmation = false;
+            System.out.println("Game marked as completed.");
+            return null;
+        });
+    }
+
 
     @Override
     public void cleanup() {
@@ -663,6 +826,7 @@ public class GameRunningAppState extends AbstractAppState {
             debrisEmitter.getParent().detachChild(debrisEmitter);
         }
         rootNode.detachAllChildren();
+        guiNode.detachAllChildren();
         inputManager.removeListener(analogListener);
     }
 }

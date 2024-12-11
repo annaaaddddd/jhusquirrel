@@ -33,7 +33,8 @@ public class SquirrelControl extends AbstractControl {
     private List<Spatial> acorns;
     private Node rootNode;
     private BitmapText acornCounterText;
-    private static int collectedAcorns = 0;
+    private static int collectedAcorns = 2;
+    private GameRunningAppState gameRunningAppState;
     
     private float sensitivity = 0.2f;
     private InputManager inputManager;
@@ -62,9 +63,10 @@ public class SquirrelControl extends AbstractControl {
     private Vector3f originalCameraPosition = null;
 
 
-    public SquirrelControl(Camera cam, List<Spatial> trees, List<Spatial> acorns, Node rootNode,
+    public SquirrelControl(GameRunningAppState gameRunningAppState, Camera cam, List<Spatial> trees, List<Spatial> acorns, Node rootNode,
                             BitmapText acornCounterText, InputManager inputManager, RigidBodyControl squirrelPhysics, 
                             AssetManager assetManager, AnimComposer animComposer) {
+        this.gameRunningAppState = gameRunningAppState;
         this.cam = cam;
         this.trees = trees;
         this.acorns = acorns;
@@ -86,7 +88,7 @@ protected void controlUpdate(float tpf) {
     Vector3f position = spatial.getWorldTranslation();
 
     // Print the XYZ values in real-time
-    System.out.printf("Squirrel Position - X: %.2f, Y: %.2f, Z: %.2f%n", position.x, position.y, position.z);
+    // System.out.printf("Squirrel Position - X: %.2f, Y: %.2f, Z: %.2f%n", position.x, position.y, position.z);
 
     // Prevent the squirrel from sinking below the ground
     if (position.y < 0) {
@@ -174,14 +176,18 @@ protected void controlUpdate(float tpf) {
     }
 
     private void endGame() {
-        acornCounterText.setText("CONGRATULATIONS!!!!");
-        acornCounterText.setSize(cam.getHeight() / 8);
-        acornCounterText.setColor(ColorRGBA.Yellow);
-        float textWidth = acornCounterText.getLineWidth();
-        float textHeight = acornCounterText.getLineHeight();
-        acornCounterText.setLocalTranslation((cam.getWidth() - textWidth) / 2, (cam.getHeight() + textHeight) / 2, 0);
-    }
+        if (gameRunningAppState == null) {
+            System.err.println("GameRunningAppState reference is null!");
+            return;
+        }
 
+        if (!gameRunningAppState.isGameCompleted()) { // Only call once
+            System.out.println("Trigger endGame.");
+            gameRunningAppState.endGame();
+        } else {
+            System.out.println("Game already marked as completed. Skipping duplicate call.");
+        }
+    }
 
     private void updateAcornCounter(int count) {
         if (acornCounterText != null) {
@@ -411,12 +417,7 @@ protected void controlUpdate(float tpf) {
             int randomIndex = (int) (Math.random() * idleAnimationNumber);
             String idleAnimation = "Idle.00" + randomIndex;
 
-            // Check if an idle animation is already playing
-            String currentAnimation = animComposer.getCurrentAction() != null
-                ? animComposer.getCurrentAction().toString() // Get the current animation name
-                : "";
-
-            if (!currentAnimation.startsWith("Idle.")) {
+            if (animComposer.getCurrentAction() == null) {
                 playAnimation(idleAnimation);
                 // System.out.println("Playing idle animation: " + idleAnimation);
             }
