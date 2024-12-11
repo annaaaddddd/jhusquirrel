@@ -77,7 +77,7 @@ public class GameRunningAppState extends AbstractAppState {
     private boolean playAnim = true;
     
     private List<Spatial> acorns = new ArrayList<>(); // List to store acorn geometries
-    private int collectedAcorns = 1; // Counter for collected acorns
+    private int collectedAcorns = 0; // Counter for collected acorns
     private BitmapText acornCounterText; // GUI element to display the counter
 
     private Picture settingsIcon;
@@ -284,7 +284,7 @@ public class GameRunningAppState extends AbstractAppState {
         addMapping();
         attachCenterMark();   
         //generateRandomCubes(8);
-        generateRandomAcorns(8);
+        generateRandomAcorns(2);
     }
     
     private void createGUI() {
