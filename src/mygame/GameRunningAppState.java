@@ -75,12 +75,15 @@ public class GameRunningAppState extends AbstractAppState {
     private boolean playAnim = true;
     
     private List<Spatial> acorns = new ArrayList<>(); // List to store acorn geometries
-    private int collectedAcorns = 0; // Counter for collected acorns
-    private BitmapText acornCounterText; // GUI element to display the counter
-
+    
+    // GUI element
+    private BitmapText acornCounterText; 
     private Picture settingsIcon;
     private Picture saveIcon;
     private BitmapText restartMessage;
+    private float timeRemaining = 10.0f; // 60 seconds countdown with 5 s buffer time
+    private BitmapText timerText;       // GUI element to display the timer
+    private boolean isTimeUp = false;   // Flag to track if time is up
     
     private AudioNode ambientSound;
     private AudioNode bellSound;
@@ -296,6 +299,15 @@ public class GameRunningAppState extends AbstractAppState {
         restartMessage.setText("Press R to Restart");
         restartMessage.setLocalTranslation(20, cam.getHeight() - 200, 0); // Position on the screen
         guiNode.attachChild(restartMessage);
+        
+        // Timer text
+        timerText = new BitmapText(font, false);
+        timerText.setSize(font.getCharSet().getRenderedSize() * 3);
+        timerText.setColor(ColorRGBA.White);
+        timerText.setText("Time Remaining: 60"); // Initial text
+        timerText.setLocalTranslation(cam.getWidth()/2, cam.getHeight() - 50, 0); // Position on the screen
+        guiNode.attachChild(timerText);
+
     }
 
     
@@ -388,6 +400,10 @@ public class GameRunningAppState extends AbstractAppState {
         
         // Stop all input handling
         clearInputMappings();
+        if (!inputManager.hasMapping(MAPPING_RESTART)) {
+            inputManager.addMapping(MAPPING_RESTART, TRIGGER_RESTART);
+            inputManager.addListener(actionListener, MAPPING_RESTART);
+        }
 
         // Pause physics simulation
         bulletAppState.setEnabled(false);
@@ -396,18 +412,20 @@ public class GameRunningAppState extends AbstractAppState {
         if (composer != null) {
             composer.setEnabled(false);
         }
-
-        // Display freeze message
-        BitmapText freezeMessage = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
-        freezeMessage.setSize(80); // Adjust font size
-        freezeMessage.setColor(ColorRGBA.Black);
-        freezeMessage.setText("Game Paused");
-        freezeMessage.setLocalTranslation(
-            (cam.getWidth() - freezeMessage.getLineWidth()) / 2,
-            (cam.getHeight() / 2 + 50 ),
-            0
-        );
-        guiNode.attachChild(freezeMessage);
+        
+        if (!isTimeUp){
+            // Display freeze message
+            BitmapText freezeMessage = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
+            freezeMessage.setSize(100); // Adjust font size
+            freezeMessage.setColor(ColorRGBA.Black);
+            freezeMessage.setText("Game Paused");
+            freezeMessage.setLocalTranslation(
+                (cam.getWidth() - freezeMessage.getLineWidth()) / 2,
+                (cam.getHeight() / 2 + 50 ),
+                0
+            );
+            guiNode.attachChild(freezeMessage);
+        }
 
         isFrozen = true; // Mark the game as frozen
     }
@@ -818,6 +836,16 @@ public class GameRunningAppState extends AbstractAppState {
     @Override
     public void update(float tpf) {
         super.update(tpf);
+        // Timer countdown logic
+        if (!isTimeUp) {
+            timeRemaining -= tpf; // Decrement timer
+            if (timeRemaining <= 0) {
+                timeRemaining = 0;
+                isTimeUp = true; // Mark as time-up
+                handleTimeUp();  // Handle the timeout logic
+            }
+            updateTimerDisplay(); // Update the timer display
+        }
         
         debrisTimer += tpf;
         // Trigger debris effect after 2 seconds
@@ -841,7 +869,34 @@ public class GameRunningAppState extends AbstractAppState {
         float volume = Math.max(0, 1 - (distance / maxDistance));
         bellSound.setVolume(volume);
     }
-
+    
+    private void updateTimerDisplay() {
+        int seconds = (int) Math.ceil(timeRemaining);
+        timerText.setText("Time Remaining: " + seconds);
+    }
+    
+    private void handleTimeUp() {
+        System.out.println("Time is up! Game over.");
+        freezeScreen();
+        app.enqueue(() -> {
+            BitmapText timeUpMessage = new BitmapText(assetManager.loadFont("Interface/Fonts/Default.fnt"), false);
+            timeUpMessage.setSize(cam.getHeight() / 10);
+            timeUpMessage.setColor(ColorRGBA.Red);
+            timeUpMessage.setText("TIME UP!\nPress R to Restart");
+            float textWidth = timeUpMessage.getLineWidth();
+            float textHeight = timeUpMessage.getLineHeight();
+            timeUpMessage.setLocalTranslation(
+                (cam.getWidth() - textWidth) / 2 - 200,
+                (cam.getHeight() + textHeight) / 2 + 50,
+                0
+            );
+            guiNode.attachChild(timeUpMessage);
+            setGameCompleted(true); // Mark the game as completed
+            awaitingRestartConfirmation = false;
+            return null;
+        });
+    }
+    
     private void activateFog(){
         // activate fog
         fogFilter = new FogFilter();
