@@ -206,7 +206,7 @@ A building (originally Stieff Silver Building) is added to mimic campus environm
 <img width="1512" alt="Screenshot 2024-12-11 at 3 17 56 PM" src="https://github.com/user-attachments/assets/34009cbd-4ac7-467b-a3f3-49b0e7547378" />
 
 ## Demo
-The file is too big so we uploaded it to drive: https://drive.google.com/file/d/1rb97wYGjivudkPmiCa7ondFjtoTWuktU/view?usp=sharing 
+The file is too big so we uploaded it to drive: https://drive.google.com/file/d/1OLgoCAgGwxRtgrIhffHtK-E0_WtzgrSk/view?usp=drivesdk
 
 ## Member Contributions
 - Serena: Implemented initial scene graph, textures,  ambient and positional sound components with dynamic responses to player actions and environmental cues. Updated the README.
